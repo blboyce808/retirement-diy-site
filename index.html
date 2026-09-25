@@ -393,7 +393,7 @@ const N_PATHS = 2000;
    Built from Robert Shiller's monthly S&P composite, dividend, CPI and long-rate series (1871 to 2022). */
 const HIST = [[1871,0.1532,0.0504,0.0152],[1872,0.1094,0.0384,0.0229],[1873,-0.0262,0.0635,-0.044],[1874,0.0451,0.083,-0.0695],[1875,0.0515,0.0854,-0.0573],[1876,-0.1368,0.0561,0.0083],[1877,-0.0168,0.0526,-0.1563],[1878,0.1583,0.0522,-0.1029],[1879,0.4807,0.0571,0.2065],[1880,0.2568,0.0643,-0.0571],[1881,0.0036,0.0431,0.0807],[1882,0.0355,0.0354,-0.0187],[1883,-0.0524,0.0371,-0.0761],[1884,-0.1199,0.0438,-0.1029],[1885,0.2906,0.0467,-0.035],[1886,0.1171,0.0223,0.0],[1887,-0.006,0.0239,0.0476],[1888,0.0319,0.0535,-0.0454],[1889,0.0696,0.0368,-0.0476],[1890,-0.0595,0.0191,0.025],[1891,0.1839,0.0377,-0.0603],[1892,0.06,0.0247,0.0778],[1893,-0.1862,0.0413,-0.1329],[1894,0.0367,0.0553,-0.0409],[1895,0.0516,0.024,0.0137],[1896,0.0315,0.0513,-0.0285],[1897,0.1991,0.0378,0.0294],[1898,0.285,0.0529,0.015],[1899,0.0371,0.0271,0.1686],[1900,0.2014,0.0354,-0.0241],[1901,0.1925,0.0248,0.0246],[1902,0.0819,0.0226,0.0962],[1903,-0.1701,0.0254,-0.0439],[1904,0.3111,0.0279,0.0229],[1905,0.2089,0.0386,0.0],[1906,0.0059,0.0162,0.0449],[1907,-0.2394,0.0217,-0.0215],[1908,0.3837,0.047,0.0323],[1909,0.1591,0.0264,0.1074],[1910,-0.0351,0.0339,-0.0677],[1911,0.0345,0.0376,-0.0108],[1912,0.0719,0.008,0.0734],[1913,-0.0484,0.0659,0.0204],[1914,-0.0529,0.0357,0.01],[1915,0.3042,0.0565,0.0297],[1916,0.0794,0.0273,0.125],[1917,-0.1807,0.0177,0.1966],[1918,0.1755,0.0508,0.1786],[1919,0.1947,0.0115,0.1697],[1920,-0.136,0.0412,-0.0155],[1921,0.0946,0.1088,-0.1105],[1922,0.2859,0.0386,-0.0059],[1923,0.0507,0.0658,0.0298],[1924,0.2594,0.0556,0.0],[1925,0.2502,0.0522,0.0347],[1926,0.1106,0.0629,-0.0223],[1927,0.3629,0.0342,-0.0114],[1928,0.4645,0.0129,-0.0116],[1929,-0.0899,0.0598,0.0],[1930,-0.219,0.0291,-0.0702],[1931,-0.4247,0.0077,-0.1006],[1932,-0.0679,0.0652,-0.0979],[1933,0.5525,0.0478,0.0233],[1934,-0.0792,0.0571,0.0303],[1935,0.5344,0.039,0.0147],[1936,0.3201,0.0241,0.0217],[1937,-0.3125,0.0363,0.0071],[1938,0.1668,0.0416,-0.0141],[1939,0.0279,0.0357,-0.0071],[1940,-0.0894,0.0434,0.0144],[1941,-0.088,-0.0212,0.1135],[1942,0.2027,0.0238,0.0764],[1943,0.2335,0.0239,0.0296],[1944,0.1916,0.0336,0.023],[1945,0.3842,0.0383,0.0225],[1946,-0.1179,0.0171,0.1813],[1947,0.0254,0.0073,0.1023],[1948,0.0942,0.0349,0.0127],[1949,0.1659,0.0223,-0.0208],[1950,0.3315,0.0033,0.0809],[1951,0.2116,0.017,0.0433],[1952,0.1415,0.015,0.0038],[1953,0.0268,0.0562,0.0113],[1954,0.4562,0.0145,-0.0074],[1955,0.2848,0.0034,0.0037],[1956,0.0691,-0.0137,0.0299],[1957,-0.0564,0.0633,0.0362],[1958,0.3951,-0.0382,0.014],[1959,0.0756,-0.0102,0.0103],[1960,0.0625,0.1131,0.0171],[1961,0.1894,0.0206,0.0067],[1962,-0.0281,0.0595,0.0133],[1963,0.2088,0.0132,0.0164],[1964,0.1578,0.0402,0.0097],[1965,0.114,0.0115,0.0192],[1966,-0.0647,0.0483,0.0346],[1967,0.1598,-0.0202,0.0365],[1968,0.1048,0.0207,0.044],[1969,-0.0839,-0.0499,0.0618],[1970,0.0703,0.1822,0.0529],[1971,0.1381,0.0822,0.0327],[1972,0.176,0.0255,0.0365],[1973,-0.1609,0.0301,0.0939],[1974,-0.2085,0.0374,0.118],[1975,0.3857,0.0598,0.0672],[1976,0.111,0.1116,0.0522],[1977,-0.0884,0.0252,0.0684],[1978,0.1593,0.0115,0.0928],[1979,0.1661,-0.0039,0.1391],[1980,0.2529,0.0157,0.1183],[1981,-0.0698,0.0279,0.0839],[1982,0.2881,0.3795,0.0371],[1983,0.2014,0.0393,0.0419],[1984,0.0752,0.1325,0.0353],[1985,0.2585,0.2441,0.0389],[1986,0.3094,0.2289,0.0146],[1987,-0.0206,-0.0258,0.0405],[1988,0.1763,0.0616,0.0467],[1989,0.2277,0.1454,0.052],[1990,-0.0083,0.0896,0.0565],[1991,0.3157,0.1499,0.026],[1992,0.0757,0.0988,0.0326],[1993,0.1155,0.1244,0.0252],[1994,0.0108,-0.0705,0.028],[1995,0.3495,0.2249,0.0273],[1996,0.2705,-0.0052,0.0304],[1997,0.2771,0.138,0.0157],[1998,0.3128,0.1144,0.0167],[1999,0.1548,-0.081,0.0274],[2000,-0.0515,0.1725,0.0373],[2001,-0.1345,0.0601,0.0114],[2002,-0.2004,0.1238,0.026],[2003,0.2826,0.0331,0.0193],[2004,0.0596,0.0363,0.0297],[2005,0.1001,0.0276,0.0399],[2006,0.1322,0.0198,0.0208],[2007,-0.0134,0.1243,0.0428],[2008,-0.3515,0.1346,0.0003],[2009,0.3273,-0.0659,0.0263],[2010,0.1613,0.0633,0.0163],[2011,0.0331,0.15,0.0292],[2012,0.1603,0.0246,0.016],[2013,0.2535,-0.0554,0.0158],[2014,0.1335,0.109,-0.0009],[2015,-0.0334,0.0017,0.0137],[2016,0.2091,-0.0063,0.025],[2017,0.2471,0.0124,0.0207],[2018,-0.047,0.0155,0.0155],[2019,0.2788,0.1055,0.0249],[2020,0.1753,0.0756,0.014],[2021,0.2211,-0.0453,0.0748],[2022,-0.1201,-0.1169,0.0641]];
 const HIST_FIRST = HIST[0][0], HIST_LAST = HIST[HIST.length-1][0];
-const BUILD = 'c1d286e';            // deploy.sh stamps the published copy with the source commit
+const BUILD = 'b05977b';            // deploy.sh stamps the published copy with the source commit
 const PAID_PREVIEW = true;   // paid features are open while the license system is built
 let engine = 'mc';           // 'mc' Monte Carlo, 'hist' every historical start year
 let selYear = null;          // historical start year picked on the history chart
@@ -407,6 +407,7 @@ const SECTIONS = [
   {id:'uncert',   lvl:2, title:'Sources of uncertainty', sub:'Level 2'},
   {id:'incspend', lvl:2, title:'Income and spending',    sub:'Level 2'},
   {id:'accounts', lvl:3, title:'Your accounts',          sub:'Level 3'},
+  {id:'income',   lvl:3, title:'Other income',           sub:'Level 3'},
   {id:'events',   lvl:4, title:'Life events',            sub:'Level 4'},
   {id:'tax5',     lvl:5, title:'Tax strategy',           sub:'Level 5'},
 ];
@@ -453,7 +454,8 @@ const INPUTS = [
 const DEF = {}; INPUTS.forEach(d=>DEF[d.id]=d.def);
 
 DEF.events = [];
-let S = Object.assign({}, DEF, {events:[]});
+DEF.income = [];
+let S = Object.assign({}, DEF, {events:[], income:[]});
 let eventsSeeded = false;
 let level = 1, dollars = 'real', seed = 20260924, splitDone = false;
 /* Scale of the Total savings chart. Auto by default; either end can be pinned so that two
@@ -487,6 +489,7 @@ function applySnapshot(o){
     else { const n=Number(v); if(isFinite(n)) S[d.id]=Math.min(d.max, Math.max(d.min, n)); }
   });
   if(o.S && Array.isArray(o.S.events)) S.events = o.S.events.slice(0,30).map(cleanEvent);
+  if(o.S && Array.isArray(o.S.income)) S.income = o.S.income.slice(0,12).map(cleanIncome);
   if([1,2,3,4,5].includes(o.level)) level = o.level;
   if(typeof o.eventsSeeded==='boolean') eventsSeeded = o.eventsSeeded;
   if(['mc','hist'].includes(o.engine)) engine = o.engine;
@@ -679,6 +682,7 @@ function simulate(s, lvl, seedVal, mode){
         const n65 = a >= 65 ? L.persons : 0;
         const ssNow  = ssAmt>0 && a>=ssAge ? ssAmt*f : 0;
         const penNow = penAmt>0 && a>=penAge ? penAmt*penF : 0;
+        const oth = lvl>=3 ? incomeAt(s.income, a, f) : {taxed:0, free:0};
         // The distribution is compulsory, so it behaves like income that arrives whether or not it
         // is wanted: it is taxed as ordinary income, it covers spending first, and anything left
         // over stays invested rather than vanishing.
@@ -686,9 +690,9 @@ function simulate(s, lvl, seedVal, mode){
         if(rmdOn && trad>0 && a>=rmdAge){ const d=rmdDivisor(a); if(d>0) { rmd=Math.min(trad, trad/d); trad-=rmd; } }
         // before retirement, withdrawals stack on top of a working income assumed equal to the income target
         const wage = retired ? 0 : s.spend*f;
-        const base = incomeTax(wage + penNow + rmd, 0, ssNow, L, f, n65, yr, st);
+        const base = incomeTax(wage + penNow + rmd + oth.taxed, 0, ssNow, L, f, n65, yr, st);
         const baseW = retired ? 0 : incomeTax(wage, 0, 0, L, f, n65, yr, st);
-        const guarNet = ssNow + penNow + rmd - (base - baseW);
+        const guarNet = ssNow + penNow + rmd + oth.taxed + oth.free - (base - baseW);
         let life = retired ? netSpend*f*(a>75 ? Math.pow(1-decl, a-75) : 1) : 0;
         if(retired && guard){
           // guardrails: if this year's withdrawal rate drifts 20% above or below where it started, cut or raise spending by 10%
@@ -744,7 +748,7 @@ function simulate(s, lvl, seedVal, mode){
         // retirement accounts, which is what makes the move worth doing; if there is not enough to
         // pay it, the conversion shrinks to what can be paid for.
         if(!dry && convRate > 0 && retired && a <= convEndAge && trad > 1){
-          const ordNow = wage + penNow + rmd + tradDrawn;
+          const ordNow = wage + penNow + rmd + oth.taxed + tradDrawn;
           const taxNow = incomeTax(ordNow, gainsDrawn, ssNow, L, f, n65, yr, st);
           const room = bracketTop(L, convRate, f) - taxableIncome(ordNow, gainsDrawn, ssNow, L, f, n65, yr);
           if(room > 0){
@@ -873,6 +877,7 @@ function buildInputs(){
   SECTIONS.forEach(sc=>{
     if(sc.lvl>level) return;
     if(sc.id==='events'){ inputsEl.appendChild(buildEvents(sc, first)); return; }
+    if(sc.id==='income'){ inputsEl.appendChild(buildIncome(sc, first)); return; }
     const sec=makeGroup(sc, first);
     if(sc.id==='basics') sec.body.insertAdjacentHTML('beforeend',PERSONA_HTML_T());
     if(sc.id==='accounts') sec.body.insertAdjacentHTML('beforeend','<p class="note">Spending draws from cash first, then brokerage, then traditional, then Roth.</p>');
@@ -942,7 +947,7 @@ function buildInputs(){
   document.getElementById('expNo').onclick=()=>{ document.getElementById('expNote').hidden=true; document.getElementById('exportCsv').focus(); };
   const rr=document.getElementById('reroll'); if(rr) rr.onclick=()=>{ seed=(Math.random()*1e9)|0; save(); run(); };
   const bs=document.getElementById('baseSet'); if(bs) bs.onclick=setBaseline;
-  document.getElementById('reset').onclick=()=>{ S=Object.assign({},DEF,{events:[]}); splitDone=false; eventsSeeded=false; if(level>=3) splitSavings(); if(level>=4) seedEvents(); save(); buildInputs(); run(); };
+  document.getElementById('reset').onclick=()=>{ S=Object.assign({},DEF,{events:[],income:[]}); splitDone=false; eventsSeeded=false; if(level>=3) splitSavings(); if(level>=4) seedEvents(); save(); buildInputs(); run(); };
   tools.querySelector('details').addEventListener('toggle',syncCode);
   document.getElementById('copyCode').onclick=()=>{
     const ta=document.getElementById('codeOut'), m=document.getElementById('codeMsg');
@@ -991,6 +996,27 @@ function copyString(text){
 
 /* ===================== LIFE EVENTS (Level 4) ===================== */
 function esc(t){ return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+/* An income stream, from saved state or a scenario code, so every field is untrusted. endAge of 0
+   means it runs for life. */
+function cleanIncome(c){
+  c = c||{};
+  const s = Math.max(30, Math.min(105, Math.round(+c.startAge||65)));
+  const e = (+c.endAge>0) ? Math.max(s, Math.min(105, Math.round(+c.endAge))) : 0;
+  return {name:String(c.name||'').slice(0,40), amt:Math.max(0,Math.min(5e7,+c.amt||0)),
+    startAge:s, endAge:e, cola:c.cola!==false, taxable:c.taxable!==false};
+}
+/* What the streams pay in one year, split by how it is taxed. Amounts that rise with inflation are
+   entered in today's dollars; fixed ones are the amount of the cheque, which never changes. */
+function incomeAt(list, a, f){
+  let taxed = 0, free = 0;
+  if(!Array.isArray(list)) return {taxed, free};
+  for(const c of list){
+    if(a < c.startAge || (c.endAge && a > c.endAge)) continue;
+    const amt = c.cola ? c.amt*f : c.amt;
+    if(c.taxable) taxed += amt; else free += amt;
+  }
+  return {taxed, free};
+}
 function cleanEvent(e){
   e = e||{};
   return {name:String(e.name||'').slice(0,40), type:e.type==='in'?'in':'out',
@@ -1004,6 +1030,52 @@ function seedEvents(){
     {name:'Home down payment', type:'out', amt:80000, year:CUR_YEAR+3, years:1},
     {name:'Inheritance', type:'in', amt:150000, year:CUR_YEAR+15, years:1},
   ];
+}
+function buildIncome(sc, first){
+  const sec=makeGroup(sc, first);
+  sec.body.insertAdjacentHTML('beforeend',`<p class="note">Money arriving regularly that your savings do not produce: rent, an annuity, part-time work, royalties. Leave out dividends and interest from the accounts above, which are already in the returns.</p>
+    <div id="incList"></div>
+    <button type="button" class="btn addev" id="addInc"><span aria-hidden="true">+</span> Add an income stream</button>`);
+  const list=sec.querySelector('#incList');
+  const draw=()=>{
+    list.innerHTML = S.income.length ? '' : '<p class="note">None yet. Add rent, an annuity, consulting work, a trust distribution or anything else paid to you year after year.</p>';
+    S.income.forEach((c,ix)=>{
+      const card=document.createElement('div'); card.className='ev';
+      card.innerHTML=`
+        <div class="evrow"><input class="evname" aria-label="Income name" placeholder="Name this income" value="${esc(c.name)}">${q('inc_name')}
+          <button type="button" class="evdel" aria-label="Remove ${esc(c.name||'this income')}">×</button></div>
+        <div class="evrow"><div class="seg evtype" role="group" aria-label="Taxable or not">
+            <button type="button" data-x="yes" aria-pressed="${c.taxable}">Taxable</button><button type="button" data-x="no" aria-pressed="${!c.taxable}">Tax-free</button></div>${q('inc_taxable')}
+          <span class="num evamt"><span>$</span><input class="incamt" aria-label="Amount per year" inputmode="decimal" value="${Math.round(c.amt).toLocaleString('en-US')}"></span>${q('inc_amt')}</div>
+        <div class="evrow evwhen"><label>From age <input class="incfrom" inputmode="numeric" aria-label="Start age" value="${c.startAge}"></label>
+          <label>to <input class="incto" inputmode="numeric" aria-label="End age, blank for life" value="${c.endAge||''}" placeholder="life"></label>${q('inc_when')}
+          <span class="evage">${c.endAge ? '' : 'for life'}</span></div>
+        <div class="evrow evwhen"><div class="seg evtype" role="group" aria-label="Rises with inflation or fixed">
+            <button type="button" data-c="yes" aria-pressed="${c.cola}">Rises with inflation</button><button type="button" data-c="no" aria-pressed="${!c.cola}">Fixed amount</button></div>${q('inc_cola')}</div>`;
+      const upd=()=>{ changed(); };
+      card.querySelector('.evname').addEventListener('change',e=>{ c.name=e.target.value.slice(0,40); upd(); });
+      card.querySelectorAll('[data-x]').forEach(b=>b.addEventListener('click',()=>{ c.taxable=b.dataset.x==='yes'; draw(); upd(); }));
+      card.querySelectorAll('[data-c]').forEach(b=>b.addEventListener('click',()=>{ c.cola=b.dataset.c==='yes'; draw(); upd(); }));
+      const amt=card.querySelector('.incamt');
+      amt.addEventListener('change',()=>{ let v=parseFloat(amt.value.replace(/[^0-9.]/g,'')); if(!isFinite(v)) v=c.amt; c.amt=Math.max(0,Math.min(5e7,v)); amt.value=Math.round(c.amt).toLocaleString('en-US'); upd(); });
+      const from=card.querySelector('.incfrom');
+      from.addEventListener('change',()=>{ let v=parseInt(from.value,10); if(!isFinite(v)) v=c.startAge; c.startAge=Math.max(30,Math.min(105,v)); if(c.endAge && c.endAge<c.startAge) c.endAge=c.startAge; draw(); upd(); });
+      const to=card.querySelector('.incto');
+      to.addEventListener('change',()=>{ const raw=to.value.trim(); let v=parseInt(raw,10);
+        c.endAge = (!raw || !isFinite(v)) ? 0 : Math.max(c.startAge, Math.min(105, v)); draw(); upd(); });
+      card.querySelectorAll('input').forEach(inp=>inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); inp.blur(); } }));
+      card.querySelector('.evdel').addEventListener('click',()=>{ S.income.splice(ix,1); draw(); upd(); });
+      list.appendChild(card);
+    });
+  };
+  draw();
+  sec.querySelector('#addInc').addEventListener('click',()=>{
+    if(S.income.length>=12) return;
+    S.income.push(cleanIncome({name:'', amt:12000, startAge:Math.max(Math.round(S.retAge), Math.round(S.age))}));
+    draw(); changed();
+    const names=list.querySelectorAll('.evname'); names[names.length-1].focus();
+  });
+  return sec;
 }
 function buildEvents(sc, first){
   const sec=makeGroup(sc, first);
@@ -1182,6 +1254,9 @@ function buildCSV(){
     const v=S[d.id];
     rows.push([d.label, d.type==='select' ? (d.options.find(o=>o[0]===v)||[,v])[1] : v]);
   });
+  if(level>=3) S.income.forEach(c=>rows.push([`Other income: ${c.name||'Unnamed'}`,
+    `$${Math.round(c.amt)} per year from age ${c.startAge}${c.endAge?` to ${c.endAge}`:' for life'}, `+
+    `${c.cola?'rises with inflation':'fixed amount'}, ${c.taxable?'taxable':'tax-free'}`]));
   if(level>=4) S.events.forEach(ev=>rows.push([`Life event: ${ev.name||'Unnamed'}`, `${ev.type==='in'?'Money in':'Money out'} $${Math.round(ev.amt)} per year, ${ev.year} for ${ev.years} yr`]));
   if(level<2) rows.push(['Plan to age (fixed at Level 1)', 95], ['Average inflation (fixed at Level 1)', '2.5%'], ['State tax rate (fixed at Level 1)', '4%']);
   rows.push(['Tax filing status', S.filing==='single'?'Single':'Married, filing jointly'], ['Federal tax', `${TAXLAW.year} brackets, indexed to each future's inflation`]);
@@ -2120,6 +2195,21 @@ const HELP = {
   legacy:{t:'Leave behind at least', b:['An amount you want left at your plan age, in today\'s dollars. It does not change how much you spend.','It feeds the legacy statistic, which counts the futures where money never ran short and the ending total meets this goal.']},
 
   // Level 4
+  inc_name:{t:'Income name', b:['A label for your own reference, such as "Rental" or "Consulting". It does not affect the math.']},
+  inc_amt:{t:'Amount per year', b:[
+    'What arrives in a year, after the costs of producing it. For a rental that means rent minus mortgage, tax, insurance, maintenance and an allowance for empty months, not the gross rent.',
+    'Enter it in today’s dollars if it rises with inflation, or as the amount of the cheque if it is fixed.',
+    'Leave out dividends and interest produced by the accounts you entered above. Those are already inside the assumed returns, and entering them here would count the same money twice.']},
+  inc_taxable:{t:'Taxable or tax-free', b:[
+    'Taxable income is added to your ordinary income for the year and taxed through the federal brackets and your state rate, like a pension. Rent, annuity payments, consulting work, royalties and most trust distributions are taxable.',
+    'Tax-free covers the rarer cases, such as certain disability payments or the return-of-capital portion of some settlements. If you are unsure, taxable is the cautious choice.',
+    'Earned income before your full retirement age can temporarily reduce Social Security, and work income owes payroll tax. Neither is modelled here, so part-time work is treated a little kindly.']},
+  inc_when:{t:'From age, to age', b:[
+    'The ages this income starts and stops. Leave the second box empty for income that continues for life, such as an annuity.',
+    'The value of the underlying asset is not counted anywhere: a rental property produces income here, but the property itself is not part of your savings. If you expect to sell it, add the proceeds as a Level 4 life event in the year of the sale.']},
+  inc_cola:{t:'Rises with inflation, or fixed', b:[
+    'Rent and consulting fees tend to keep pace with prices over time, so they hold their buying power. Choose "Rises with inflation" for those and enter the amount in today’s dollars.',
+    'A fixed annuity pays the same number of dollars for life, so its buying power falls every year. Choose "Fixed amount" for those and enter the amount of the cheque.']},
   ev_name:{t:'Event name', b:['A label for your own reference, such as "Kitchen remodel" or "Aunt\'s estate". It does not affect the math.']},
   ev_type:{t:'Money in or money out', b:['Money in adds to your savings: an inheritance, the sale of a home or business, a bonus, a legal settlement.','Money out is a cost paid from savings: a home down payment, college, a wedding, a new car, a gift to family.']},
   ev_amt:{t:'Amount', b:['Enter it in today\'s dollars. The model grows it with each future\'s inflation up to the year it happens, so a $50,000 cost in 15 years stays a $50,000-sized cost in real terms.','Enter the after-tax amount. Money in is invested in your brokerage account, with all of it counted as cost basis. Money out is paid from cash, then brokerage, then traditional, then Roth, with tax on those withdrawals added automatically.','Early-withdrawal penalties on retirement accounts before age 59½ are not modeled.']},
