@@ -1,0 +1,33 @@
+Copyright (c) 2026 Brad Boyce. All rights reserved.
+
+Retirement.diy is source-available, not open source. The source is published so that anyone
+can verify what it does with their data: every calculation runs in your browser and nothing
+you type is ever sent anywhere. Reading it is encouraged. Reusing it is not.
+
+You may:
+  - read, study and audit this source code;
+  - run it, including keeping a copy for your own personal use;
+  - quote short excerpts, with attribution, for review or discussion.
+
+You may not, without prior written permission from the copyright holder:
+  - redistribute this software or any substantial part of it;
+  - host or publish a copy of it, modified or unmodified;
+  - create or distribute derivative works;
+  - use it, or any part of it, for any commercial purpose;
+  - remove or alter this notice, or the copyright notice in index.html.
+
+Third-party components keep their own licences:
+  - Chart.js, Copyright (c) Chart.js contributors, MIT licensed.
+  - Market history derived from Robert Shiller's public dataset,
+    http://www.econ.yale.edu/~shiller/data.htm
+
+NO WARRANTY. This software is provided "as is", without warranty of any kind, express or
+implied, including but not limited to the warranties of merchantability, fitness for a
+particular purpose and non-infringement. In no event shall the copyright holder be liable for
+any claim, damages or other liability arising from, out of or in connection with this
+software or its use.
+
+NOT FINANCIAL ADVICE. Retirement.diy produces estimates for planning and education. It is not
+investment, tax or legal advice, and it is not a recommendation to buy, sell or hold any
+security. Figures depend entirely on assumptions that may not hold. Consult a qualified
+professional before acting on anything it shows you.

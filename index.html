@@ -1,0 +1,2142 @@
+<!DOCTYPE html>
+<!--
+  Retirement.diy - a Monte Carlo retirement calculator that runs entirely in your browser.
+  Copyright (c) 2026 Brad Boyce. All rights reserved.
+
+  Source-available, not open source. This file is readable on purpose: it is how you can check
+  that nothing you type ever leaves your device. You may read, run and audit it. You may not
+  redistribute it, host a copy, or build a derivative work from it without written permission.
+  Full terms: https://github.com/blboyce808/retirement-diy-site/blob/main/LICENSE
+
+  Chart.js is Copyright (c) Chart.js contributors, MIT licensed. Market history is derived from
+  Robert Shiller's public dataset, http://www.econ.yale.edu/~shiller/data.htm
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Retirement.diy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#EDF0EA; --surface:#F8F9F5; --ink:#1C2A33; --muted:#5B6A70; --line:#D3D9D0;
+  --pine:#2E6A5C; --steel:#3C6788; --ochre:#9C6C18; --plum:#7B4868; --slate:#5F7077; --risk:#A8432A;
+  --focus:#3C6788;
+  --display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body:"Public Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#10181D; --surface:#172228; --ink:#E3E8E3; --muted:#93A3A6; --line:#2A3A41;
+    --pine:#6BB39F; --steel:#7DA9CB; --ochre:#D6A652; --plum:#C18AAE; --slate:#9AABB1; --risk:#E07A5C; --focus:#7DA9CB;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10181D; --surface:#172228; --ink:#E3E8E3; --muted:#93A3A6; --line:#2A3A41;
+  --pine:#6BB39F; --steel:#7DA9CB; --ochre:#D6A652; --plum:#C18AAE; --slate:#9AABB1; --risk:#E07A5C; --focus:#7DA9CB;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+.wrap{max-width:1240px;margin:0 auto;padding:20px 18px 48px}
+header.top{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 24px;padding:6px 0 18px}
+.brand{font-family:var(--display);font-weight:700;font-size:26px;letter-spacing:-.01em;margin:0}
+.brand small{font-weight:500;color:var(--muted);font-size:.62em;margin-left:1px}
+.tagline{font-family:var(--display);font-weight:500;font-size:16px;color:var(--pine);margin:0}
+.cmplink{background:none;border:0;padding:4px 0 0;font:inherit;font-size:13.5px;font-weight:600;color:var(--pine);cursor:pointer;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.cmplink:hover{text-decoration-thickness:2px}
+dialog.xdlg.cmpdlg{width:min(780px,calc(100vw - 24px))}
+.cmpintro{margin:8px 0 12px;font-size:14px;color:var(--muted)}
+table.cmp{width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.35}
+table.cmp th,table.cmp td{text-align:left;vertical-align:top;padding:8px 8px;border-top:1px solid var(--line)}
+table.cmp thead th{border-top:0;font-size:12px;color:var(--muted);font-weight:600}
+table.cmp tbody th{font-weight:600;width:24%}
+table.cmp td.us,table.cmp thead th.us{background:rgba(47,110,90,.09);color:var(--ink);font-weight:600}
+table.cmp thead th.us{color:var(--pine)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.cmpnote{margin:10px 0 0;font-size:12px;color:var(--muted)}
+@media (max-width:620px){
+  table.cmp thead{display:none}
+  table.cmp,table.cmp tbody,table.cmp tr,table.cmp th,table.cmp td{display:block;width:auto}
+  table.cmp tr{border-top:1px solid var(--line);padding:8px 0}
+  table.cmp tbody th{border:0;padding:0 0 4px;width:auto}
+  table.cmp td{border:0;padding:3px 8px;display:grid;grid-template-columns:44% 1fr;gap:8px}
+  table.cmp td::before{content:attr(data-l);color:var(--muted);font-weight:500;font-size:12px}
+  table.cmp td.us{border-radius:6px}
+}
+.privacy{margin:0 0 22px;color:var(--muted);font-size:13.5px;max-width:64ch;display:flex;gap:8px;align-items:flex-start}
+.privacy svg{flex:none;margin-top:3px}
+
+/* depth rail */
+.rail{display:flex;gap:0;overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface);scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.step{flex:1 0 128px;border:0;background:none;text-align:left;padding:10px 14px 11px;cursor:pointer;border-right:1px solid var(--line);position:relative}
+.step:last-child{border-right:0}
+.step .n{display:block;font-family:var(--display);font-weight:700;font-size:13px;color:var(--muted)}
+.step .t{display:block;font-weight:600;font-size:14px}
+.step .d{display:block;font-size:12px;color:var(--muted);line-height:1.35;margin-top:2px}
+.step[aria-pressed="true"]{background:var(--pine);color:var(--surface)}
+.step[aria-pressed="true"] .n,.step[aria-pressed="true"] .d{color:inherit;opacity:.85}
+.step.done .n{color:var(--pine)}
+.step.paid{color:var(--muted)}
+.step.paid .t::after{content:"";display:inline-block;width:9px;height:11px;margin-left:6px;vertical-align:-1px;
+  background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 11'%3E%3Cpath d='M2 5V3.5a2.5 2.5 0 015 0V5h1v6H1V5zm1 0h3V3.5a1.5 1.5 0 00-3 0z'/%3E%3C/svg%3E") no-repeat center/contain;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 11'%3E%3Cpath d='M2 5V3.5a2.5 2.5 0 015 0V5h1v6H1V5zm1 0h3V3.5a1.5 1.5 0 00-3 0z'/%3E%3C/svg%3E") no-repeat center/contain}
+.paidinfo{margin:10px 0 0;padding:14px 16px;border:1px dashed var(--line);border-radius:10px;background:var(--surface);font-size:14px}
+.paidinfo[hidden]{display:none}
+.paidinfo h3{margin:0 0 4px;font-family:var(--display);font-size:17px}
+.paidinfo p{margin:0 0 10px;max-width:70ch;color:var(--muted)}
+.keyrow{display:flex;gap:8px;flex-wrap:wrap}
+.keyrow input{flex:1 1 200px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+
+/* layout */
+.main{display:grid;grid-template-columns:340px minmax(0,1fr);gap:22px;margin-top:22px;align-items:start}
+@media (max-width:900px){.main{grid-template-columns:1fr}}
+aside.inputs{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 16px 16px;position:sticky;top:calc(12px + env(safe-area-inset-top,0px));max-height:calc(100vh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow:auto}
+@media (max-width:900px){aside.inputs{position:static;max-height:none}}
+.grp{padding:12px 0 4px;border-bottom:1px solid var(--line)}
+.grp:last-of-type{border-bottom:0}
+.grp h2{font-family:var(--display);font-weight:700;font-size:15px;margin:0 0 6px;display:flex;justify-content:space-between;align-items:baseline}
+.grp h2 span{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted)}
+.field{margin:0 0 12px}
+.field .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.field label{font-size:14px;font-weight:500}
+.field .hint{display:block;font-size:12px;color:var(--muted);line-height:1.3}
+.num{display:flex;align-items:center;border:1px solid var(--line);border-radius:7px;background:var(--bg);padding:0 8px;min-width:0;width:118px;flex:none}
+.num span{color:var(--muted);font-size:13px}
+.num input{border:0;background:none;width:100%;padding:5px 0;text-align:right;font-variant-numeric:tabular-nums;font-weight:600;font-size:14px;outline:none}
+.num:focus-within{outline:2px solid var(--focus);outline-offset:1px}
+select.sel{border:1px solid var(--line);border-radius:7px;background:var(--bg);padding:5px 8px;font-size:14px;max-width:160px}
+input[type=range]{width:100%;margin:8px 0 0;accent-color:var(--pine);height:22px}
+.note{font-size:12.5px;color:var(--muted);margin:4px 0 10px;line-height:1.4}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.btn{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:7px 12px;font-size:13.5px;font-weight:500;cursor:pointer}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--pine);border-color:var(--pine);color:var(--surface)}
+details.share{margin-top:12px;font-size:13.5px}
+details.share summary{cursor:pointer;font-weight:600}
+details.share textarea{width:100%;min-height:62px;margin:8px 0 6px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);font-size:12px;word-break:break-all;resize:vertical}
+.msg{font-size:12.5px;color:var(--muted);min-height:1.2em}
+
+/* results */
+.verdict{padding:4px 0 16px}
+.verdict .big{font-family:var(--display);font-weight:700;font-size:clamp(24px,3.4vw,36px);line-height:1.12;letter-spacing:-.015em;margin:0;max-width:24ch}
+.verdict .state{display:inline-block;margin-top:10px;font-weight:600;font-size:13.5px;padding:3px 10px;border-radius:99px;border:1.5px solid currentColor}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));align-items:center;gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:18px}
+.stat{padding:10px 14px 11px 0}
+.stat + .stat{padding-left:14px;border-left:1px solid var(--line)}
+.stat .l{font-size:12.5px;color:var(--muted)}
+.stat .v{font-family:var(--display);font-weight:700;font-size:21px;font-variant-numeric:tabular-nums}
+.stat .s{font-size:12px;color:var(--muted);line-height:1.35}
+:root{--heroA:#34B38B;--heroB:#72D6B1;--heroInk:#0C2A22}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--heroA:#3E9E82;--heroB:#86D6B9;--heroInk:#0E1A17}}
+:root[data-theme="dark"]{--heroA:#3E9E82;--heroB:#86D6B9;--heroInk:#0E1A17}
+.stat.hero{background:linear-gradient(135deg,var(--heroA),var(--heroB));color:var(--heroInk);border-radius:12px;padding:12px 16px 13px;margin:8px 0;box-shadow:0 6px 20px rgba(31,122,98,.35)}
+@media (max-width:640px){.stat.hero{grid-column:1/-1}.stat.hero + .stat{padding-left:0}}
+.stat.hero .l{color:inherit;opacity:.9;font-weight:600;letter-spacing:.01em}
+.stat.hero .v{font-size:28px;line-height:1.15}
+.stat.hero .s{color:inherit;opacity:.88}
+.stat.hero .q{border-color:currentColor;color:inherit}
+.stat.hero .q:hover,.stat.hero .q[aria-expanded="true"]{background:var(--heroInk);color:var(--heroA);border-color:var(--heroInk)}
+.stat.hero + .stat{border-left:0}
+.stat.hero.pending .v,.stat.hero.pending .s{opacity:.55}
+@keyframes sustglow{0%{box-shadow:0 0 0 0 rgba(46,106,92,.55),0 4px 16px rgba(46,106,92,.28);transform:scale(1)}30%{transform:scale(1.025)}100%{box-shadow:0 0 0 14px rgba(46,106,92,0),0 4px 16px rgba(46,106,92,.28);transform:scale(1)}}
+.stat.hero.flash{animation:sustglow 1s ease-out}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.bar p{margin:0;font-size:13px;color:var(--muted)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:6px 11px;font-size:13px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:640px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px 10px;min-width:0}
+.panel.wide{grid-column:1/-1}
+.panel h3{margin:0;font-family:var(--display);font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px}
+.panel h3 i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:none}
+.panel .desc{margin:2px 0 8px;font-size:12.5px;color:var(--muted);line-height:1.35}
+.cv{position:relative;height:200px}
+.panel.wide .cv{height:260px}
+.panel.wide .cv.cvtop{height:210px}
+.panel.wide .cv.cvbot{height:130px}
+.ttab table{width:100%;border-collapse:collapse;margin:6px 0 8px;font-size:12px}
+.ttab caption{text-align:left;font-weight:600;padding:2px 0}
+.ttab td{padding:2px 6px 2px 0;border-top:1px solid rgba(128,128,128,.35);vertical-align:top}
+.pop:has(.ttab){max-width:min(430px,calc(100vw - 24px))}
+.pop{overflow:auto;overscroll-behavior:contain}
+.ttab td:first-child{width:40%;padding-right:10px}
+.ttab p{margin:0 0 4px}
+.scards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:10px}
+.scard{text-align:left;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer}
+.scard[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.scard b{display:block;font-size:13px}
+.scard span{display:block;font-size:12px;color:var(--muted)}
+.scard .res{margin-top:4px;font-size:13px;font-weight:600;color:var(--pine)}
+.scard .res.bad{color:var(--risk)}
+.basebar{margin:10px 0 4px}
+.basebar .bhead{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.basebar .bbtns{margin-left:auto;display:flex;gap:6px}
+.basebar .bgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px;margin:8px 0 4px;font-size:14px;font-weight:600}
+.basebar .bgrid span{display:block;font-size:12px;font-weight:400;color:var(--muted)}
+.basebar em{font-style:normal;font-size:12px;margin-left:4px}
+.basebar em.up{color:var(--pine)} .basebar em.dn{color:var(--risk)}
+.basebar .bchg{font-size:13px;color:var(--muted);margin:4px 0 0}
+.stklab{font-size:12px;font-weight:600;color:var(--muted);margin:10px 0 2px}
+.panel.locked{background:transparent;border-style:dashed}
+.panel.locked .desc{margin-bottom:0}
+.legend{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12px;color:var(--muted);margin:14px 0 0}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{display:inline-block;width:18px;height:9px;border-radius:2px;background:var(--ink)}
+.q{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;flex:none;margin-left:5px;padding:0;border-radius:50%;border:1.25px solid var(--muted);background:none;color:var(--muted);font:600 11px/1 var(--body);cursor:help;vertical-align:1px}
+.q:hover,.q[aria-expanded="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.q::before{content:"";position:absolute;width:32px;height:32px}
+.q{position:relative}
+.pop{position:fixed;z-index:50;max-width:min(320px,calc(100vw - 24px));padding:11px 13px;border-radius:10px;background:var(--ink);color:var(--surface);font-size:13px;line-height:1.45;box-shadow:0 6px 24px rgba(0,0,0,.22)}
+.pop[hidden]{display:none}
+.pop b{display:block;font-family:var(--display);font-size:14px;margin-bottom:3px}
+.pop p{margin:0 0 6px}.pop p:last-child{margin:0}
+.lab{min-width:0}
+.lab .hint{display:block}
+.assump{margin-top:26px;border-top:1px solid var(--line);padding-top:14px}
+.assump h2{font-family:var(--display);font-size:17px;margin:0 0 4px}
+.assump > p{margin:0 0 10px;font-size:13px;color:var(--muted);max-width:70ch}
+.alist{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0 24px;margin:0;padding:0;list-style:none}
+.alist li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.alist li span.v{font-variant-numeric:tabular-nums;font-weight:600;margin-left:auto;text-align:right}
+.mctl{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:0 0 6px}
+.yctl{gap:10px;font-size:12.5px}
+.yctl .ytog{display:inline-flex;align-items:center;gap:5px;font-weight:600;cursor:pointer}
+.yctl .ytog input{accent-color:var(--pine);margin:0}
+.yctl .ymanual{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
+.yctl .ymanual[hidden]{display:none}
+.yctl .ymanual label{display:inline-flex;align-items:center;gap:5px;color:var(--muted)}
+.yctl .ynum{width:110px}
+.rsum{margin:0 0 8px;font-size:12.5px;color:var(--ink);min-height:1.4em}
+.ev{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:0 0 10px;background:var(--bg)}
+.evrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 6px}
+.evrow:last-child{margin:0}
+.evname{flex:1 1 140px;min-width:0;border:1px solid var(--line);border-radius:7px;background:var(--surface);padding:5px 8px;font-weight:600;font-size:14px}
+.evdel{border:0;background:none;font-size:20px;line-height:1;padding:2px 6px;color:var(--muted);cursor:pointer;border-radius:6px}
+.evdel:hover{color:var(--risk)}
+.evtype button{padding:5px 9px;font-size:12.5px}
+.evtype button[data-t="in"][aria-pressed="true"]{background:var(--pine);color:var(--surface)}
+.evtype button[data-t="out"][aria-pressed="true"]{background:var(--risk);color:var(--surface)}
+.evamt{width:110px;background:var(--surface);margin-left:auto}
+.evwhen{font-size:13px}
+.evwhen label{display:inline-flex;align-items:center;gap:5px}
+.evwhen input{width:56px;border:1px solid var(--line);border-radius:7px;background:var(--surface);padding:4px 6px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.evwhen .evyears{width:38px}
+.evage{margin-left:auto;color:var(--muted);font-size:12.5px}
+.addev{width:100%;border-style:dashed;font-weight:600}
+.addev span{font-size:16px;margin-right:4px}
+.personas{display:flex;align-items:center;gap:4px;margin:0 0 14px}
+select.sel.psel{max-width:none;width:100%;flex:1 1 auto;padding:6px 8px}
+.wl{font-size:12.5px;color:var(--muted);margin-right:2px;display:inline-flex;align-items:center}
+.chip{border:1px solid var(--line);background:var(--bg);border-radius:99px;padding:4px 10px;font-size:12.5px;cursor:pointer;display:inline-flex;gap:6px;align-items:baseline}
+.chip:hover{border-color:var(--pine)}
+.chip b{font-variant-numeric:tabular-nums;color:var(--pine)}
+.estbtn{display:inline-flex;align-items:center;gap:7px;margin-top:6px;padding:6px 11px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--steel);font-size:13px;font-weight:600;cursor:pointer}
+.estbtn:hover{border-color:var(--steel);background:var(--surface)}
+.estbtn svg{flex:none}
+dialog.xdlg{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);padding:0;width:min(520px,calc(100vw - 24px));max-height:calc(100dvh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
+dialog.xdlg::backdrop{background:rgba(10,20,25,.45)}
+.ssbox{padding:14px 18px 18px}
+.sshead{display:flex;justify-content:space-between;align-items:center}
+.sshead h2{font-family:var(--display);font-size:20px;margin:0}
+.ssgrid .field{margin-bottom:10px}
+.chk{display:block;font-size:14px;font-weight:500;margin:6px 0 8px;cursor:pointer}
+.chk input{accent-color:var(--pine);margin-right:6px}
+.chk .hint{display:block;margin-left:24px;font-size:12px;color:var(--muted);font-weight:400}
+.ssout{border-top:1px solid var(--line);margin-top:8px;padding-top:10px}
+.ssbig{font-family:var(--display);font-weight:700;font-size:24px;margin:0 0 6px}
+.ssbig span{display:block;font-family:var(--body);font-weight:400;font-size:13px;color:var(--muted)}
+.sstab{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:10px;margin:0 0 8px}
+.sstab div{padding:6px 10px}.sstab div+div{border-left:1px solid var(--line)}
+.sstab span{display:block;font-size:12px;color:var(--muted)}.sstab b{font-variant-numeric:tabular-nums}
+.pop{z-index:1000}
+.clg{margin:8px 0 2px}
+.engrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.engrow[hidden]{display:none}
+.badge{display:inline-block;font:600 11px/1 var(--body);letter-spacing:.02em;color:var(--ochre);border:1px solid var(--ochre);border-radius:99px;padding:3px 7px;margin-left:6px;vertical-align:2px}
+.teaser{margin:10px 0 0;font-size:14px}
+.teaser[hidden]{display:none}
+.bar{align-items:flex-start}
+.bar #barnote{flex-basis:100%;order:3}
+.hlg{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 6px}
+.hlg .chip{align-items:center}
+.hlg .chip[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.expnote{margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-left:3px solid var(--steel);border-radius:8px;background:var(--bg);font-size:13px;line-height:1.45}
+.expnote[hidden]{display:none}
+.expnote p{margin:0 0 6px}
+.rq{width:15px;height:15px;font-size:10px;margin-left:6px;vertical-align:1px}
+.step[aria-pressed="true"] .rq{border-color:currentColor;color:inherit}
+.bgrid{display:grid;grid-template-columns:1fr;gap:4px}
+.bfoot{position:sticky;bottom:-18px;margin:8px -18px -18px;padding:10px 18px 14px;background:var(--surface);border-top:1px solid var(--line);box-shadow:0 -6px 14px rgba(0,0,0,.06)}
+.bfoot .ssbig{font-size:21px;margin:0}
+dialog.xdlg{overflow:auto}
+.bgrp{border:0;border-top:1px solid var(--line);margin:0;padding:8px 0 2px}
+.bgrp legend{font-family:var(--display);font-weight:700;font-size:14px;padding:0 6px 0 0;display:flex;align-items:center;width:100%}
+.bsub{margin-left:auto;font-family:var(--body);font-weight:600;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.brow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 6px;font-size:13.5px}
+.brow label{flex:1 1 auto;line-height:1.3}
+.brow .num{width:132px}
+footer{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:80ch}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1 class="brand">Retirement<small>.diy</small></h1>
+    <p class="tagline">Deep Analysis. Never Shared. Sleep Easier.</p>
+    <button type="button" class="cmplink" id="openCmp">How is this different? ›</button>
+  </header>
+  <p class="privacy">
+    <svg width="14" height="16" viewBox="0 0 14 16" aria-hidden="true"><path fill="currentColor" d="M7 0l7 3v4.5C14 11.6 11 15 7 16 3 15 0 11.6 0 7.5V3zm0 1.6L1.5 4v3.5C1.5 10.8 3.8 13.6 7 14.4c3.2-.8 5.5-3.6 5.5-6.9V4z"/></svg>
+    <span>Every calculation runs on this device. Your numbers are never uploaded, and no account is needed.</span>
+  </p>
+
+  <nav class="rail" id="rail" aria-label="Level of detail"></nav>
+  <div class="paidinfo" id="paidinfo" hidden></div>
+
+  <div class="main">
+    <aside class="inputs" id="inputs" aria-label="Your plan"></aside>
+
+    <section aria-live="polite">
+      <div class="verdict">
+        <p class="big" id="verdict">Running your futures…</p>
+        <span class="state" id="state"></span><span id="verdictQ"></span>
+        <p class="teaser" id="teaser" hidden></p>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div class="basebar" id="basebar"></div>
+      <div class="bar">
+        <div class="engrow" id="engrow"><span class="wl">Method</span><div class="seg" role="group" aria-label="Method"><button data-eng="mc">Monte Carlo Statistical Projections</button><button data-eng="hist">Historical Backtests</button></div><span data-q="engine"></span></div>
+        <p id="barnote"></p>
+        <div style="display:flex;align-items:center;gap:4px"><div class="seg" role="group" aria-label="Dollar basis">
+          <button id="dToday" aria-pressed="true">Today's dollars</button>
+          <button id="dFuture" aria-pressed="false">Future dollars</button>
+        </div><span data-q="dollars"></span></div>
+      </div>
+      <div class="grid" id="grid"></div>
+      
+      <div class="assump"><h2>Assumptions behind these results</h2><p>These are fixed in the free levels. Tap any question mark for how each one works and why it matters.</p><ul class="alist" id="alist"></ul></div>
+      <footer id="footer"></footer>
+  <dialog id="ssdlg" class="xdlg" aria-label="Social Security estimator"></dialog>
+  <dialog id="buddlg" class="xdlg" aria-label="Retirement budget planner"></dialog>
+  <dialog id="cmpdlg" class="xdlg cmpdlg" aria-labelledby="cmpTitle">
+    <div class="ssbox">
+      <div class="sshead"><h2 id="cmpTitle">How Retirement.diy is different</h2><button type="button" class="evdel" id="cmpClose" aria-label="Close">×</button></div>
+      <p class="cmpintro">Most people end up using two tools: a free calculator for market risk and a paid planner for taxes. This is both, with nothing to sign up for.</p>
+      <table class="cmp">
+        <thead><tr><th scope="col"><span class="vh">Feature</span></th><th scope="col">Typical free calculator</th><th scope="col">Paid planners</th><th scope="col" class="us">Retirement.diy</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Real federal tax brackets</th><td data-l="Typical free calculator">Rarely; usually a flat rate</td><td data-l="Paid planners">Yes</td><td data-l="Retirement.diy" class="us">Yes, free</td></tr>
+          <tr><th scope="row">History back to 1871 and stress tests</th><td data-l="Typical free calculator">Some</td><td data-l="Paid planners">Some</td><td data-l="Retirement.diy" class="us">Yes, free</td></tr>
+          <tr><th scope="row">&ldquo;How much can I safely spend?&rdquo;</th><td data-l="Typical free calculator">Rarely</td><td data-l="Paid planners">Some, on paid tiers</td><td data-l="Retirement.diy" class="us">Yes, free, on the first screen</td></tr>
+          <tr><th scope="row">Assumptions, explanations and raw numbers</th><td data-l="Typical free calculator">Varies; some publish their math</td><td data-l="Paid planners">Help articles; reports often on paid tiers</td><td data-l="Retirement.diy" class="us">Explained beside every input and result; every number exports free to a spreadsheet</td></tr>
+          <tr><th scope="row">Account, password or email</th><td data-l="Typical free calculator">Usually none</td><td data-l="Paid planners">Required</td><td data-l="Retirement.diy" class="us">None, even for paid levels</td></tr>
+          <tr><th scope="row">Tracking, ads or referrals</th><td data-l="Typical free calculator">Often</td><td data-l="Paid planners">Varies</td><td data-l="Retirement.diy" class="us">None</td></tr>
+          <tr><th scope="row">Price</th><td data-l="Typical free calculator">Free</td><td data-l="Paid planners">About $110&ndash;150 a year</td><td data-l="Retirement.diy" class="us">Free; $19 or $29 once for advanced levels</td></tr>
+        </tbody>
+      </table>
+      <p class="cmpnote">Describes typical tools in each category as of September 2026. Features vary by product and change often.</p>
+    </div>
+  </dialog>
+  <div class="pop" id="pop" role="tooltip" hidden></div>
+    </section>
+  </div>
+</div>
+
+<script>
+/* ============ MARKET ASSUMPTIONS (fixed in free levels, except the Level 2 stock-return preset) ============ */
+const MKT = {sMean:.0875, sVol:.17, bMean:.040, bVol:.06, rho:.10, inflVol:.012, cMean:.030, cVol:.010};
+/* Average stock return, chosen at Level 2. Only the average moves: every option keeps the same
+   17% year-to-year spread, so the three stay a like-for-like comparison. MKT.sMean is the default. */
+const STOCK_RET = {cautious:.080, balanced:.0875, historical:.095};
+const retPctS = v => (v*100).toFixed(2).replace(/0$/,'') + '%';   // 8.0%, 8.75%, 9.5%: exact, where pctS rounds to one decimal
+const N_PATHS = 2000;
+/* Annual US history, Jan to Jan: [year, stock total return, 10-year Treasury return, CPI inflation].
+   Built from Robert Shiller's monthly S&P composite, dividend, CPI and long-rate series (1871 to 2022). */
+const HIST = [[1871,0.1532,0.0504,0.0152],[1872,0.1094,0.0384,0.0229],[1873,-0.0262,0.0635,-0.044],[1874,0.0451,0.083,-0.0695],[1875,0.0515,0.0854,-0.0573],[1876,-0.1368,0.0561,0.0083],[1877,-0.0168,0.0526,-0.1563],[1878,0.1583,0.0522,-0.1029],[1879,0.4807,0.0571,0.2065],[1880,0.2568,0.0643,-0.0571],[1881,0.0036,0.0431,0.0807],[1882,0.0355,0.0354,-0.0187],[1883,-0.0524,0.0371,-0.0761],[1884,-0.1199,0.0438,-0.1029],[1885,0.2906,0.0467,-0.035],[1886,0.1171,0.0223,0.0],[1887,-0.006,0.0239,0.0476],[1888,0.0319,0.0535,-0.0454],[1889,0.0696,0.0368,-0.0476],[1890,-0.0595,0.0191,0.025],[1891,0.1839,0.0377,-0.0603],[1892,0.06,0.0247,0.0778],[1893,-0.1862,0.0413,-0.1329],[1894,0.0367,0.0553,-0.0409],[1895,0.0516,0.024,0.0137],[1896,0.0315,0.0513,-0.0285],[1897,0.1991,0.0378,0.0294],[1898,0.285,0.0529,0.015],[1899,0.0371,0.0271,0.1686],[1900,0.2014,0.0354,-0.0241],[1901,0.1925,0.0248,0.0246],[1902,0.0819,0.0226,0.0962],[1903,-0.1701,0.0254,-0.0439],[1904,0.3111,0.0279,0.0229],[1905,0.2089,0.0386,0.0],[1906,0.0059,0.0162,0.0449],[1907,-0.2394,0.0217,-0.0215],[1908,0.3837,0.047,0.0323],[1909,0.1591,0.0264,0.1074],[1910,-0.0351,0.0339,-0.0677],[1911,0.0345,0.0376,-0.0108],[1912,0.0719,0.008,0.0734],[1913,-0.0484,0.0659,0.0204],[1914,-0.0529,0.0357,0.01],[1915,0.3042,0.0565,0.0297],[1916,0.0794,0.0273,0.125],[1917,-0.1807,0.0177,0.1966],[1918,0.1755,0.0508,0.1786],[1919,0.1947,0.0115,0.1697],[1920,-0.136,0.0412,-0.0155],[1921,0.0946,0.1088,-0.1105],[1922,0.2859,0.0386,-0.0059],[1923,0.0507,0.0658,0.0298],[1924,0.2594,0.0556,0.0],[1925,0.2502,0.0522,0.0347],[1926,0.1106,0.0629,-0.0223],[1927,0.3629,0.0342,-0.0114],[1928,0.4645,0.0129,-0.0116],[1929,-0.0899,0.0598,0.0],[1930,-0.219,0.0291,-0.0702],[1931,-0.4247,0.0077,-0.1006],[1932,-0.0679,0.0652,-0.0979],[1933,0.5525,0.0478,0.0233],[1934,-0.0792,0.0571,0.0303],[1935,0.5344,0.039,0.0147],[1936,0.3201,0.0241,0.0217],[1937,-0.3125,0.0363,0.0071],[1938,0.1668,0.0416,-0.0141],[1939,0.0279,0.0357,-0.0071],[1940,-0.0894,0.0434,0.0144],[1941,-0.088,-0.0212,0.1135],[1942,0.2027,0.0238,0.0764],[1943,0.2335,0.0239,0.0296],[1944,0.1916,0.0336,0.023],[1945,0.3842,0.0383,0.0225],[1946,-0.1179,0.0171,0.1813],[1947,0.0254,0.0073,0.1023],[1948,0.0942,0.0349,0.0127],[1949,0.1659,0.0223,-0.0208],[1950,0.3315,0.0033,0.0809],[1951,0.2116,0.017,0.0433],[1952,0.1415,0.015,0.0038],[1953,0.0268,0.0562,0.0113],[1954,0.4562,0.0145,-0.0074],[1955,0.2848,0.0034,0.0037],[1956,0.0691,-0.0137,0.0299],[1957,-0.0564,0.0633,0.0362],[1958,0.3951,-0.0382,0.014],[1959,0.0756,-0.0102,0.0103],[1960,0.0625,0.1131,0.0171],[1961,0.1894,0.0206,0.0067],[1962,-0.0281,0.0595,0.0133],[1963,0.2088,0.0132,0.0164],[1964,0.1578,0.0402,0.0097],[1965,0.114,0.0115,0.0192],[1966,-0.0647,0.0483,0.0346],[1967,0.1598,-0.0202,0.0365],[1968,0.1048,0.0207,0.044],[1969,-0.0839,-0.0499,0.0618],[1970,0.0703,0.1822,0.0529],[1971,0.1381,0.0822,0.0327],[1972,0.176,0.0255,0.0365],[1973,-0.1609,0.0301,0.0939],[1974,-0.2085,0.0374,0.118],[1975,0.3857,0.0598,0.0672],[1976,0.111,0.1116,0.0522],[1977,-0.0884,0.0252,0.0684],[1978,0.1593,0.0115,0.0928],[1979,0.1661,-0.0039,0.1391],[1980,0.2529,0.0157,0.1183],[1981,-0.0698,0.0279,0.0839],[1982,0.2881,0.3795,0.0371],[1983,0.2014,0.0393,0.0419],[1984,0.0752,0.1325,0.0353],[1985,0.2585,0.2441,0.0389],[1986,0.3094,0.2289,0.0146],[1987,-0.0206,-0.0258,0.0405],[1988,0.1763,0.0616,0.0467],[1989,0.2277,0.1454,0.052],[1990,-0.0083,0.0896,0.0565],[1991,0.3157,0.1499,0.026],[1992,0.0757,0.0988,0.0326],[1993,0.1155,0.1244,0.0252],[1994,0.0108,-0.0705,0.028],[1995,0.3495,0.2249,0.0273],[1996,0.2705,-0.0052,0.0304],[1997,0.2771,0.138,0.0157],[1998,0.3128,0.1144,0.0167],[1999,0.1548,-0.081,0.0274],[2000,-0.0515,0.1725,0.0373],[2001,-0.1345,0.0601,0.0114],[2002,-0.2004,0.1238,0.026],[2003,0.2826,0.0331,0.0193],[2004,0.0596,0.0363,0.0297],[2005,0.1001,0.0276,0.0399],[2006,0.1322,0.0198,0.0208],[2007,-0.0134,0.1243,0.0428],[2008,-0.3515,0.1346,0.0003],[2009,0.3273,-0.0659,0.0263],[2010,0.1613,0.0633,0.0163],[2011,0.0331,0.15,0.0292],[2012,0.1603,0.0246,0.016],[2013,0.2535,-0.0554,0.0158],[2014,0.1335,0.109,-0.0009],[2015,-0.0334,0.0017,0.0137],[2016,0.2091,-0.0063,0.025],[2017,0.2471,0.0124,0.0207],[2018,-0.047,0.0155,0.0155],[2019,0.2788,0.1055,0.0249],[2020,0.1753,0.0756,0.014],[2021,0.2211,-0.0453,0.0748],[2022,-0.1201,-0.1169,0.0641]];
+const HIST_FIRST = HIST[0][0], HIST_LAST = HIST[HIST.length-1][0];
+const PAID_PREVIEW = true;   // paid features are open while the license system is built
+let engine = 'mc';           // 'mc' Monte Carlo, 'hist' every historical start year
+let selYear = null;          // historical start year picked on the history chart
+const CUR_YEAR = new Date().getFullYear();
+
+/* ===================== INPUTS ===================== */
+const GROUPS = {
+  1:{title:'The basics', sub:'Level 1'},
+  2:{title:'Your anticipated lifespan', sub:'Level 2'},
+  3:{title:'Your accounts and taxes', sub:'Level 3'},
+  4:{title:'Life events', sub:'Level 4'},
+};
+const INPUTS = [
+  {id:'age', lvl:1, label:'Your age now', min:20,max:80,step:1,def:50,fmt:'age'},
+  {id:'retAge', lvl:1, label:'Retire at age', min:30,max:80,step:1,def:62,fmt:'age'},
+  {id:'savings', lvl:1, only:[1,2], label:'Retirement savings today', min:0,max:5e6,step:5000,def:500000,fmt:'usd'},
+  {id:'contrib', lvl:1, label:'Added each year until you retire', hint:"In today's dollars", min:0,max:150000,step:1000,def:12000,fmt:'usd'},
+  {id:'spend', lvl:1, label:'Yearly income needs in retirement, before tax', hint:"Like a salary, in today's dollars", extra:'budEst', min:10000,max:400000,step:1000,def:81000,fmt:'usd'},
+  {id:'stocks', lvl:1, label:'Stocks in your mix', hint:'The rest is bonds, rebalanced yearly', min:0,max:100,step:5,def:60,fmt:'pct0'},
+  {id:'ssAmt', lvl:1, label:'Social Security', hint:"Per year, today's dollars", min:0,max:80000,step:500,def:36000,fmt:'usd', extra:'ssEst'},
+  {id:'ssAge', lvl:1, label:'Social Security starts at age', min:62,max:70,step:1,def:67,fmt:'age'},
+  {id:'filing', lvl:1, label:'Tax filing status', type:'select', def:'mfj', options:[['mfj','Married'],['single','Single']]},
+
+  {id:'planAge', lvl:2, label:'Plan to age', min:80,max:105,step:1,def:95,fmt:'age'},
+  {id:'infl', lvl:2, label:'Average inflation', hint:'Varies year to year around this', min:0,max:6,step:.1,def:2.5,fmt:'pct'},
+  {id:'stockRet', lvl:2, label:'Average stock return', hint:'The year-to-year spread stays the same', type:'select', def:'balanced',
+   options:[['cautious',`Cautious, ${retPctS(STOCK_RET.cautious)}`],['balanced',`Balanced, ${retPctS(STOCK_RET.balanced)}`],['historical',`Historical, ${retPctS(STOCK_RET.historical)}`]]},
+  {id:'penAmt', lvl:2, label:'Pension', hint:'Per year, the dollar amount of the first check', min:0,max:200000,step:500,def:0,fmt:'usd'},
+  {id:'penAge', lvl:2, label:'Pension starts at age', min:50,max:75,step:1,def:62,fmt:'age'},
+  {id:'penCola', lvl:2, label:'Pension raises', type:'select', def:'none', options:[['none','Fixed amount'],['full','Rises with inflation']]},
+  {id:'spendRule', lvl:2, label:'Spending rule', type:'select', def:'fixed', options:[['fixed','Steady, rises with inflation'],['guard','Guardrails: adjust to markets']]},
+  {id:'spendDecl', lvl:2, label:'Spending eases after 75', hint:'Yearly drop, after inflation', min:0,max:3,step:.25,def:0,fmt:'pct'},
+  {id:'stateTax', lvl:2, label:'State income tax rate', hint:'Flat rate on federally taxable income', min:0,max:13,step:.1,def:4,fmt:'pct'},
+
+  {id:'trad', lvl:3, label:'Traditional 401(k) and IRA', hint:'Taxed as income when you withdraw', min:0,max:4e6,step:5000,def:325000,fmt:'usd'},
+  {id:'roth', lvl:3, label:'Roth 401(k) and IRA', hint:'Tax-free when you withdraw', min:0,max:2e6,step:5000,def:79000,fmt:'usd'},
+  {id:'brok', lvl:3, label:'Taxable brokerage', hint:'Only gains are taxed', min:0,max:3e6,step:5000,def:85000,fmt:'usd'},
+  {id:'basis', lvl:3, label:'Brokerage cost basis', hint:'Share of it that is money you put in', min:0,max:100,step:5,def:60,fmt:'pct0'},
+  {id:'cash', lvl:3, label:'Excess savings held as cash', hint:'Beyond what you keep for everyday bills', min:0,max:500000,step:1000,def:15000,fmt:'usd'},
+  {id:'contribTo', lvl:3, label:'New savings go to', type:'select', def:'trad', options:[['trad','Traditional'],['roth','Roth'],['brok','Brokerage']]},
+  {id:'legacy', lvl:3, label:'Leave behind at least', hint:"Today's dollars, at your plan age", min:0,max:3e6,step:10000,def:250000,fmt:'usd'},
+];
+const DEF = {}; INPUTS.forEach(d=>DEF[d.id]=d.def);
+
+DEF.events = [];
+let S = Object.assign({}, DEF, {events:[]});
+let eventsSeeded = false;
+let level = 1, dollars = 'real', seed = 20260924, splitDone = false;
+/* Scale of the Total savings chart. Auto by default; either end can be pinned so that two
+   scenarios can be compared at the same height. A view setting like `dollars`: kept on this
+   device, deliberately left out of scenario codes, which describe the plan and not the view. */
+let yAxis = {auto:true, min:null, max:null};
+
+/* ===================== PERSISTENCE (this device only) ===================== */
+const LS_KEY = 'diyr:v2';
+let BASE = null;
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify({S,level,dollars,splitDone,eventsSeeded,engine,BUD,BASE,seed,yAxis})); }catch(e){} }
+function load(){
+  try{
+    const raw = localStorage.getItem(LS_KEY); if(!raw) return;
+    const o = JSON.parse(raw);
+    applySnapshot(o);
+    BASE = cleanBase(o.BASE);
+  }catch(e){}
+}
+function applySnapshot(o){
+  if(!o || typeof o!=='object') return false;
+  if(Number.isInteger(o.seed) && o.seed>=0 && o.seed<2**32) seed=o.seed;
+  if(o.S) INPUTS.forEach(d=>{
+    const v=o.S[d.id]; if(v===undefined) return;
+    if(d.type==='select'){ if(d.options.some(op=>op[0]===String(v))) S[d.id]=String(v); }
+    else { const n=Number(v); if(isFinite(n)) S[d.id]=Math.min(d.max, Math.max(d.min, n)); }
+  });
+  if(o.S && Array.isArray(o.S.events)) S.events = o.S.events.slice(0,30).map(cleanEvent);
+  if([1,2,3,4].includes(o.level)) level = o.level;
+  if(typeof o.eventsSeeded==='boolean') eventsSeeded = o.eventsSeeded;
+  if(['mc','hist'].includes(o.engine)) engine = o.engine;
+  if(o.BUD && typeof o.BUD==='object'){ budInit(); Object.keys(BUD).forEach(k=>{ if(isFinite(+o.BUD[k])) BUD[k]=Math.max(0,+o.BUD[k]); }); }
+  if(o.dollars==='real'||o.dollars==='nominal') dollars = o.dollars;
+  if(o.yAxis && typeof o.yAxis==='object') yAxis = {auto:o.yAxis.auto!==false, min:cleanY(o.yAxis.min), max:cleanY(o.yAxis.max)};
+  if(typeof o.splitDone==='boolean') splitDone = o.splitDone;
+  return true;
+}
+function encodeScenario(){
+  const json = JSON.stringify({S,level,splitDone,eventsSeeded:true,seed});
+  return 'DIYR2.' + btoa(unescape(encodeURIComponent(json))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function decodeScenario(code){
+  code = code.trim();
+  if(!code.startsWith('DIYR2.')) throw new Error('That code does not start with DIYR2.');
+  let b = code.slice(6).replace(/-/g,'+').replace(/_/g,'/'); while(b.length%4) b+='=';
+  return JSON.parse(decodeURIComponent(escape(atob(b))));
+}
+
+/* ===================== RANDOM NUMBERS ===================== */
+function mulberry32(a){ return function(){ a|=0; a=(a+0x6D2B79F5)|0; let t=Math.imul(a^a>>>15,1|a); t=(t+Math.imul(t^t>>>7,61|t))^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function makeNormal(rng){ let spare=null; return function(){ if(spare!==null){const s=spare;spare=null;return s;} let u,v,s; do{u=rng()*2-1;v=rng()*2-1;s=u*u+v*v;}while(s>=1||s===0); const m=Math.sqrt(-2*Math.log(s)/s); spare=v*m; return u*m; }; }
+
+/* ===================== FEDERAL TAX (2026 law, IRS Rev. Proc. 2025-32 and OBBBA) =====================
+   Dollar thresholds are 2026 values. In each simulated future they rise with that future's inflation,
+   except the Social Security thresholds and the senior deduction, which the law does not index. */
+const TAXLAW = {
+  year: 2026,
+  mfj:    {std:32200, add65:1650, persons:2,
+           brk:[[24800,.10],[100800,.12],[211400,.22],[403550,.24],[512450,.32],[768700,.35],[Infinity,.37]],
+           cg:[[98900,0],[613700,.15],[Infinity,.20]], ss1:32000, ss2:44000, senPhase:150000},
+  single: {std:16100, add65:2050, persons:1,
+           brk:[[12400,.10],[50400,.12],[105700,.22],[201775,.24],[256225,.32],[640600,.35],[Infinity,.37]],
+           cg:[[49450,0],[545500,.15],[Infinity,.20]], ss1:25000, ss2:34000, senPhase:75000},
+  senior:{amt:6000, rate:.06, lastYear:2028}
+};
+function bracketTax(x, brk, f){
+  let t=0, lo=0;
+  for(const [hi,r] of brk){ const top=hi*f; if(x<=lo) break; t += (Math.min(x,top)-lo)*r; lo=top; }
+  return t;
+}
+/* Income tax for one year, in that year's dollars.
+   ord: ordinary income other than Social Security. gains: long-term gains. ss: Social Security benefits.
+   f: that future's cumulative inflation since today. n65: people aged 65+. yr: calendar year. st: state rate. */
+function incomeTax(ord, gains, ss, L, f, n65, yr, st){
+  const pi = ord + gains + .5*ss;
+  let tss = 0;
+  if(pi > L.ss1){
+    tss = pi <= L.ss2 ? Math.min(.5*ss, .5*(pi-L.ss1))
+                      : Math.min(.85*ss, .85*(pi-L.ss2) + Math.min(.5*ss, .5*(L.ss2-L.ss1)));
+  }
+  const agi = ord + gains + tss;
+  let ded = (L.std + n65*L.add65) * f;
+  if(n65 && yr <= TAXLAW.senior.lastYear) ded += n65*Math.max(0, TAXLAW.senior.amt - TAXLAW.senior.rate*Math.max(0, agi - L.senPhase));
+  const taxable = Math.max(0, agi - ded);
+  const ordT = Math.max(0, taxable - gains), gT = taxable - ordT;
+  let t = bracketTax(ordT, L.brk, f);
+  if(gT > 0) t += bracketTax(ordT+gT, L.cg, f) - bracketTax(ordT, L.cg, f);
+  return t + st*taxable;
+}
+/* Tax on a salary of the same size: turns the before-tax income target into after-tax spending. */
+function salaryTax(gross, L, st){ return incomeTax(gross, 0, 0, L, 1, 0, 0, st); }
+function stateRateOf(s, lvl){ return (lvl>=2 ? s.stateTax : 4)/100; }
+function stockMeanOf(s, lvl){ const v=STOCK_RET[s.stockRet]; return (lvl>=2 && v!==undefined) ? v : MKT.sMean; }
+function grossFromNet(net, L, st){
+  let lo=net, hi=net*2+50000;
+  for(let j=0;j<40;j++){ const m=(lo+hi)/2; if(m - salaryTax(m,L,st) < net) lo=m; else hi=m; }
+  return hi;
+}
+
+/* ===================== SIMULATION ===================== */
+function simulate(s, lvl, seedVal, mode){
+  mode = mode || 'mc';
+  let nP = N_PATHS;
+  const A = Math.round(s.age);
+  const R = Math.max(Math.round(s.retAge), A);
+  const H = Math.max(lvl>=2 ? Math.round(s.planAge) : 95, R+1, A+1);
+  const nY = H - A + 1;
+  if(mode==='hist'){ nP = HIST.length - (nY-1) + 1; if(nP<1) return null; }
+  const ages = []; for(let a=A;a<=H;a++) ages.push(a);
+
+  const w = s.stocks/100;
+  const inflMean = (lvl>=2 ? s.infl : 2.5)/100;
+  const L = TAXLAW[s.filing==='single' ? 'single' : 'mfj'];
+  const st = stateRateOf(s, lvl);
+  const ssAmt = s.ssAmt, ssAge = s.ssAge;
+  // the before-tax income target is turned into after-tax spending as if it were a salary of that size
+  const netSpend = s.spend - salaryTax(s.spend, L, st);
+  const penAmt = lvl>=2 ? s.penAmt : 0, penAge = s.penAge, penCola = s.penCola==='full';
+  const contribTo = lvl>=3 ? s.contribTo : 'trad';
+  const decl = lvl>=2 ? (s.spendDecl||0)/100 : 0;
+  const guard = lvl>=2 && s.spendRule==='guard';
+  // early-withdrawal penalty: 10% on traditional withdrawals before 59 1/2, waived after a separation at 55 or later (Rule of 55)
+  const rule55 = R >= 55;
+  if(mode==='stress') nP = 1;
+
+  const muS = Math.log(1+stockMeanOf(s, lvl)) - .5*MKT.sVol*MKT.sVol;
+  const muB = Math.log(1+MKT.bMean) - .5*MKT.bVol*MKT.bVol;
+  const rc = Math.sqrt(1-MKT.rho*MKT.rho);
+
+  const mk = ()=>{ const a=[]; for(let k=0;k<nY;k++) a.push(new Float64Array(nP)); return a; };
+  const TRAD=mk(), ROTH=mk(), BROK=mk(), CASH=mk(), TAX=mk(), RET=mk(), INF=mk(), CI=mk();
+  const dryAge = new Float64Array(nP).fill(NaN);
+  const MINM = new Float64Array(nP).fill(1);   // lowest spending level reached, as a share of plan (guardrails)
+
+  // life events, in today's dollars, by year index k (year starting at age A+k-1)
+  const evIn = new Float64Array(nY), evOut = new Float64Array(nY);
+  if(lvl>=4 && Array.isArray(s.events)){
+    s.events.forEach(ev=>{
+      const amt=Math.max(0,+ev.amt||0), n=Math.max(1,Math.round(+ev.years||1));
+      const startAge = A + (Math.round(+ev.year||CUR_YEAR) - CUR_YEAR);
+      for(let j=0;j<n;j++){
+        const k = startAge + j - A + 1;
+        if(k<1 || k>=nY) continue;
+        if(ev.type==='in') evIn[k]+=amt; else evOut[k]+=amt;
+      }
+    });
+  }
+
+  const rng = mulberry32(seedVal), nrm = makeNormal(rng);
+
+  for(let i=0;i<nP;i++){
+    let trad, roth, brok, basis, cash;
+    if(lvl>=3){ trad=s.trad; roth=s.roth; brok=s.brok; basis=s.brok*s.basis/100; cash=s.cash; }
+    else { trad=s.savings; roth=0; brok=0; basis=0; cash=0; }
+    let f=1, dry=false;
+    TRAD[0][i]=trad; ROTH[0][i]=roth; BROK[0][i]=brok; CASH[0][i]=cash; CI[0][i]=1;
+    let penF=1, gm=1, wr0=-1;
+
+    for(let k=1;k<nY;k++){
+      const a = A + k - 1;       // age at the start of this year
+      let rS, rB, infl, rC;
+      if(mode==='mc'){
+        const zS = nrm(), zB = MKT.rho*zS + rc*nrm();
+        rS = Math.exp(muS + MKT.sVol*zS) - 1;
+        rB = Math.exp(muB + MKT.bVol*zB) - 1;
+        infl = Math.max(-.03, inflMean + MKT.inflVol*nrm());
+        rC = Math.max(0, MKT.cMean + MKT.cVol*nrm());
+      } else if(mode==='stress'){
+        const row = s._seq[k-1]; rS=row[0]; rB=row[1]; infl=row[2]; rC=row[3];
+      } else {
+        const row = mode==='hist' ? HIST[i+k-1] : HIST[(rng()*HIST.length)|0];
+        rS = row[1]; rB = row[2]; infl = row[3];
+        rC = Math.max(0, (1+infl)*1.005 - 1);   // cash: inflation plus half a point
+      }
+      const r = w*rS + (1-w)*rB;
+      let tax = 0;
+
+      if(a < R){
+        const c = s.contrib * f;
+        if(contribTo==='roth') roth += c;
+        else if(contribTo==='brok'){ brok += c; basis += c; }
+        else trad += c;
+      }
+      if(!dry){
+        // money in from life events is invested in the brokerage account, fully as basis
+        const eIn = evIn[k]*f; if(eIn>0){ brok += eIn; basis += eIn; }
+        const retired = a >= R;
+        const yr = CUR_YEAR + k - 1;
+        const n65 = a >= 65 ? L.persons : 0;
+        const ssNow  = ssAmt>0 && a>=ssAge ? ssAmt*f : 0;
+        const penNow = penAmt>0 && a>=penAge ? penAmt*penF : 0;
+        // before retirement, withdrawals stack on top of a working income assumed equal to the income target
+        const wage = retired ? 0 : s.spend*f;
+        const base = incomeTax(wage + penNow, 0, ssNow, L, f, n65, yr, st);
+        const baseW = retired ? 0 : incomeTax(wage, 0, 0, L, f, n65, yr, st);
+        const guarNet = ssNow + penNow - (base - baseW);
+        let life = retired ? netSpend*f*(a>75 ? Math.pow(1-decl, a-75) : 1) : 0;
+        if(retired && guard){
+          // guardrails: if this year's withdrawal rate drifts 20% above or below where it started, cut or raise spending by 10%
+          const P = trad+roth+brok+cash;
+          const wr = P>0 ? Math.max(0, life*gm - guarNet)/P : 99;
+          if(wr0 < 0) wr0 = wr;
+          else if(wr0 > 0){
+            if(wr > wr0*1.2) gm = Math.max(.7, gm*.9);
+            else if(wr < wr0*.8) gm = Math.min(1.5, gm*1.1);
+          }
+          if(gm < MINM[i]) MINM[i] = gm;
+        }
+        life *= gm;
+        const need = life + evOut[k]*f;
+        let gap = need - guarNet;
+        tax = base - baseW;
+        if(gap < 0){ if(lvl>=3) cash += -gap; else { brok += -gap; basis += -gap; } gap = 0; }
+        if(gap > 0){
+          // draw gross G in order cash, brokerage, traditional, Roth; G must also cover the tax it creates
+          const g = brok>0 ? Math.max(0, 1 - basis/brok) : 0;
+          const penRate = (retired && rule55) ? 0 : a < 59 ? .10 : a === 59 ? .05 : 0;
+          const plan = G=>{
+            let rem=G; const c=Math.min(cash,rem); rem-=c; const b=Math.min(brok,rem); rem-=b;
+            const t=Math.min(trad,rem); rem-=t; const ro=Math.min(roth,rem); rem-=ro;
+            return {c,b,t,ro,short:rem};
+          };
+          let G = gap, p = plan(G), extra = 0;
+          for(let it=0; it<12; it++){
+            extra = incomeTax(wage + penNow + p.t, p.b*g, ssNow, L, f, n65, yr, st) - base + penRate*p.t;
+            const G2 = gap + extra;
+            if(Math.abs(G2-G) < .5){ G=G2; p=plan(G); break; }
+            G = G2; p = plan(G);
+          }
+          if(p.short > 1){ dry = true; dryAge[i] = a; trad=roth=brok=cash=basis=0; }
+          else {
+            cash -= p.c;
+            if(p.b>0){ basis -= basis*(p.b/brok); brok -= p.b; }
+            trad -= p.t; roth -= p.ro; tax += extra;
+          }
+        }
+      }
+      trad*=1+r; roth*=1+r; brok*=1+r; cash*=1+rC; f*=1+infl;
+      if(penCola && a>=penAge) penF*=1+infl;
+      TRAD[k][i]=trad; ROTH[k][i]=roth; BROK[k][i]=brok; CASH[k][i]=cash;
+      TAX[k][i]=tax; RET[k][i]=r; INF[k][i]=infl; CI[k][i]=f;
+    }
+  }
+  const startYear = mode==='hist' ? Array.from({length:nP},(_,i)=>HIST[i][0]) : null;
+  return {mode, startYear, ages, A, R, H, nY, nP, evIn, evOut, TRAD, ROTH, BROK, CASH, TAX, RET, INF, CI, dryAge, MINM, guard};
+}
+
+const PCTS = [5,10,25,50,75,90,95];
+function pct(sorted,p){ const x=(p/100)*(sorted.length-1), lo=Math.floor(x), hi=Math.ceil(x); return sorted[lo]+(sorted[hi]-sorted[lo])*(x-lo); }
+function band(res, get, real){
+  const out = {}; PCTS.forEach(p=>out[p]=[]);
+  const tmp = new Float64Array(res.nP);
+  for(let k=0;k<res.nY;k++){
+    for(let i=0;i<res.nP;i++){ const v=get(res,k,i); tmp[i] = real ? v/res.CI[k][i] : v; }
+    const s = tmp.slice().sort();
+    PCTS.forEach(p=>out[p].push(pct(s,p)));
+  }
+  return out;
+}
+const GET = {
+  total:(r,k,i)=>r.TRAD[k][i]+r.ROTH[k][i]+r.BROK[k][i]+r.CASH[k][i],
+  trad:(r,k,i)=>r.TRAD[k][i], roth:(r,k,i)=>r.ROTH[k][i], brok:(r,k,i)=>r.BROK[k][i], cash:(r,k,i)=>r.CASH[k][i],
+  tax:(r,k,i)=>r.TAX[k][i],
+};
+
+/* ===================== FORMATTING ===================== */
+function money(v){
+  const a=Math.abs(v), sg=v<0?'-':'';
+  if(a>=1e6) return sg+'$'+(a/1e6).toFixed(a>=1e7?1:2)+'M';
+  if(a>=1e3) return sg+'$'+Math.round(a/1e3)+'K';
+  return sg+'$'+Math.round(a);
+}
+function fmtInput(d,v){
+  if(d.fmt==='usd') return Math.round(v).toLocaleString('en-US');
+  if(d.fmt==='pct') return Number(v).toFixed(1);
+  return String(Math.round(v));
+}
+const UNIT = {usd:['$',''], pct:['','%'], pct0:['','%'], age:['','']};
+/* A chart bound, from saved state or typed in: a non-negative number, or null for "let the chart
+   decide this end". Saved state is untrusted, so anything else becomes null. */
+function cleanY(v){ const n=Number(v); return (v!==null && v!=='' && isFinite(n) && n>=0 && n<=1e12) ? n : null; }
+/* Accepts 2000000, 2,000,000, $2m or 500k. Empty means: let the chart decide this end. */
+function parseBound(s){
+  const t=String(s).trim().toLowerCase().replace(/[$,\s]/g,'');
+  if(!t) return null;
+  const m=/^(\d*\.?\d+)([km])?$/.exec(t);
+  if(!m) return null;
+  const n=parseFloat(m[1]) * (m[2]==='k' ? 1e3 : m[2]==='m' ? 1e6 : 1);
+  return cleanY(n);
+}
+
+/* ===================== INPUT PANEL ===================== */
+const inputsEl = document.getElementById('inputs');
+function buildInputs(){
+  inputsEl.innerHTML='';
+  [1,2,3,4].forEach(g=>{
+    if(g>level) return;
+    if(g===4){ inputsEl.appendChild(buildEvents()); return; }
+    const sec=document.createElement('div'); sec.className='grp';
+    sec.innerHTML=`<h2>${GROUPS[g].title}<span>${GROUPS[g].sub}</span></h2>`;
+    if(g===1) sec.insertAdjacentHTML('beforeend',PERSONA_HTML_T());
+    if(g===3) sec.insertAdjacentHTML('beforeend','<p class="note">Spending draws from cash first, then brokerage, then traditional, then Roth.</p>');
+    INPUTS.filter(d=>d.lvl===g && (!d.only || d.only.includes(level))).forEach(d=>{
+      const f=document.createElement('div'); f.className='field';
+      const hint = d.hint ? `<span class="hint">${d.hint}</span>` : '';
+      if(d.type==='select'){
+        const opts=d.options.map(([v,l])=>`<option value="${v}" ${S[d.id]===v?'selected':''}>${l}</option>`).join('');
+        f.innerHTML=`<div class="top"><div class="lab"><label for="in_${d.id}">${d.label}</label>${q(d.id)}${hint}</div><select class="sel" id="in_${d.id}">${opts}</select></div>`;
+        sec.appendChild(f);
+        f.querySelector('select').addEventListener('change',e=>{ S[d.id]=e.target.value; changed(); });
+        return;
+      }
+      const [pre,post]=UNIT[d.fmt];
+      f.innerHTML=`<div class="top"><div class="lab"><label for="tx_${d.id}">${d.label}</label>${q(d.id)}${hint}</div>
+        <span class="num">${pre?`<span>${pre}</span>`:''}<input id="tx_${d.id}" inputmode="decimal" autocomplete="off" value="${fmtInput(d,S[d.id])}">${post?`<span>${post}</span>`:''}</span></div>
+        <input type="range" id="rg_${d.id}" aria-label="${d.label}" min="${d.min}" max="${d.max}" step="${d.step}" value="${Math.min(S[d.id],d.max)}">`;
+      if(d.extra==='ssEst') f.insertAdjacentHTML('beforeend','<button type="button" class="estbtn" id="openSS"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="10" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="4" y="3" width="6" height="2.2" rx=".4" fill="currentColor"/><circle cx="4.8" cy="7.6" r=".8" fill="currentColor"/><circle cx="7" cy="7.6" r=".8" fill="currentColor"/><circle cx="9.2" cy="7.6" r=".8" fill="currentColor"/><circle cx="4.8" cy="10.2" r=".8" fill="currentColor"/><circle cx="7" cy="10.2" r=".8" fill="currentColor"/><circle cx="9.2" cy="10.2" r=".8" fill="currentColor"/></svg>Not sure? Estimate Social Security here</button>');
+      if(d.extra==='budEst') f.insertAdjacentHTML('beforeend','<button type="button" class="estbtn" id="openBud"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="10" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="4" y="3" width="6" height="2.2" rx=".4" fill="currentColor"/><circle cx="4.8" cy="7.6" r=".8" fill="currentColor"/><circle cx="7" cy="7.6" r=".8" fill="currentColor"/><circle cx="9.2" cy="7.6" r=".8" fill="currentColor"/><circle cx="4.8" cy="10.2" r=".8" fill="currentColor"/><circle cx="7" cy="10.2" r=".8" fill="currentColor"/><circle cx="9.2" cy="10.2" r=".8" fill="currentColor"/></svg>Not sure? Build a retirement budget here</button>');
+      sec.appendChild(f);
+      const tx=f.querySelector('#tx_'+d.id), rg=f.querySelector('#rg_'+d.id);
+      rg.addEventListener('input',()=>{ S[d.id]=parseFloat(rg.value); tx.value=fmtInput(d,S[d.id]); changed(); });
+      const commit=()=>{
+        let v=parseFloat(String(tx.value).replace(/[^0-9.\-]/g,''));
+        if(!isFinite(v)) v=S[d.id];
+        const hard = d.fmt==='usd' ? d.max*5 : d.max;
+        v=Math.min(hard,Math.max(d.min,v));
+        S[d.id]=v; tx.value=fmtInput(d,v); rg.value=Math.min(v,d.max); changed();
+      };
+      tx.addEventListener('change',commit);
+      tx.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); commit(); tx.blur(); } });
+    });
+    inputsEl.appendChild(sec);
+  });
+
+  const tools=document.createElement('div');
+  tools.innerHTML=`<div class="tools">
+      ${level>=2 ? `<span style="display:inline-flex;align-items:center"><button class="btn" id="reroll">Rerun the statistical sampling</button>${q('reroll')}</span>` : ''}
+      <button class="btn" id="reset">Reset to Default Settings</button>
+    </div>
+    <div class="tools"><button class="btn" id="exportCsv">Export the full analysis (CSV)</button>${q('export')}</div>
+    <div class="expnote" id="expNote" hidden>
+      <p><b>Next, Claude will ask you to confirm the save.</b> Its notice, "Only continue if you trust this artifact," is a standard check Claude shows whenever any app published on Claude offers a file. It is not a warning about this file.</p>
+      <p>This app built the file on your device from the numbers you entered. Nothing has been sent anywhere. The file contains your personal financial data, so save or share it with care.</p>
+      <div class="tools" style="margin-top:6px"><button class="btn primary" id="expGo">Continue to save</button><button class="btn" id="expNo">Cancel</button></div>
+    </div>
+    <p class="msg" id="exportMsg"></p>
+    <details class="share"><summary>Save or share this scenario</summary>
+      <p class="note">A scenario code holds your inputs. Nothing is sent anywhere. It looks scrambled, but it is not encrypted: anyone holding the code can read your numbers, so share it only with someone you trust.</p>
+      <textarea id="codeOut" readonly aria-label="Scenario code"></textarea>
+      <div class="tools" style="margin-top:0"><button class="btn" id="copyCode">Copy code</button></div>
+      <textarea id="codeIn" placeholder="Paste a scenario code" aria-label="Paste a scenario code"></textarea>
+      <div class="tools" style="margin-top:0"><button class="btn" id="loadCode">Load scenario</button></div>
+      <p class="msg" id="codeMsg"></p>
+    </details>`;
+  inputsEl.appendChild(tools);
+  const os=document.getElementById('openSS'); if(os) os.onclick=openSSEst;
+  const ob=document.getElementById('openBud'); if(ob) ob.onclick=openBudget;
+  const ps=document.getElementById('personaSel'); if(ps) ps.onchange=()=>{ const k=ps.value; if(k) applyPersona(k); };
+  document.getElementById('exportCsv').onclick=()=>{
+    const note=document.getElementById('expNote'), msg=document.getElementById('exportMsg');
+    if(dlNS){ msg.textContent=''; note.hidden=false; document.getElementById('expGo').focus(); }
+    else exportCSV();
+  };
+  document.getElementById('expGo').onclick=()=>{ document.getElementById('expNote').hidden=true; exportCSV(); };
+  document.getElementById('expNo').onclick=()=>{ document.getElementById('expNote').hidden=true; document.getElementById('exportCsv').focus(); };
+  const rr=document.getElementById('reroll'); if(rr) rr.onclick=()=>{ seed=(Math.random()*1e9)|0; save(); run(); };
+  document.getElementById('reset').onclick=()=>{ S=Object.assign({},DEF,{events:[]}); splitDone=false; eventsSeeded=false; if(level>=3) splitSavings(); if(level>=4) seedEvents(); save(); buildInputs(); run(); };
+  tools.querySelector('details').addEventListener('toggle',syncCode);
+  document.getElementById('copyCode').onclick=()=>{
+    const ta=document.getElementById('codeOut'), m=document.getElementById('codeMsg');
+    ta.value=encodeScenario();
+    m.textContent='';
+    copyFrom(ta).then(ok=>{ m.textContent = ok ? 'Copied.'
+      : 'Copying is blocked in this view. The code is selected: press Ctrl+C, or ⌘C on a Mac.'; });
+  };
+  document.getElementById('loadCode').onclick=()=>{
+    const m=document.getElementById('codeMsg');
+    try{ const o=decodeScenario(document.getElementById('codeIn').value); applySnapshot(o); save(); renderRail(); buildInputs(); buildGrid(); run(); document.getElementById('codeMsg').textContent='Scenario loaded.'; }
+    catch(e){ m.textContent='That code could not be read. Check that it was copied in full.'; }
+  };
+}
+
+/* The scenario code describes the current inputs, so it has to follow them: refresh it on every
+   change while the section is open, not only when the section is opened. Skipped while the box has
+   focus, so that rewriting the value cannot clear a selection the reader is about to copy by hand. */
+function syncCode(){
+  const det=document.querySelector('details.share');
+  if(!det || !det.open) return;
+  const ta=document.getElementById('codeOut');
+  if(ta && document.activeElement!==ta) ta.value=encodeScenario();
+}
+/* Copy a textarea's contents. The published page runs inside a frame where the async clipboard API
+   is blocked (NotAllowedError), so try the older synchronous command first, while the click that
+   permits it is still being handled. Resolves false only if neither route works. */
+function copyFrom(ta){
+  ta.focus(); ta.select();
+  try{ ta.setSelectionRange(0, ta.value.length); }catch(e){}
+  try{ if(document.execCommand('copy')) return Promise.resolve(true); }catch(e){}
+  if(navigator.clipboard && navigator.clipboard.writeText)
+    return navigator.clipboard.writeText(ta.value).then(()=>true, ()=>false);
+  return Promise.resolve(false);
+}
+/* Same, for text with no box of its own: borrow an off-screen one, then give focus back. */
+function copyString(text){
+  const prev=document.activeElement;
+  const ta=document.createElement('textarea');
+  ta.value=text; ta.setAttribute('readonly','');
+  ta.style.cssText='position:fixed;top:0;left:-9999px;opacity:0';
+  document.body.appendChild(ta);
+  const tidy=ok=>{ ta.remove(); if(prev && prev.focus) prev.focus(); return ok; };
+  return copyFrom(ta).then(tidy, ()=>tidy(false));
+}
+
+/* ===================== LIFE EVENTS (Level 4) ===================== */
+function esc(t){ return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+function cleanEvent(e){
+  e = e||{};
+  return {name:String(e.name||'').slice(0,40), type:e.type==='in'?'in':'out',
+    amt:Math.max(0,Math.min(5e7,+e.amt||0)), year:Math.round(+e.year||CUR_YEAR+1), years:Math.max(1,Math.min(40,Math.round(+e.years||1)))};
+}
+function seedEvents(){
+  if(eventsSeeded) return;
+  eventsSeeded=true;
+  if(S.events.length) return;
+  S.events=[
+    {name:'Home down payment', type:'out', amt:80000, year:CUR_YEAR+3, years:1},
+    {name:'Inheritance', type:'in', amt:150000, year:CUR_YEAR+15, years:1},
+  ];
+}
+function buildEvents(){
+  const sec=document.createElement('div'); sec.className='grp';
+  sec.innerHTML=`<h2>${GROUPS[4].title}<span>${GROUPS[4].sub}</span></h2>
+    <p class="note">Amounts are in today's dollars and after tax. Money in is invested in your brokerage account. Money out is paid in the same order as retirement spending.</p>
+    <div id="evList"></div>
+    <button type="button" class="btn addev" id="addEv"><span aria-hidden="true">+</span> Add a life event</button>`;
+  const list=sec.querySelector('#evList');
+  const draw=()=>{
+    list.innerHTML = S.events.length ? '' : '<p class="note">No events yet. Add an inheritance, a home purchase, college costs or anything else that moves a large sum in or out.</p>';
+    S.events.forEach((ev,ix)=>{
+      const card=document.createElement('div'); card.className='ev';
+      const age = Math.round(S.age) + (ev.year - CUR_YEAR);
+      card.innerHTML=`
+        <div class="evrow"><input class="evname" aria-label="Event name" placeholder="Name this event" value="${esc(ev.name)}">${q('ev_name')}
+          <button type="button" class="evdel" aria-label="Remove ${esc(ev.name||'this event')}">×</button></div>
+        <div class="evrow"><div class="seg evtype" role="group" aria-label="Money in or out">
+            <button type="button" data-t="in" aria-pressed="${ev.type==='in'}">Money in</button><button type="button" data-t="out" aria-pressed="${ev.type==='out'}">Money out</button></div>${q('ev_type')}
+          <span class="num evamt"><span>$</span><input aria-label="Amount" inputmode="decimal" value="${Math.round(ev.amt).toLocaleString('en-US')}"></span>${q('ev_amt')}</div>
+        <div class="evrow evwhen"><label>Year <input class="evyear" inputmode="numeric" aria-label="Year" value="${ev.year}"></label>${q('ev_year')}
+          <label>for <input class="evyears" inputmode="numeric" aria-label="Number of years" value="${ev.years}"> yr</label>${q('ev_years')}
+          <span class="evage">${age<Math.round(S.age)?'Already past':'Age '+age}</span></div>`;
+      const upd=()=>{ changed(); };
+      card.querySelector('.evname').addEventListener('change',e=>{ ev.name=e.target.value.slice(0,40); upd(); });
+      card.querySelectorAll('.evtype button').forEach(b=>b.addEventListener('click',()=>{ ev.type=b.dataset.t; draw(); upd(); }));
+      const amt=card.querySelector('.evamt input');
+      amt.addEventListener('change',()=>{ let v=parseFloat(amt.value.replace(/[^0-9.]/g,'')); if(!isFinite(v)) v=ev.amt; ev.amt=Math.max(0,Math.min(5e7,v)); amt.value=Math.round(ev.amt).toLocaleString('en-US'); upd(); });
+      const yr=card.querySelector('.evyear');
+      yr.addEventListener('change',()=>{ let v=parseInt(yr.value,10); if(!isFinite(v)) v=ev.year; ev.year=Math.max(CUR_YEAR-5,Math.min(CUR_YEAR+80,v)); draw(); upd(); });
+      const ny=card.querySelector('.evyears');
+      ny.addEventListener('change',()=>{ let v=parseInt(ny.value,10); if(!isFinite(v)) v=ev.years; ev.years=Math.max(1,Math.min(40,v)); ny.value=ev.years; upd(); });
+      card.querySelectorAll('input').forEach(inp=>inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); inp.blur(); } }));
+      card.querySelector('.evdel').addEventListener('click',()=>{ S.events.splice(ix,1); draw(); upd(); });
+      list.appendChild(card);
+    });
+  };
+  draw();
+  sec.querySelector('#addEv').addEventListener('click',()=>{
+    if(S.events.length>=30) return;
+    S.events.push({name:'', type:'out', amt:25000, year:CUR_YEAR+5, years:1});
+    draw(); changed();
+    const cards=list.querySelectorAll('.evname'); cards[cards.length-1].focus();
+  });
+  return sec;
+}
+
+/* ===================== EXAMPLE STARTING POINTS ===================== */
+const PERSONAS = {
+  p40:  {label:'The early retiree, age 40: retire at 45, $2.2M saved', v:{age:40, retAge:45, savings:2200000, contrib:60000, spend:87000,  stocks:80, ssAmt:24000, ssAge:67, filing:'mfj'}},
+  p50:  {label:'Mid-career, age 50: retire at 62, $500K saved',       v:{age:50, retAge:62, savings:500000,  contrib:12000, spend:81000, stocks:60, ssAmt:36000, ssAge:67, filing:'mfj'}},
+  p55:  {label:'Late saver, age 55: retire at 67, $100K saved',       v:{age:55, retAge:67, savings:100000,  contrib:25000, spend:57000,  stocks:60, ssAmt:32000, ssAge:67, filing:'mfj'}},
+  p58:  {label:'Five years out, age 58: retire at 63, $1.5M saved',   v:{age:58, retAge:63, savings:1500000, contrib:30000, spend:105000, stocks:60, ssAmt:40000, ssAge:67, filing:'mfj'}},
+  p64:  {label:'Retiring this year, age 64: $1.8M saved',             v:{age:64, retAge:64, savings:1800000, contrib:0,     spend:105000, stocks:50, ssAmt:40000, ssAge:67, filing:'mfj'}},
+  p70:  {label:'Already retired, age 70: $1.4M saved',               v:{age:70, retAge:70, savings:1400000, contrib:0,     spend:105000, stocks:50, ssAmt:45000, ssAge:70, filing:'mfj'}},
+};
+const PERSONA_HTML_T = ()=>`<div class="personas"><select class="sel psel" id="personaSel" aria-label="Start from an example"><option value="">Start from an example…</option>`+
+  Object.entries(PERSONAS).map(([k,p])=>`<option value="${k}">${p.label}</option>`).join('')+`</select>${q('personas')}</div>`;
+function applyPersona(k){
+  const p=PERSONAS[k]; if(!p) return;
+  Object.assign(S,p.v); splitDone=false;
+  if(level>=3) splitSavings();
+  save(); buildInputs(); run();
+}
+
+/* ===================== SOCIAL SECURITY ESTIMATOR ===================== */
+// 2026 parameters: PIA bend points and taxable maximum. Full retirement age 67 (born 1960 or later).
+const SSP = {b1:1286, b2:7749, cap:184500, fra:67};
+const SSE = {earn:110000, start:23, shape:'some', stop:null, claim:67, spouse:false, cut:false};
+function ssCompute(o){
+  const cur=Math.round(S.age), stop=Math.round(o.stop), start=Math.round(o.start);
+  const f0 = o.shape==='same'?1 : o.shape==='some'?.75 : .5;
+  const yrs=[];
+  for(let a=start; a<Math.min(stop,70); a++){
+    let fac = 1;
+    if(a<cur && cur>start) fac = f0 + (1-f0)*(a-start)/(cur-start);
+    yrs.push(Math.min(SSP.cap, Math.max(0,o.earn)*fac));
+  }
+  const worked = yrs.filter(v=>v>0).length;
+  yrs.sort((a,b)=>b-a);
+  const top = yrs.slice(0,35), zeros = Math.max(0,35-top.length);
+  const aime = Math.floor(top.reduce((m,v)=>m+v,0)/420);
+  let pia = .9*Math.min(aime,SSP.b1) + .32*Math.max(0,Math.min(aime,SSP.b2)-SSP.b1) + .15*Math.max(0,aime-SSP.b2);
+  if(worked<10) pia=0;
+  const own = c=>{ const m=(SSP.fra-c)*12; if(m>0) return pia*(1-(Math.min(m,36)*5/9 + Math.max(0,m-36)*5/12)/100); return pia*(1+.08*(c-SSP.fra)); };
+  const sp  = c=>{ const m=(SSP.fra-c)*12; const base=.5*pia; if(m>0) return base*(1-(Math.min(m,36)*25/36 + Math.max(0,m-36)*5/12)/100); return base; };
+  const total = c=> (own(c) + (o.spouse?sp(c):0)) * (o.cut?.8:1);
+  return {aime, pia, worked, zeros, total, own, sp};
+}
+function openSSEst(){
+  if(SSE.stop===null) SSE.stop=Math.round(S.retAge);
+  SSE.claim=Math.round(S.ssAge);
+  const dlg=document.getElementById('ssdlg');
+  dlg.innerHTML = `<form method="dialog" class="ssbox" onsubmit="return false">
+    <div class="sshead"><h2>Estimate your Social Security</h2><button type="button" class="evdel" id="ssClose" aria-label="Close">×</button></div>
+    <p class="note">A quick estimate from your pay. For your exact figure, sign in at ssa.gov/myaccount, where your statement shows your benefit at each claiming age.</p>
+    <div class="ssgrid">
+      <div class="field"><div class="top"><div class="lab"><label for="se_earn">Your yearly pay now</label>${q('se_earn')}<span class="hint">Wages or self-employment income</span></div>
+        <span class="num"><span>$</span><input id="se_earn" inputmode="decimal" value="${Math.round(SSE.earn).toLocaleString('en-US')}"></span></div></div>
+      <div class="field"><div class="top"><div class="lab"><label for="se_start">Age you started full-time work</label>${q('se_start')}</div>
+        <span class="num"><input id="se_start" inputmode="numeric" value="${SSE.start}"></span></div></div>
+      <div class="field"><div class="top"><div class="lab"><label for="se_shape">Earlier pay, compared with now</label>${q('se_shape')}<span class="hint">After adjusting for wage growth</span></div>
+        <select class="sel" id="se_shape"><option value="same">About the same</option><option value="some">Somewhat lower</option><option value="much">Much lower</option></select></div></div>
+      <div class="field"><div class="top"><div class="lab"><label for="se_stop">Stop working at age</label>${q('se_stop')}</div>
+        <span class="num"><input id="se_stop" inputmode="numeric" value="${SSE.stop}"></span></div></div>
+      <div class="field"><div class="top"><div class="lab"><label for="se_claim">Start benefits at age</label>${q('se_claim')}</div>
+        <span class="num"><input id="se_claim" inputmode="numeric" value="${SSE.claim}"></span></div>
+        <input type="range" id="se_claimR" min="62" max="70" step="1" value="${SSE.claim}" aria-label="Start benefits at age"></div>
+      <label class="chk"><input type="checkbox" id="se_spouse" ${SSE.spouse?'checked':''}> Add a spousal benefit${q('se_spouse')}<span class="hint">For a spouse with little or no work history of their own</span></label>
+      <label class="chk"><input type="checkbox" id="se_cut" ${SSE.cut?'checked':''}> Plan for a 20% benefit cut${q('se_cut')}<span class="hint">If the trust fund shortfall is not fixed</span></label>
+    </div>
+    <div class="ssout" id="ssOut"></div>
+    <div class="tools"><button type="button" class="btn primary" id="ssUse"></button><button type="button" class="btn" id="ssCancel">Close</button></div>
+  </form>`;
+  dlg.querySelector('#se_shape').value=SSE.shape;
+  const num=(id,lo,hi)=>{ const el=dlg.querySelector('#'+id); let v=parseFloat(el.value.replace(/[^0-9.]/g,'')); return isFinite(v)?Math.max(lo,Math.min(hi,v)):null; };
+  const recalc=()=>{
+    const e=num('se_earn',0,2e6); if(e!==null) SSE.earn=e;
+    const st=num('se_start',14,70); if(st!==null) SSE.start=Math.round(st);
+    const sp=num('se_stop',SSE.start+1,75); if(sp!==null) SSE.stop=Math.round(sp);
+    const c=num('se_claim',62,70); if(c!==null) SSE.claim=Math.round(c);
+    dlg.querySelector('#se_claimR').value=SSE.claim;
+    SSE.shape=dlg.querySelector('#se_shape').value; SSE.spouse=dlg.querySelector('#se_spouse').checked; SSE.cut=dlg.querySelector('#se_cut').checked;
+    const r=ssCompute(SSE);
+    const yr=c=>Math.round(r.total(c)*12/100)*100;
+    const out=dlg.querySelector('#ssOut');
+    if(r.pia===0){
+      out.innerHTML=`<p class="ssbig">No benefit</p><p class="note">Social Security requires 40 work credits, about 10 years of covered work. These inputs give ${r.worked} years.</p>`;
+      dlg.querySelector('#ssUse').textContent='Use $0'; dlg.querySelector('#ssUse').dataset.v=0; return;
+    }
+    out.innerHTML=`<p class="ssbig">$${yr(SSE.claim).toLocaleString('en-US')} a year<span> starting at ${SSE.claim}, in today's dollars</span></p>
+      <div class="sstab"><div><span>At 62</span><b>$${yr(62).toLocaleString('en-US')}</b></div><div><span>At 67</span><b>$${yr(67).toLocaleString('en-US')}</b></div><div><span>At 70</span><b>$${yr(70).toLocaleString('en-US')}</b></div></div>
+      <p class="note">Based on average indexed monthly earnings of $${r.aime.toLocaleString('en-US')}${q('se_aime')} and a full-retirement-age benefit of $${Math.round(r.pia).toLocaleString('en-US')} a month${q('se_pia')}. ${r.zeros?`${r.zeros} of the 35 years counted are zeros.`:'All 35 counted years have earnings.'}</p>`;
+    const b=dlg.querySelector('#ssUse'); b.textContent=`Use $${yr(SSE.claim).toLocaleString('en-US')} starting at ${SSE.claim}`; b.dataset.v=yr(SSE.claim);
+  };
+  dlg.querySelectorAll('input,select').forEach(el=>{ el.addEventListener('change',recalc); if(el.type==='checkbox') return; el.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); recalc(); } }); });
+  dlg.querySelector('#se_claimR').addEventListener('input',e=>{ dlg.querySelector('#se_claim').value=e.target.value; recalc(); });
+  const close=()=>{ hideHelp(); dlg.close(); document.getElementById('openSS')?.focus(); };
+  dlg.querySelector('#ssClose').onclick=close; dlg.querySelector('#ssCancel').onclick=close;
+  dlg.querySelector('#ssUse').onclick=()=>{
+    S.ssAmt=+dlg.querySelector('#ssUse').dataset.v; S.ssAge=SSE.claim;
+    close(); save(); buildInputs(); run();
+  };
+  recalc();
+  dlg.appendChild(pop);
+  dlg.onclose=()=>{ hideHelp(); document.body.appendChild(pop); };
+  dlg.showModal();
+}
+
+/* ===================== CSV EXPORT ===================== */
+let dlNS = null;
+(async()=>{ try{ if(window.claude && window.claude.use) dlNS = await window.claude.use('downloads'); }catch(e){ dlNS=null; } })();
+function csvCell(v){
+  if(v===null || v===undefined) return '';
+  if(typeof v==='number') return isFinite(v) ? String(v) : '';
+  const t=String(v); return /[",\n]/.test(t) ? '"'+t.replace(/"/g,'""')+'"' : t;
+}
+function buildCSV(){
+  const {res, real, mode} = lastRun, A=res.A, nY=res.nY, last=nY-1;
+  const rows=[];
+  const r0=v=>Math.round(v), p2=v=>Math.round(v*10000)/100;
+  const modeName = mode==='hist' ? `Historical Backtests (${res.nP} start years, ${res.startYear[0]}-${res.startYear[res.nP-1]})` : 'Monte Carlo Statistical Projections';
+  let nOk=0; for(let i=0;i<res.nP;i++) if(isNaN(res.dryAge[i])) nOk++;
+  rows.push(['Retirement.diy full analysis export']);
+  rows.push(['Note', 'This file contains your personal financial data. Save or share it with care.']);
+  rows.push(['Generated', new Date().toISOString().slice(0,10)]);
+  rows.push(['Level', level]);
+  rows.push(['Returns', modeName]);
+  rows.push(['Dollars', real ? "Today's dollars" : 'Future dollars']);
+  rows.push(['Futures or start years', res.nP]);
+  if(mode==='mc') rows.push(['Random seed', seed], ['Random number generator', 'mulberry32; normal draws by the polar method; yearly lognormal returns']);
+  rows.push(['Scenario code (paste into the app to reproduce these exact results)', encodeScenario()]);
+  rows.push([`Share lasting to age ${res.H}`, p2(nOk/res.nP)+'%']);
+  if(lastSustain!==null) rows.push(['Sustainable income (before tax, lasting in 90%)', lastSustain]);
+  rows.push([]);
+  rows.push(['Input','Value']);
+  INPUTS.filter(d=>d.lvl<=level && (!d.only || d.only.includes(level))).forEach(d=>{
+    const v=S[d.id];
+    rows.push([d.label, d.type==='select' ? (d.options.find(o=>o[0]===v)||[,v])[1] : v]);
+  });
+  if(level>=4) S.events.forEach(ev=>rows.push([`Life event: ${ev.name||'Unnamed'}`, `${ev.type==='in'?'Money in':'Money out'} $${Math.round(ev.amt)} per year, ${ev.year} for ${ev.years} yr`]));
+  if(level<2) rows.push(['Plan to age (fixed at Level 1)', 95], ['Average inflation (fixed at Level 1)', '2.5%'], ['State tax rate (fixed at Level 1)', '4%']);
+  rows.push(['Tax filing status', S.filing==='single'?'Single':'Married, filing jointly'], ['Federal tax', `${TAXLAW.year} brackets, indexed to each future's inflation`]);
+  if(mode==='mc') rows.push(['Stock returns', `${retPctS(stockMeanOf(S, level))} avg, ${pctS(MKT.sVol)} spread`], ['Bond returns', `${pctS(MKT.bMean)} avg, ${pctS(MKT.bVol)} spread`], ['Cash returns', `${pctS(MKT.cMean)} avg`]);
+  rows.push([]);
+
+  // columns, one row per age
+  const cols=[];
+  const add=(name,vals)=>cols.push({name,vals});
+  add('Age', res.ages);
+  add(mode==='hist'?'Years from now':'Calendar year', res.ages.map(a=> mode==='hist' ? a-A : CUR_YEAR+a-A));
+  const tb=band(res, GET.total, real);
+  PCTS.forEach(pc=>add(`Total savings p${pc}`, tb[pc].map(r0)));
+  if(level>=2){ const b=band(res, GET.tax, real); [10,25,50,75,90].forEach(pc=>add(`Taxes incurred p${pc}`, b[pc].map(r0))); }
+  if(level>=3) [['trad','Traditional'],['roth','Roth'],['brok','Brokerage'],['cash','Excess cash']].forEach(([k,l])=>{
+    const b=band(res, GET[k], real); [10,50,90].forEach(pc=>add(`${l} p${pc}`, b[pc].map(r0)));
+  });
+  // the median future, account by account, with its market returns
+  const i=rankPaths(res)[Math.round(.5*(res.nP-1))];
+  const sc=k=> real ? 1/res.CI[k][i] : 1;
+  if(level>=3){
+    [['CASH','Excess cash'],['BROK','Brokerage'],['TRAD','Traditional'],['ROTH','Roth']].forEach(([k,l])=>add(`Median future: ${l}`, res.ages.map((_,j)=>r0(res[k][j][i]*sc(j)))));
+  } else add('Median future: Savings', res.ages.map((_,j)=>r0(GET.total(res,j,i)*sc(j))));
+  add('Median future: Social Security as savings (income / 4%)', res.ages.map((a,j)=> a<S.ssAge ? 0 : r0(S.ssAmt*(real?1:res.CI[j][i])/SWR)));
+  if(level>=2 && S.penAmt>0){
+    const kS=Math.min(nY-1,Math.max(0,Math.round(S.penAge)-A)), cola=S.penCola==='full';
+    add('Median future: Pension as savings (income / 4%)', res.ages.map((a,k)=>{
+      if(k<kS) return 0;
+      const ciS=res.CI[kS][i], ciK=res.CI[k][i];
+      const v = real ? (cola ? S.penAmt/ciS : S.penAmt/ciK) : (!cola ? S.penAmt : S.penAmt*ciK/ciS);
+      return r0(v/SWR);
+    }));
+  }
+  add('Median future: market return in year ending at this age (%)', res.ages.map((_,k)=> k===0 ? '' : p2(real ? (1+res.RET[k][i])/(1+res.INF[k][i])-1 : res.RET[k][i])));
+  add('Median future: inflation in year ending at this age (%)', res.ages.map((_,k)=> k===0 ? '' : p2(res.INF[k][i])));
+  // backtest curves
+  if(level>=2){
+    const h = mode==='hist' ? res : histRun();
+    if(h && h.nY===nY){
+      histPicks(h).slice().sort((a,b)=>h.startYear[a]-h.startYear[b]).forEach(ix=>{
+        add(`Backtest: savings, starting in ${h.startYear[ix]}`, h.ages.map((_,k)=>r0(GET.total(h,k,ix)/(real?h.CI[k][ix]:1))));
+      });
+    }
+  }
+  rows.push(cols.map(c=>c.name));
+  for(let k=0;k<nY;k++) rows.push(cols.map(c=>c.vals[k]));
+  return rows.map(r=>r.map(csvCell).join(',')).join('\r\n') + '\r\n';
+}
+async function exportCSV(){
+  const msg=document.getElementById('exportMsg');
+  if(!lastRun){ msg.textContent='Nothing to export yet.'; return; }
+  const csv=buildCSV();
+  const fname=`retirement-diy-projection-${new Date().toISOString().slice(0,10)}.csv`;
+  if(dlNS){
+    msg.textContent='Waiting for you to confirm the save…';
+    try{ await dlNS.save({filename:fname, data:csv}); msg.textContent='Exported. This file contains your personal financial data. Save or share it with care.'; }
+    catch(e){
+      const c=e && e.code;
+      if(c==='declined') msg.textContent='Export cancelled.';
+      else if(c==='rate_limited') msg.textContent='A save prompt is already open.';
+      else { dlNS=null; saveOrCopy(csv, fname, msg); }
+    }
+    return;
+  }
+  saveOrCopy(csv, fname, msg);
+}
+/* A plain page can hand the file straight over. Inside a frame a download is usually blocked and
+   fails silently, so there the clipboard is the honest route rather than claiming a save happened. */
+function canDownload(){ try{ return window.self===window.top; }catch(e){ return false; } }
+function saveOrCopy(csv, fname, msg){
+  if(canDownload() && saveFile(csv, fname)){
+    msg.textContent='Saved as '+fname+'. This file contains your personal financial data. Save or share it with care.';
+    return Promise.resolve(true);
+  }
+  return copyFallback(csv, msg);
+}
+function saveFile(text, fname){
+  try{
+    const url=URL.createObjectURL(new Blob([text], {type:'text/csv;charset=utf-8'}));
+    const a=document.createElement('a');
+    a.href=url; a.download=fname; a.rel='noopener'; a.style.display='none';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 10000);
+    return true;
+  }catch(e){ return false; }
+}
+function copyFallback(csv, msg){
+  return copyString(csv).then(ok=>{
+    msg.textContent = ok
+      ? 'Downloads are not available in this view, so the data was copied instead. Paste it into a spreadsheet. It contains your personal financial data, so share it with care.'
+      : 'Downloads and copying are both blocked in this view. Open the published page to export.';
+  });
+}
+
+/* ===================== RETIREMENT BUDGET PLANNER ===================== */
+// Example amounts in today's dollars. 'm' = per month, 'y' = per year.
+const BUDGET_GROUPS = [
+  {id:'home', t:'Home', rows:[
+    ['mort','Mortgage or rent','m',0],['ptax','Property tax','m',330],['hins','Home insurance','m',140],['hoa','HOA or condo fees','m',0],['repair','Repairs and upkeep','y',3500]]},
+  {id:'util', t:'Utilities', rows:[
+    ['power','Electric, gas, water, trash','m',300],['net','Phone, internet, streaming','m',160]]},
+  {id:'food', t:'Food', rows:[
+    ['groc','Groceries','m',780],['dine','Dining out','m',340]]},
+  {id:'car', t:'Transportation', rows:[
+    ['cins','Car insurance','m',135],['fuel','Fuel and charging','m',170],['cmaint','Car maintenance','m',90],['creplace','Setting aside for the next car','y',5000]]},
+  {id:'health', t:'Health care', rows:[
+    ['hprem','Insurance premiums (Medicare, supplement, drug plan, or pre-65 coverage)','m',700],['hoop','Out-of-pocket costs, dental, vision','m',260]]},
+  {id:'life', t:'Living and fun', rows:[
+    ['travel','Travel','y',8500],['hobby','Hobbies and entertainment','m',260],['personal','Clothing and personal care','m',210],['house','Household goods','m',170]]},
+  {id:'give', t:'Family and giving', rows:[
+    ['gifts','Gifts and family support','y',2700],['charity','Charitable giving','y',900]]},
+  {id:'other', t:'Other', rows:[
+    ['oins','Other insurance (life, umbrella, long-term care)','m',90],['misc','Everything else, a cushion','m',330]]},
+];
+let BUD = null;
+function budInit(){ if(BUD) return; BUD={}; BUDGET_GROUPS.forEach(g=>g.rows.forEach(r=>BUD[r[0]]=r[3])); }
+function budYearly(){ let t=0; BUDGET_GROUPS.forEach(g=>g.rows.forEach(r=>t+=(+BUD[r[0]]||0)*(r[2]==='m'?12:1))); return t; }
+function budGross(net){ return grossFromNet(net, TAXLAW[S.filing==='single'?'single':'mfj'], stateRateOf(S, level)); }
+function openBudget(){
+  budInit();
+  const dlg=document.getElementById('buddlg');
+  const groupHtml=g=>`<fieldset class="bgrp"><legend>${g.t}${q('bud_'+g.id)}<span class="bsub" id="bsub_${g.id}"></span></legend>`+
+    g.rows.map(([k,l,u])=>`<div class="brow"><label for="bd_${k}">${l}</label><span class="num"><span>$</span><input id="bd_${k}" data-k="${k}" inputmode="decimal" value="${Math.round(BUD[k]).toLocaleString('en-US')}"><span>${u==='m'?'/mo':'/yr'}</span></span></div>`).join('')+`</fieldset>`;
+  dlg.innerHTML=`<form method="dialog" class="ssbox" onsubmit="return false">
+    <div class="sshead"><h2>Build a retirement budget</h2><button type="button" class="evdel" id="budClose" aria-label="Close">×</button></div>
+    <p class="note">Enter what you expect to spend in a typical retirement year, in today's dollars. The amounts shown are examples, so replace them with your own. Leave a line at zero if it won't apply, such as a mortgage you will have paid off.</p>
+    <div class="bgrid">${BUDGET_GROUPS.map(groupHtml).join('')}</div>
+    <div class="bfoot"><div id="budOut"></div>
+    <div class="tools" style="margin-top:6px"><button type="button" class="btn primary" id="budUse"></button><button type="button" class="btn" id="budReset">Restore examples</button><button type="button" class="btn" id="budCancel">Close</button></div></div>
+  </form>`;
+  const recalc=()=>{
+    dlg.querySelectorAll('[data-k]').forEach(el=>{ let v=parseFloat(el.value.replace(/[^0-9.]/g,'')); BUD[el.dataset.k]=isFinite(v)?Math.max(0,Math.min(1e6,v)):0; });
+    BUDGET_GROUPS.forEach(g=>{ let t=0; g.rows.forEach(r=>t+=(+BUD[r[0]]||0)*(r[2]==='m'?12:1)); dlg.querySelector('#bsub_'+g.id).textContent=money(t)+'/yr'; });
+    const spend=budYearly(), gross=Math.round(budGross(spend)/1000)*1000;
+    dlg.querySelector('#budOut').innerHTML=`<p class="ssbig">$${gross.toLocaleString('en-US')} a year<span>before tax, needed to cover $${Math.round(spend).toLocaleString('en-US')} of spending, taxed like a salary of that size (${gross>0?Math.round((1-spend/gross)*100):0}% overall)${q('bud_total')}</span></p>`;
+    const b=dlg.querySelector('#budUse'); b.textContent=`Use $${gross.toLocaleString('en-US')} a year`; b.dataset.v=gross;
+  };
+  dlg.querySelectorAll('[data-k]').forEach(el=>{
+    el.addEventListener('change',()=>{ recalc(); el.value=Math.round(BUD[el.dataset.k]).toLocaleString('en-US'); save(); });
+    el.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); el.blur(); } });
+  });
+  const close=()=>{ hideHelp(); dlg.close(); document.getElementById('openBud')?.focus(); };
+  dlg.querySelector('#budClose').onclick=close; dlg.querySelector('#budCancel').onclick=close;
+  dlg.querySelector('#budReset').onclick=()=>{ BUD=null; budInit(); save(); dlg.close(); openBudget(); };
+  dlg.querySelector('#budUse').onclick=()=>{ S.spend=+dlg.querySelector('#budUse').dataset.v; close(); save(); buildInputs(); run(); };
+  recalc();
+  dlg.appendChild(pop);
+  dlg.onclose=()=>{ hideHelp(); document.body.appendChild(pop); };
+  if(!dlg.open) dlg.showModal();
+}
+
+/* ===================== LEVEL RAIL ===================== */
+const RAIL = [
+  {k:1, n:'Level 1', t:'Essentials', d:'Key numbers and a verdict'},
+  {k:2, n:'Level 2', t:'Uncertainty', d:'Range of futures, pension, inflation'},
+  {k:3, n:'Level 3', t:'Accounts', d:'Traditional, Roth, brokerage, cash'},
+  {k:4, n:'Level 4', t:'Life events', d:'Inheritances, a home, big costs'},
+  {k:'p1', n:'Level 5', t:'Tax Strategy', d:'Withdrawal sequencing, Roth conversions, RMDs, state‑specific taxes', paid:true,
+   info:'Withdrawal sequencing: compare which accounts to spend first, from the usual order to filling a low tax bracket each year, and see the effect on lifetime taxes and what you leave behind. A Roth conversion planner, required minimum distributions and Medicare premium surcharges. Your own state\'s tax rules, including its treatment of Social Security and retirement income. Survivor years: when one spouse dies, the other keeps the larger Social Security check, any pension drops to its survivor share, spending adjusts, and taxes switch to single filing. Head of household, married filing separately and dependents. Plus control over the market assumptions that are fixed in the free levels, and backtests against every start year since 1871 rather than the ten shown free.'},
+  {k:'p10', n:'Level 6', t:'Your Real Portfolio', d:'Actual funds, history and advisor fees', paid:true,
+   info:'Enter the funds you own by ticker. Returns, volatility and correlations come from their real price history, with sequence-of-returns views and a down-year cash buffer rule. Add your advisor\'s fee and each fund\'s expense ratio to see what they cost you over retirement, in dollars and in sustainable income.'},
+];
+let paidOpen=null;
+function renderRail(){
+  const el=document.getElementById('rail'); el.innerHTML='';
+  RAIL.forEach(r=>{
+    const b=document.createElement('button');
+    b.className='step'+(r.paid?' paid':'')+(!r.paid && r.k<level?' done':'');
+    b.setAttribute('aria-pressed', r.paid ? String(paidOpen===r.k) : String(r.k===level));
+    b.innerHTML=`<span class="n">${r.n}${r.paid?`<span class="q rq" role="button" tabindex="0" data-help="cost_${r.k}" aria-label="About the cost of ${r.n}" aria-expanded="false">?</span>`:''}</span><span class="t">${r.t}</span><span class="d">${r.d}</span>`;
+    const rq=b.querySelector('.rq');
+    if(rq){
+      rq.addEventListener('click',e=>{ e.stopPropagation(); e.preventDefault(); if(popBtn===rq && pinned) hideHelp(); else showHelp(rq,true); });
+      rq.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); e.stopPropagation(); showHelp(rq,true); } });
+    }
+    b.onclick=()=>{
+      if(r.paid){ paidOpen = paidOpen===r.k ? null : r.k; showPaid(); renderRail(); return; }
+      paidOpen=null; showPaid(); setLevel(r.k);
+    };
+    el.appendChild(b);
+  });
+}
+function showPaid(){
+  const box=document.getElementById('paidinfo');
+  const r=RAIL.find(x=>x.k===paidOpen);
+  if(!r){ box.hidden=true; return; }
+  box.hidden=false;
+  box.innerHTML=`<h3>${r.t} <span style="font-weight:500;color:var(--muted)">${r.n}</span></h3><p>${r.info}</p>
+    <div class="keyrow"><input placeholder="License key" aria-label="License key" id="lic"><button class="btn" id="unlock">Unlock</button></div>
+    <p class="msg" id="licMsg"></p>`;
+  document.getElementById('unlock').onclick=()=>{ document.getElementById('licMsg').textContent='Paid levels are still being built. Your free levels keep working in the meantime.'; };
+}
+function splitSavings(){
+  const t=S.savings;
+  S.trad=Math.round(t*.65/5000)*5000; S.roth=Math.round(t*.15/5000)*5000;
+  S.brok=Math.round(t*.17/5000)*5000; S.cash=Math.max(0,t-S.trad-S.roth-S.brok);
+  splitDone=true;
+}
+function setLevel(k){
+  if(k>=3 && level<3 && !splitDone) splitSavings();
+  if(k<3 && level>=3) S.savings=S.trad+S.roth+S.brok+S.cash;
+  if(k===4) seedEvents();
+  level=k; save(); renderRail(); buildInputs(); buildGrid(); run();
+}
+
+/* ===================== PANELS ===================== */
+const PANELS = [
+  {id:'total', lvl:1, title:'Total savings', color:'--pine', wide:true, desc:'All accounts combined, at the end of each year of age.'},
+  {id:'assets', lvl:1, title:'Assets by class, median outcome', color:'--steel', wide:true, desc:'Each account in the median future, stacked. Hatched areas show guaranteed income as the savings it would take to replace it.'},
+  {id:'history', lvl:2, title:'Backtest your scenario against history', color:'--pine', wide:true, paid:true, desc:'Your plan replayed through ten real stretches of US markets since 1871, from the worst outcome to the best. Tap a line or a year to follow it in the charts below.'},
+  {id:'stress', lvl:2, title:'Stress tests: retiring into a crash', color:'--risk', wide:true, desc:'Your plan with average markets until you retire, then history\'s worst moments starting the year you retire. Tap a test to highlight it.'},
+  {id:'market', lvl:2, title:'One future, year by year', color:'--slate', wide:true, desc:'Pick a future to see its market returns and what they do to your savings.'},
+  {id:'tax', lvl:2, title:'Taxes incurred in retirement', color:'--plum', desc:'Estimated tax on your withdrawals and retirement income.'},
+  {id:'trad', lvl:3, title:'Traditional 401(k) and IRA', color:'--steel', desc:'Taxed as income. Spent after cash and brokerage.'},
+  {id:'roth', lvl:3, title:'Roth', color:'--pine', desc:'Tax-free. Spent last, so it often keeps growing.'},
+  {id:'brok', lvl:3, title:'Taxable brokerage', color:'--ochre', desc:'Only the gains are taxed when you sell.'},
+  {id:'cash', lvl:3, title:'Excess savings held as cash', color:'--slate', desc:'Cash beyond your everyday needs. Spent first, earning a savings-account rate.'},
+];
+const LOCKED = [
+  {lvl:2, title:'Historical backtest, market returns and taxes', desc:'Level 2 adds these panels.'},
+  {lvl:3, title:'Each account on its own', desc:'Level 3 splits your savings into traditional, Roth, brokerage and cash.'},
+  {lvl:4, title:'Life events on your timeline', desc:'Level 4 adds inheritances, a home purchase and other one-time or repeating costs.'},
+  {lvl:'p1', title:'Roth conversions and tax brackets', desc:'Level 5 Analysis'},
+  {lvl:'p10', title:'Your actual funds', desc:'Level 6 Analysis'},
+];
+const charts={};
+function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function rgba(hex,a){ const h=hex.replace('#',''); const n=parseInt(h.length===3?h.split('').map(c=>c+c).join(''):h,16); return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`; }
+
+function buildGrid(){
+  Object.values(charts).forEach(c=>c.destroy()); for(const k in charts) delete charts[k];
+  const g=document.getElementById('grid'); g.innerHTML='';
+  PANELS.filter(p=>p.lvl<=level).forEach(p=>{
+    const el=document.createElement('div'); el.className='panel'+(p.wide?' wide':'');
+    el.innerHTML=`<h3><i style="background:var(${p.color})"></i><span id="ttl_${p.id}">${p.title}</span>${q('panel_'+p.id)}</h3><p class="desc">${p.desc}</p>${p.id==='market'?MARKET_CTRL:''}${p.id==='total'?Y_CTRL:''}${p.id==='market'
+      ? `<div class="stklab">Total savings in this future</div><div class="cv cvtop"><canvas id="cv_mbal" role="img" aria-label="Total savings in the selected future"></canvas></div><div class="stklab">Market return each year</div><div class="cv cvbot"><canvas id="cv_market" role="img" aria-label="Yearly market returns in the selected future"></canvas></div><div class="legend clg" id="lg_market"></div>`
+      : `<div class="cv"><canvas id="cv_${p.id}" role="img" aria-label="${p.title} over time"></canvas></div>`}${p.id==='total'?'<div class="legend clg" id="legend"></div>':''}${p.id==='assets'?'<div class="legend clg" id="lg_assets"></div>':''}${p.id==='history'?'<div class="hlg" id="lg_history"></div><p class="rsum" id="histnote"></p>':''}${p.id==='stress'?'<div class="scards" id="stressCards"></div>':''}`;
+    g.appendChild(el);
+  });
+  document.querySelectorAll('[data-q="pick"]').forEach(el=>el.outerHTML=q('pick'));
+  document.querySelectorAll('[data-q="yaxis"]').forEach(el=>el.outerHTML=q('yaxis'));
+  wireYAxis();
+  const lg=document.getElementById('legend');
+  const ink=cssVar('--ink');
+  const evLeg = level>=4 ? `<span><b style="color:var(--pine)">▲</b> Money in<b style="color:var(--risk);margin-left:8px">▼</b> Money out${q('ev_marks')}</span>` : '';
+  lg.innerHTML = evLeg + (level===1
+    ? `<span><i style="background:${rgba(ink,.18)}"></i>8 in 10 futures fall in this band${q('band80')}</span><span><i style="height:3px"></i>Typical (median) future${q('median')}</span><span><i style="height:2px;background:none;border-top:2px dashed var(--muted)"></i>Retirement${q('retline')}</span>`
+    : `<span><i style="background:${rgba(ink,.12)}"></i>9 in 10 futures${q('band90')}</span><span><i style="background:${rgba(ink,.26)}"></i>Middle half${q('band50')}</span><span><i style="height:3px"></i>Typical (median)${q('median')}</span><span><i style="height:2px;background:none;border-top:2px dashed var(--muted)"></i>Retirement${q('retline')}</span>`);
+  if(BASE) lg.insertAdjacentHTML('beforeend', `<span><i style="height:2px;background:none;border-top:2px dashed var(--ochre)"></i>Baseline median${q('baseline')}</span>`);
+}
+
+const Y_CTRL = `<div class="mctl yctl">
+  <label class="ytog"><input type="checkbox" id="yAuto"> Auto scale</label>
+  <span class="ymanual" id="yManual" hidden>
+    <label>Bottom <span class="num ynum"><span>$</span><input id="yMin" inputmode="decimal" autocomplete="off" aria-label="Bottom of the chart"></span></label>
+    <label>Top <span class="num ynum"><span>$</span><input id="yMax" inputmode="decimal" autocomplete="off" aria-label="Top of the chart"></span></label>
+  </span><span data-q="yaxis"></span></div>`;
+/* Bounds for a chart's y axis: only the total chart is pinnable, and only while Auto is off.
+   undefined leaves that end to Chart.js. An upside-down range ignores the top rather than
+   throwing the scale away. */
+function yBounds(id){
+  if(id!=='total' || yAxis.auto) return {min:undefined, max:undefined};
+  const lo=yAxis.min, hi=(yAxis.max!=null && lo!=null && yAxis.max<=lo) ? null : yAxis.max;
+  return {min: lo==null?undefined:lo, max: hi==null?undefined:hi};
+}
+function wireYAxis(){
+  const auto=document.getElementById('yAuto'); if(!auto) return;
+  const box=document.getElementById('yManual'), lo=document.getElementById('yMin'), hi=document.getElementById('yMax');
+  const show=v=>v==null?'':Math.round(v).toLocaleString('en-US');
+  auto.checked=yAxis.auto; box.hidden=yAxis.auto; lo.value=show(yAxis.min); hi.value=show(yAxis.max);
+  auto.onchange=()=>{ yAxis.auto=auto.checked; box.hidden=auto.checked; save(); run(); };
+  const commit=(el,key)=>{ const v=parseBound(el.value); yAxis[key]=v; el.value=show(v); save(); run(); };
+  lo.onchange=()=>commit(lo,'min'); hi.onchange=()=>commit(hi,'max');
+  [lo,hi].forEach(el=>el.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); el.blur(); } }));
+}
+
+let retPick='bad', randIdx=null;
+const MARKET_CTRL = `<div class="mctl"><div class="seg" role="group" aria-label="Which future">
+  <button data-pick="bad">Unlucky</button><button data-pick="typ">Typical</button><button data-pick="good">Lucky</button><button data-pick="rand">Another</button></div>
+  <span data-q="pick"></span></div><p class="rsum" id="retSum"></p>`;
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-pick]'); if(!b) return;
+  retPick=b.dataset.pick; selYear=null; if(retPick==='rand') randIdx=null; run();
+});
+function rankPaths(res){
+  if(res._rank) return res._rank;
+  const last=res.nY-1, n=res.nP, idx=new Array(n);
+  const end=new Float64Array(n);
+  for(let i=0;i<n;i++){ idx[i]=i; end[i]=GET.total(res,last,i)/res.CI[last][i] - (isNaN(res.dryAge[i])?0:1e9*(200-res.dryAge[i])); }
+  idx.sort((a,b)=>end[a]-end[b]);
+  return (res._rank=idx);
+}
+function pickPath(res){
+  const n=res.nP, idx=rankPaths(res);
+  if(res.mode==='hist' && retPick==='year' && selYear!==null){ const j=selYear-res.startYear[0]; if(j>=0 && j<n) return j; }
+  if(retPick==='rand'){ if(randIdx===null || randIdx>=n) randIdx=(Math.random()*n)|0; return randIdx; }
+  const p = retPick==='bad'?.10 : retPick==='good'?.90 : .50;
+  return idx[Math.round(p*(n-1))];
+}
+/* ---- stress tests: average markets until retirement, then a historical sequence from the retirement year ---- */
+const STRESS = [
+  {k:'y1929', y:1929, t:'1929', d:'The Great Depression'},
+  {k:'y1937', y:1937, t:'1937', d:'The second crash of the 1930s'},
+  {k:'y1966', y:1966, t:'1966', d:'Stagflation, the classic worst case'},
+  {k:'y1973', y:1973, t:'1973', d:'Oil shock and high inflation'},
+  {k:'y2000', y:2000, t:'2000', d:'Dot-com bust, a lost decade'},
+  {k:'y2008', y:2008, t:'2008', d:'The financial crisis'},
+  {k:'crash', y:null, t:'−30% at retirement', d:'Stocks fall 30% the year you retire, then average years'},
+];
+let stressSel = null;
+function stressSeq(s, lvl, test){
+  const A=Math.round(s.age), R=Math.max(Math.round(s.retAge),A);
+  const H=Math.max(lvl>=2?Math.round(s.planAge):95, R+1, A+1), nY=H-A+1;
+  const infl=(lvl>=2?s.infl:2.5)/100, avg=[stockMeanOf(s, lvl), MKT.bMean, infl, MKT.cMean];
+  const kR = R - A + 1;                      // first year of retirement
+  const h0 = test.y!=null ? test.y - HIST_FIRST : -1;
+  const seq=[];
+  for(let k=1;k<nY;k++){
+    if(k < kR){ seq.push(avg); continue; }
+    if(test.y==null){ seq.push(k===kR ? [-.30, MKT.bMean, infl, MKT.cMean] : avg); continue; }
+    const row = HIST[h0 + (k-kR)];
+    seq.push(row ? [row[1], row[2], row[3], Math.max(0,(1+row[3])*1.005-1)] : avg);
+  }
+  return seq;
+}
+function runStress(lvl){
+  return STRESS.map(t=>{
+    const s=Object.assign({}, S, {_seq: stressSeq(S, lvl, t)});
+    const r=simulate(s, lvl, 1, 'stress');
+    const histYears = t.y!=null ? Math.min(r.nY-1-(r.R-r.A), HIST_LAST - t.y + 1) : 0;
+    return {t, r, histYears};
+  });
+}
+function drawStress(res, real, tb){
+  const out=runStress(level);
+  const labels=res.ages, muted=cssVar('--muted'), line=cssVar('--line'), surface=cssVar('--surface'), ink=cssVar('--ink'), risk=cssVar('--risk'), pine=cssVar('--pine');
+  const val=(o,k)=> GET.total(o.r,k,0)/(real?o.r.CI[k][0]:1);
+  const box=document.getElementById('stressCards');
+  if(box){
+    box.innerHTML = out.map(o=>{
+      const dry=o.r.dryAge[0], last=o.r.nY-1;
+      const resTxt = isNaN(dry) ? `Lasts to ${o.r.H}, ${money(val(o,last))} left` : `Runs short at ${dry}`;
+      const note = o.t.y!=null && o.histYears < o.r.nY-1-(o.r.R-o.r.A) ? `<span>History through ${HIST_LAST}, then average years</span>` : '';
+      return `<button type="button" class="scard" data-st="${o.t.k}" aria-pressed="${stressSel===o.t.k}"><b>${o.t.t}</b><span>${o.t.d}</span>${note}<div class="res${isNaN(dry)?'':' bad'}">${resTxt}</div></button>`;
+    }).join('');
+    box.querySelectorAll('.scard').forEach(b=>b.onclick=()=>{ stressSel = stressSel===b.dataset.st ? null : b.dataset.st; drawStress(lastRun.res, lastRun.real, band(lastRun.res, GET.total, lastRun.real)); });
+  }
+  const datasets=[
+    {data:tb[50].slice(), label:'Typical future (median)', borderColor:rgba(ink,.55), borderWidth:1.5, borderDash:[5,4], pointRadius:0, tension:.2, fill:false}
+  ].concat(out.map(o=>{
+    const bad=!isNaN(o.r.dryAge[0]), on=stressSel===o.t.k, dim=stressSel && !on;
+    const c = bad ? risk : pine;
+    return {data:labels.map((_,k)=>val(o,k)), label:o.t.t, borderColor:rgba(c, dim?.18:(on?1:.75)), borderWidth:on?3:1.75, pointRadius:0, tension:.15, fill:false};
+  }));
+  if(charts.stress){ const c=charts.stress; c.data.labels=labels; c.data.datasets=datasets; c.options.plugins.retire.index=res.R-res.A; c.update('none'); return; }
+  const cv=document.getElementById('cv_stress'); if(!cv) return;
+  charts.stress=new Chart(cv,{type:'line',data:{labels,datasets},
+    options:{animation:false,maintainAspectRatio:false,responsive:true,interaction:{mode:'index',intersect:false},
+      scales:{x:{grid:{display:false},border:{color:line},ticks:{color:muted,maxTicksLimit:7,maxRotation:0,font:{size:11}},title:{display:true,text:'Age',color:muted,font:{size:11}}},
+              y:{beginAtZero:true,grid:{color:line},border:{display:false},ticks:{color:muted,maxTicksLimit:5,font:{size:11},callback:v=>money(v)}}},
+      plugins:{legend:{display:false},retire:{index:res.R-res.A,color:muted},
+        tooltip:{backgroundColor:surface,titleColor:ink,bodyColor:ink,borderColor:line,borderWidth:1,padding:10,
+          callbacks:{title:it=>'Age '+it[0].label,label:it=>`${it.dataset.label}: ${money(it.parsed.y)}`},itemSort:(a,b)=>b.parsed.y-a.parsed.y}}},
+    plugins:[retirePlugin]});
+}
+const AXW = 58;  // fixed y-axis width so the two stacked charts line up age for age
+const xhairPlugin = {
+  id:'xhair',
+  afterDraw(chart){
+    const h=chart.$hx; if(h==null) return;
+    const x=chart.scales.x.getPixelForValue(h), {top,bottom}=chart.chartArea, c=chart.ctx;
+    c.save(); c.strokeStyle=cssVar('--ink'); c.globalAlpha=.35; c.lineWidth=1;
+    c.beginPath(); c.moveTo(x,top); c.lineTo(x,bottom); c.stroke(); c.restore();
+  }
+};
+function syncHover(e, chart){
+  const pair=[charts.mbal, charts.market].filter(Boolean);
+  let h=null;
+  if(e.type!=='mouseout'){
+    const {left,right}=chart.chartArea;
+    if(e.x>=left && e.x<=right){ h=Math.round(chart.scales.x.getValueForPixel(e.x)); h=Math.max(0,Math.min(chart.data.labels.length-1,h)); }
+  }
+  pair.forEach(c=>{ if(c.$hx!==h){ c.$hx=h; c.draw(); } });
+}
+function drawReturns(res, real, tb){
+  const i=pickPath(res);
+  const labels=[], vals=[], bal=[], lo=[], hi=[], med=[];
+  for(let k=1;k<res.nY;k++){
+    labels.push(res.A+k-1);
+    const r=res.RET[k][i], inf=res.INF[k][i];
+    vals.push(100*(real ? (1+r)/(1+inf)-1 : r));
+    bal.push(GET.total(res,k,i)/(real ? res.CI[k][i] : 1));
+    lo.push(tb[25][k]); hi.push(tb[75][k]); med.push(tb[50][k]);
+  }
+  const pos=cssVar('--pine'), neg=cssVar('--risk'), muted=cssVar('--muted'), line=cssVar('--line'), surface=cssVar('--surface'), ink=cssVar('--ink'), band=cssVar('--slate');
+  const colors=vals.map(v=>v>=0?pos:neg);
+  const retIdx=res.R-res.A;
+  document.querySelectorAll('[data-pick]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.pick===retPick)));
+  const y0 = res.mode==='hist' ? res.startYear[i] : null;
+  const pickName = res.mode==='hist' && retPick==='year' ? `The ${res.startYear[i]} start` : ({bad:'The unlucky future',typ:'The typical future',good:'The lucky future',rand:'This future'})[retPick] || 'This future';
+  // summary line
+  const n=vals.length, g=vals.reduce((m,v)=>m*(1+v/100),1), avg=(Math.pow(g,1/n)-1)*100;
+  let wi=0; vals.forEach((v,j)=>{ if(v<vals[wi]) wi=j; });
+  const neg3 = vals.slice(retIdx, retIdx+5).filter(v=>v<0).length;
+  const dry = res.dryAge[i];
+  const sgn=v=>(v>=0?'+':'−')+Math.abs(v).toFixed(1)+'%';
+  const sum=document.getElementById('retSum');
+  if(sum) sum.textContent = (res.mode==='hist' ? `Retiring into the markets of ${res.startYear[i]}. ` : '') + `This future averaged ${sgn(avg)} a year${real?' after inflation':''}. Worst year: ${sgn(vals[wi])} at age ${labels[wi]}. `
+    + `${neg3} losing year${neg3===1?'':'s'} in the first five of retirement. `
+    + (isNaN(dry) ? 'Money lasted to the end.' : `Money ran short at age ${dry}.`);
+  const lg=document.getElementById('lg_market');
+  if(lg) lg.innerHTML = `<span><i style="background:${ink};height:3px"></i>${pickName}</span><span><i style="background:${rgba(band,.22)}"></i>Middle half of all futures</span>`;
+
+  const fmt=v=>(v>0?'+':'')+Math.round(v)+'%';
+  const ttTitle=it=>{ const j=it[0].dataIndex; return 'Year starting at age '+labels[j]+(y0!=null ? ` (${y0+j})` : ''); };
+  const ttBody=it=>{ const j=it.dataIndex; return [
+      (real?'Return after inflation: ':'Return: ')+(vals[j]>=0?'+':'')+vals[j].toFixed(1)+'%',
+      'Savings at year end: '+money(bal[j]),
+      'Typical future: '+money(med[j])]; };
+  const tooltip={backgroundColor:surface,titleColor:ink,bodyColor:ink,borderColor:line,borderWidth:1,padding:10,displayColors:false,
+    filter:it=>it.datasetIndex===0,
+    callbacks:{title:ttTitle,label:ttBody}};
+  const xAx=(showTicks)=>({offset:true,grid:{display:false},border:{color:line},ticks:{display:showTicks,color:muted,maxTicksLimit:7,maxRotation:0,font:{size:11}},title:{display:showTicks,text:'Age',color:muted,font:{size:11}}});
+  const fixW=ax=>{ ax.width=AXW; };
+
+  if(charts.mbal && charts.market){
+    const a=charts.mbal; a.data.labels=labels;
+    a.data.datasets[0].data=bal; a.data.datasets[1].data=lo; a.data.datasets[2].data=hi; a.data.datasets[3].data=med;
+    a.options.plugins.retire.index=retIdx; a.options.plugins.tooltip=tooltip; a.update('none');
+    const c=charts.market; c.data.labels=labels; c.data.datasets[0].data=vals; c.data.datasets[0].backgroundColor=colors;
+    c.options.plugins.retire.index=retIdx; c.options.plugins.tooltip=tooltip; c.update('none');
+    return;
+  }
+  const cvA=document.getElementById('cv_mbal'), cvB=document.getElementById('cv_market'); if(!cvA||!cvB) return;
+  const common={animation:false,maintainAspectRatio:false,responsive:true,interaction:{mode:'index',intersect:false},
+    layout:{padding:{right:8}},onHover:(e,_,c)=>syncHover(e,c),events:['mousemove','mouseout','touchstart','touchmove','touchend']};
+  charts.mbal=new Chart(cvA,{type:'line',
+    data:{labels,datasets:[
+      {data:bal,label:'Savings',borderColor:ink,borderWidth:2.5,pointRadius:0,pointHoverRadius:4,tension:.15,fill:false,order:0},
+      {data:lo,label:'25th',borderWidth:0,pointRadius:0,pointHoverRadius:0,fill:false,tension:.25,order:3},
+      {data:hi,label:'75th',borderWidth:0,pointRadius:0,pointHoverRadius:0,fill:'-1',backgroundColor:rgba(band,.22),tension:.25,order:2},
+      {data:med,label:'Median',borderColor:rgba(band,.7),borderWidth:1.25,borderDash:[5,4],pointRadius:0,fill:false,tension:.25,order:1}]},
+    options:{...common,
+      scales:{x:xAx(false),y:{beginAtZero:true,afterFit:fixW,grid:{color:line},border:{display:false},ticks:{color:muted,maxTicksLimit:5,font:{size:11},callback:v=>money(v)}}},
+      plugins:{legend:{display:false},retire:{index:retIdx,color:muted},tooltip}},
+    plugins:[retirePlugin,xhairPlugin]});
+  charts.market=new Chart(cvB,{type:'bar',
+    data:{labels,datasets:[{data:vals,backgroundColor:colors,borderWidth:0,barPercentage:.8,categoryPercentage:.9,label:'Return'}]},
+    options:{...common,
+      scales:{x:xAx(true),y:{afterFit:fixW,grid:{color:line},border:{display:false},suggestedMin:-30,suggestedMax:30,ticks:{color:muted,maxTicksLimit:5,font:{size:11},callback:fmt}}},
+      plugins:{legend:{display:false},retire:{index:retIdx,color:muted},tooltip}},
+    plugins:[retirePlugin,xhairPlugin]});
+}
+
+const eventsPlugin = {
+  id:'events',
+  afterDraw(chart, args, opts){
+    if(!opts.list || !opts.list.length) return;
+    const c=chart.ctx, {top}=chart.chartArea;
+    opts.list.forEach(m=>{
+      const x=chart.scales.x.getPixelForValue(m.idx);
+      c.save(); c.fillStyle=m.dir>0?opts.inColor:opts.outColor; c.beginPath();
+      if(m.dir>0){ c.moveTo(x,top); c.lineTo(x-5,top+8); c.lineTo(x+5,top+8); }
+      else { c.moveTo(x,top+8); c.lineTo(x-5,top); c.lineTo(x+5,top); }
+      c.closePath(); c.fill(); c.restore();
+    });
+  }
+};
+function eventMarks(res){
+  if(level<4) return [];
+  const out=[];
+  for(let k=1;k<res.nY;k++){
+    const net=res.evIn[k]-res.evOut[k];
+    if(res.evIn[k]||res.evOut[k]) out.push({idx:k-1, dir: net>=0?1:-1});
+  }
+  return out;
+}
+
+/* ---- assets by class, median future ---- */
+function hatch(color){
+  const c=document.createElement('canvas'); c.width=c.height=8;
+  const x=c.getContext('2d');
+  x.fillStyle=rgba(color,.08); x.fillRect(0,0,8,8);
+  x.strokeStyle=rgba(color,.75); x.lineWidth=1.2; x.beginPath();
+  x.moveTo(0,8); x.lineTo(8,0); x.moveTo(-2,2); x.lineTo(2,-2); x.moveTo(6,10); x.lineTo(10,6); x.stroke();
+  return x.createPattern(c,'repeat');
+}
+const SWR = .04;
+function drawAssets(res, real){
+  const idx=rankPaths(res);
+  let i=idx[Math.round(.5*(res.nP-1))];
+  const followYear = res.mode==='hist' && retPick==='year' && selYear!==null && selYear-res.startYear[0]>=0 && selYear-res.startYear[0]<res.nP;
+  if(followYear) i=selYear-res.startYear[0];
+  const ttl=document.getElementById('ttl_assets'); if(ttl) ttl.textContent = followYear ? `Assets by class, retiring into ${selYear}` : 'Assets by class, median outcome';
+  const labels=res.ages, nY=res.nY, A=res.A;
+  const scale=k=> real ? 1/res.CI[k][i] : 1;
+  const series=[];
+  const acct=(key,label,cv)=>series.push({label,color:cssVar(cv),hatched:false,data:labels.map((_,k)=>res[key][k][i]*scale(k))});
+  if(level>=3){ acct('CASH','Excess cash','--slate'); acct('BROK','Brokerage','--ochre'); acct('TRAD','Traditional','--steel'); acct('ROTH','Roth','--pine'); }
+  else series.push({label:'Savings',color:cssVar('--pine'),hatched:false,data:labels.map((_,k)=>GET.total(res,k,i)*scale(k))});
+  // pension: nominal first check at start age; real value depends on that future's inflation
+  if(level>=2 && S.penAmt>0){
+    const kS=Math.min(nY-1,Math.max(0,Math.round(S.penAge)-A));
+    const cola=S.penCola==='full';
+    series.push({label:'Pension (income ÷ 4%)',color:cssVar('--plum'),hatched:true,data:labels.map((a,k)=>{
+      if(k<kS) return 0;
+      const ciS=res.CI[kS][i], ciK=res.CI[k][i];
+      const val = real
+        ? (cola ? S.penAmt/ciS : S.penAmt/ciK)
+        : (!cola ? S.penAmt : S.penAmt*ciK/ciS);
+      return val/SWR;
+    })});
+  }
+  if(S.ssAmt>0){
+    series.push({label:'Social Security (income ÷ 4%)',color:cssVar('--ink'),hatched:true,data:labels.map((a,k)=> a<S.ssAge ? 0 : S.ssAmt*(real?1:res.CI[k][i])/SWR)});
+  }
+  const muted=cssVar('--muted'), line=cssVar('--line'), surface=cssVar('--surface'), ink=cssVar('--ink');
+  const datasets=series.map((sr,j)=>({label:sr.label,data:sr.data,fill:j===0?'origin':'-1',
+    backgroundColor: sr.hatched ? hatch(sr.color) : rgba(sr.color,.55),
+    borderColor: sr.color, borderWidth: sr.hatched?1.25:1, borderDash: sr.hatched?[4,3]:[], pointRadius:0, tension:.2}));
+  const lg=document.getElementById('lg_assets');
+  if(lg) lg.innerHTML=series.map(sr=>`<span><i style="${sr.hatched
+      ? `background:repeating-linear-gradient(135deg, ${rgba(sr.color,.75)} 0 1.5px, ${rgba(sr.color,.08)} 1.5px 4px);border:1px dashed ${sr.color}`
+      : `background:${rgba(sr.color,.55)};border:1px solid ${sr.color}`}"></i>${sr.label}</span>`).join('')+q('assets_hatch');
+  if(charts.assets) charts.assets.destroy();
+  const cv=document.getElementById('cv_assets'); if(!cv) return;
+  const accountsN = series.filter(x=>!x.hatched).length;
+  charts.assets=new Chart(cv,{type:'line',data:{labels,datasets},
+    options:{animation:false,maintainAspectRatio:false,responsive:true,interaction:{mode:'index',intersect:false},
+      scales:{
+        x:{grid:{display:false},border:{color:line},ticks:{color:muted,maxTicksLimit:7,maxRotation:0,font:{size:11}},title:{display:true,text:'Age',color:muted,font:{size:11}}},
+        y:{stacked:true,beginAtZero:true,grid:{color:line},border:{display:false},ticks:{color:muted,maxTicksLimit:5,font:{size:11},callback:v=>money(v)}}
+      },
+      plugins:{legend:{display:false},retire:{index:res.R-res.A,color:muted},
+        events:{list:eventMarks(res),inColor:cssVar('--pine'),outColor:cssVar('--risk')},
+        tooltip:{backgroundColor:surface,titleColor:ink,bodyColor:ink,footerColor:ink,borderColor:line,borderWidth:1,padding:10,
+          itemSort:(a,b)=>b.datasetIndex-a.datasetIndex,
+          callbacks:{title:it=>'Age '+it[0].label,label:it=>`${it.dataset.label}: ${money(it.parsed.y)}`,
+            footer:it=>{ const acc=it.filter(x=>x.datasetIndex<accountsN).reduce((m,x)=>m+x.parsed.y,0); return 'Savings you could leave to heirs: '+money(acc); }}}
+      }},
+    plugins:[retirePlugin, eventsPlugin]});
+}
+
+/* ---- backtest ---- */
+let histCache={key:null,res:null};
+function histRun(){
+  const key=JSON.stringify([S,level,seed]);
+  if(histCache.key!==key){ histCache={key,res:simulate(S,level,seed,'hist')}; }
+  return histCache.res;
+}
+function syncEngine(){
+  const row=document.getElementById('engrow'); if(!row) return;
+  row.hidden = !(level>=2 && PAID_PREVIEW);
+  row.querySelectorAll('[data-eng]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.eng===engine)));
+}
+function renderTeaser(mode){
+  const el=document.getElementById('teaser');
+  if(level<2 || mode==='hist'){ el.hidden=true; return; }
+  const h=histRun();
+  if(!h){ el.hidden=true; return; }
+  let ok=0; for(let i=0;i<h.nP;i++) if(isNaN(h.dryAge[i])) ok++;
+  el.hidden=false;
+  el.innerHTML=`Across real US markets since ${HIST_FIRST}, this plan would have lasted in <b>${ok} of ${h.nP}</b> start years.${q('teaser')}`;
+}
+function drawHistory(res0, real){
+  const h = res0.mode==='hist' ? res0 : histRun();
+  const cv=document.getElementById('cv_history'); if(!cv) return;
+  const note=document.getElementById('histnote'), lg=document.getElementById('lg_history');
+  if(!h){ if(note) note.textContent='Your plan is longer than the historical record.'; return; }
+  const last=h.nY-1, n=h.nP;
+  const pick=histPicks(h);
+  const selIx = selYear!==null ? selYear-h.startYear[0] : -1;
+  if(selIx>=0 && selIx<n && !pick.includes(selIx)) pick.push(selIx);
+  const risk=cssVar('--risk'), pine=cssVar('--pine'), ochre=cssVar('--ochre'), ink=cssVar('--ink'), muted=cssVar('--muted'), line=cssVar('--line'), surface=cssVar('--surface');
+  const hex=c=>{const x=c.replace('#','');return [0,2,4].map(o=>parseInt(x.substr(o,2),16));};
+  const mix=(a,b,t)=>{const A=hex(a),B=hex(b);return '#'+A.map((v,k)=>Math.round(v+(B[k]-v)*t).toString(16).padStart(2,'0')).join('');};
+  const colorFor=(ix,pos)=>{ if(ix===selIx) return ink; if(!isNaN(h.dryAge[ix])) return risk; const t=pos/9; return t<.5?mix(ochre,pine,t*2):pine; };
+  const series = pick.map((ix,pos)=>({ix, year:h.startYear[ix], color:colorFor(ix,Math.min(pos,9)), ok:isNaN(h.dryAge[ix]),
+    data:h.ages.map((_,k)=>GET.total(h,k,ix)/(real?h.CI[k][ix]:1))}));
+  const datasets = series.map(sr=>({label:String(sr.year), data:sr.data, borderColor:sr.color, backgroundColor:sr.color,
+    borderWidth: sr.ix===selIx?3:1.6, pointRadius:0, pointHoverRadius:3, tension:.2, fill:false, order: sr.ix===selIx?0:1}));
+  let nOk=0; for(let i=0;i<n;i++) if(isNaN(h.dryAge[i])) nOk++;
+  let worst=null; for(let i=0;i<n;i++) if(!isNaN(h.dryAge[i]) && (worst===null || h.dryAge[i]<h.dryAge[worst])) worst=i;
+  if(note) note.textContent = `Across all ${n} complete start years (${h.startYear[0]} to ${h.startYear[n-1]}), ${nOk} lasted to age ${h.H}.` + (worst!==null ? ` The hardest was ${h.startYear[worst]}, running short at age ${h.dryAge[worst]}.` : '');
+  if(lg){
+    lg.innerHTML = series.slice().sort((a,b)=>a.year-b.year).map(sr=>`<button type="button" class="chip" data-hy="${sr.year}" aria-pressed="${sr.ix===selIx}"><i style="display:inline-block;width:12px;height:3px;background:${sr.color};border-radius:2px"></i>${sr.year}<b style="color:${sr.ok?pine:risk}">${sr.ok?money(sr.data[last]):'short at '+h.dryAge[sr.ix]}</b></button>`).join('');
+    lg.querySelectorAll('[data-hy]').forEach(b=>b.onclick=()=>selectHistYear(+b.dataset.hy));
+  }
+  if(charts.history) charts.history.destroy();
+  charts.history=new Chart(cv,{type:'line',data:{labels:h.ages,datasets},
+    options:{animation:false,maintainAspectRatio:false,responsive:true,
+      interaction:{mode:'nearest',axis:'xy',intersect:false},
+      onClick:(e,els)=>{ if(!els.length) return; selectHistYear(+datasets[els[0].datasetIndex].label); },
+      onHover:(e,els)=>{ if(e.native) e.native.target.style.cursor = els.length?'pointer':'default'; },
+      scales:{
+        x:{grid:{display:false},border:{color:line},ticks:{color:muted,maxTicksLimit:7,maxRotation:0,font:{size:11}},title:{display:true,text:'Age',color:muted,font:{size:11}}},
+        y:{beginAtZero:true,grid:{color:line},border:{display:false},ticks:{color:muted,maxTicksLimit:5,font:{size:11},callback:v=>money(v)}}
+      },
+      plugins:{legend:{display:false},retire:{index:h.R-h.A,color:muted},
+        events:{list:eventMarks(h),inColor:pine,outColor:risk},
+        tooltip:{backgroundColor:surface,titleColor:ink,bodyColor:ink,borderColor:line,borderWidth:1,padding:10,
+          callbacks:{title:it=>`Starting in ${it[0].dataset.label}, age ${it[0].label} (${+it[0].dataset.label + it[0].dataIndex})`,
+            label:it=>`Savings: ${money(it.parsed.y)}`, afterLabel:()=>'Tap to follow this year'}}}},
+    plugins:[retirePlugin, eventsPlugin]});
+}
+function histPicks(h){
+  const n=h.nP, rank=rankPaths(h), pick=[];   // ten start years, worst to best ending
+  for(let j=0;j<10;j++){ const ix=rank[Math.round(j*(n-1)/9)]; if(!pick.includes(ix)) pick.push(ix); }
+  return pick;
+}
+function selectHistYear(y){
+  selYear=y; retPick='year';
+  setTimeout(()=>{ if(engine!=='hist'){ engine='hist'; save(); buildGrid(); } run(); },0);
+}
+
+const retirePlugin = {
+  id:'retire',
+  afterDraw(chart, args, opts){
+    if(opts.index==null || opts.index<0) return;
+    const x=chart.scales.x.getPixelForValue(opts.index), {top,bottom}=chart.chartArea, c=chart.ctx;
+    c.save(); c.strokeStyle=opts.color; c.lineWidth=1.25; c.setLineDash([4,4]);
+    c.beginPath(); c.moveTo(x,top); c.lineTo(x,bottom); c.stroke(); c.restore();
+  }
+};
+
+function fanSets(b, color, full){
+  const mk=(data,label,fill,bg)=>({data,label,fill,backgroundColor:bg,borderWidth:0,pointRadius:0,tension:.25});
+  const sets = full
+    ? [mk(b[5],'5th percentile',false,'transparent'),
+       mk(b[25],'25th percentile','-1',rgba(color,.12)),
+       mk(b[75],'75th percentile','-1',rgba(color,.26)),
+       mk(b[95],'95th percentile','-1',rgba(color,.12))]
+    : [mk(b[10],'10th percentile',false,'transparent'),
+       mk(b[90],'90th percentile','-1',rgba(color,.18))];
+  sets.push({data:b[50],label:'Median',fill:false,borderColor:color,borderWidth:2.5,pointRadius:0,tension:.25});
+  return sets;
+}
+
+function drawPanel(id, res, b, color, yFmt){
+  const labels=res.ages;
+  const retIdx = res.R - res.A;
+  const muted=cssVar('--muted'), line=cssVar('--line'), surface=cssVar('--surface'), ink=cssVar('--ink');
+  const datasets=fanSets(b,color,level>=2);
+  if(id==='total' && BASE && BASE.ages.length){
+    const src = dollars==='real' ? BASE.medReal : BASE.medNom;
+    const byAge={}; BASE.ages.forEach((a,k)=>byAge[a]=src[k]);
+    datasets.push({data:labels.map(a=>byAge[a]??null), label:'Baseline median', borderColor:cssVar('--ochre'), borderWidth:2, borderDash:[6,4], pointRadius:0, tension:.25, fill:false, spanGaps:true});
+  }
+  if(charts[id]){
+    const c=charts[id]; c.data.labels=labels; c.data.datasets=datasets;
+    c.options.plugins.retire.index=retIdx; if(id==='total') c.options.plugins.events.list=eventMarks(res);
+    const yb=yBounds(id); c.options.scales.y.min=yb.min; c.options.scales.y.max=yb.max;
+    c.update('none'); return;
+  }
+  const cv=document.getElementById('cv_'+id); if(!cv) return;
+  charts[id]=new Chart(cv,{
+    type:'line', data:{labels,datasets},
+    options:{
+      animation:false, maintainAspectRatio:false, responsive:true,
+      interaction:{mode:'index',intersect:false},
+      layout:{padding:{top:4,right:4}},
+      scales:{
+        x:{grid:{display:false},border:{color:line},ticks:{color:muted,maxTicksLimit:7,maxRotation:0,font:{size:11}},title:{display:true,text:'Age',color:muted,font:{size:11}}},
+        y:{beginAtZero:true,...yBounds(id),grid:{color:line},border:{display:false},ticks:{color:muted,maxTicksLimit:5,font:{size:11},callback:v=>yFmt(v)}}
+      },
+      plugins:{
+        legend:{display:false},
+        retire:{index:retIdx,color:muted},
+        events:{list:id==='total'?eventMarks(res):[],inColor:cssVar('--pine'),outColor:cssVar('--risk')},
+        tooltip:{backgroundColor:surface,titleColor:ink,bodyColor:ink,borderColor:line,borderWidth:1,padding:10,
+          callbacks:{title:it=>'Age '+it[0].label,label:it=>`${it.dataset.label}: ${yFmt(it.parsed.y)}`},
+          itemSort:(a,b)=>b.parsed.y-a.parsed.y}
+      }
+    },
+    plugins:[retirePlugin, eventsPlugin]
+  });
+}
+
+/* ===================== RUN + RENDER ===================== */
+let timer=null, lastRun=null;
+
+/* sustainable income: the highest before-tax income that lasts in 90% of futures (or start years) */
+const SUST_TARGET = .90;
+let sustTimer=null, sustToken=0, lastSustain=null, sustShown=null, sustAnim=0;
+function successFor(sv, mode){
+  const r=simulate(sv, level, seed, mode); if(!r) return 0;
+  let d=0; for(let i=0;i<r.nP;i++) if(!isNaN(r.dryAge[i])) d++;
+  return 1-d/r.nP;
+}
+function scheduleSustain(mode){
+  clearTimeout(sustTimer); const tok=++sustToken; lastSustain=null;
+  sustTimer=setTimeout(()=>{
+    const ok = sp => successFor(Object.assign({},S,{spend:sp}), mode) >= SUST_TARGET - 1e-9;
+    let lo=0, hi=Math.max(200000, S.spend*2), steps=0, phase='check0';
+    const CAP=5e6;
+    const step=()=>{
+      if(tok!==sustToken) return;
+      if(phase==='check0'){
+        if(!ok(1000)){ finish(null); return; }
+        phase='expand';
+      } else if(phase==='expand'){
+        if(ok(hi)){ lo=hi; hi*=2; if(hi>CAP){ finish(CAP, true); return; } }
+        else phase='bisect';
+      } else {
+        if(hi-lo<=1000 || steps>18){ finish(Math.floor(lo/1000)*1000); return; }
+        const mid=(lo+hi)/2; if(ok(mid)) lo=mid; else hi=mid; steps++;
+      }
+      setTimeout(step,0);
+    };
+    step();
+  }, 200);
+  function finish(v, capped){
+    if(tok!==sustToken) return;
+    lastSustain = v;
+    if(BASE && BASE.tok===tok){ BASE.sust=v; BASE.tok=-1; save(); }
+    setTimeout(renderBase,0);
+    const box=document.getElementById('sustBox'), V=document.getElementById('sustV'), T=document.getElementById('sustS'); if(!V) return;
+    const unit = mode==='hist' ? 'start years' : 'futures';
+    let sub;
+    if(v===null){
+      const bigOut = level>=4 && S.events.some(e=>e.type!=='in' && e.amt>0);
+      const gapYrs = Math.max(0, Math.min(S.ssAmt>0?S.ssAge:999, level>=2&&S.penAmt>0?S.penAge:999) - Math.max(S.retAge,S.age));
+      sub = `Even minimal income falls short in more than 1 in 10 ${unit}, ` + (bigOut ? 'most likely because of the money going out for life events.'
+          : gapYrs>0 && gapYrs<100 ? `because your savings cannot cover the ${gapYrs} year${gapYrs===1?'':'s'} between retiring and your first Social Security${level>=2&&S.penAmt>0?' or pension':''} check.`
+          : 'because your savings are too small for the years ahead.');
+    }
+    else { const diff=v-S.spend; sub=`Before tax, lasting in 9 of 10 ${unit}. ` + (Math.abs(diff)<1000 ? 'About what you planned.' : diff>0 ? `${money(diff)} more than you planned.` : `${money(-diff)} less than you planned.`); }
+    const text = v===null ? 'None' : (capped?'Over ':'') + money(v) + ' a year';
+    const from = sustShown && sustShown.v!==null ? sustShown.v : 0;
+    const changed = !sustShown || sustShown.text!==text;
+    sustShown = {v, text, sub};
+    T.textContent = sub; box.classList.remove('pending');
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(!changed || v===null || reduce){ V.textContent=text; return; }
+    // count up (or down) to the new value over one second, with a brief glow
+    box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash');
+    const t0=performance.now(), id=++sustAnim;
+    const tick=now=>{
+      if(id!==sustAnim || !document.body.contains(V)) return;
+      const t=Math.min(1,(now-t0)/1000), e=1-Math.pow(1-t,3);
+      V.textContent = t<1 ? money(Math.round((from+(v-from)*e)/1000)*1000)+' a year' : text;
+      if(t<1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+}
+function activeMode(){ return (level>=2 && PAID_PREVIEW) ? engine : 'mc'; }
+function changed(){ save(); clearTimeout(timer); timer=setTimeout(run,40); }
+
+
+/* ---- compare to a saved baseline ---- */
+let lastSummary = null;
+function cleanBase(b){
+  if(!b || typeof b!=='object' || !b.S) return null;
+  const num=v=>isFinite(+v)?+v:null, arr=a=>Array.isArray(a)?a.map(v=>isFinite(+v)?+v:null):[];
+  const S2={}; INPUTS.forEach(d=>{ const v=b.S[d.id]; if(v===undefined) return;
+    if(d.type==='select'){ if(d.options.some(o=>o[0]===String(v))) S2[d.id]=String(v); } else if(isFinite(+v)) S2[d.id]=+v; });
+  S2.events = Array.isArray(b.S.events) ? b.S.events.slice(0,30).map(cleanEvent) : [];
+  return {S:S2, level:[1,2,3,4].includes(b.level)?b.level:1, mode:b.mode==='hist'?'hist':'mc', success:num(b.success), sust:num(b.sust), endMed:num(b.endMed),
+    ages:arr(b.ages), medReal:arr(b.medReal), medNom:arr(b.medNom), H:num(b.H), tok:-1};
+}
+function setBaseline(){
+  if(!lastSummary) return;
+  BASE = {S:JSON.parse(JSON.stringify(S)), level, mode:lastSummary.mode, success:lastSummary.success, sust:lastSustain, endMed:lastSummary.endMed,
+    ages:lastSummary.ages, medReal:lastSummary.medReal, medNom:lastSummary.medNom, H:lastSummary.H, tok:-1};
+  const known = lastSustain;
+  save(); buildGrid(); run();
+  // run() restarts the search for this same plan; take its answer for the baseline
+  BASE.sust = known; BASE.tok = sustToken;
+}
+function clearBaseline(){ BASE=null; save(); buildGrid(); run(); }
+function fmtVal(d,v){
+  if(v==null) return '—';
+  if(d.type==='select') return (d.options.find(o=>o[0]===v)||[,v])[1];
+  if(d.fmt==='usd') return '$'+Math.round(v).toLocaleString('en-US');
+  if(d.fmt==='pct') return (+v).toFixed(2).replace(/\.?0+$/,'')+'%';
+  if(d.fmt==='pct0') return Math.round(v)+'%';
+  return String(Math.round(v));
+}
+function renderBase(){
+  const el=document.getElementById('basebar'); if(!el) return;
+  if(!BASE){
+    el.innerHTML=`<button type="button" class="btn" id="baseSet">Save as baseline to compare changes</button>${q('baseline')}`;
+    el.querySelector('#baseSet').onclick=setBaseline; return;
+  }
+  const cur=lastSummary||{};
+  const pts=v=>v==null?'—':Math.round(v*100)+'%';
+  const dPts=(a,b)=>a==null||b==null?'':` <em class="${b>=a?'up':'dn'}">${b>=a?'+':'−'}${Math.abs(Math.round(b*100)-Math.round(a*100))} pts</em>`;
+  const dMon=(a,b)=>a==null||b==null?'':` <em class="${b>=a?'up':'dn'}">${b>=a?'+':'−'}${money(Math.abs(b-a))}</em>`;
+  const changed=[];
+  INPUTS.forEach(d=>{ if(d.lvl>level || (d.only && !d.only.includes(level))) return;
+    const a=BASE.S[d.id], b=S[d.id]; if(a===undefined || a===b || (typeof a==='number' && Math.abs(a-b)<1e-9)) return;
+    changed.push(`${d.label}: ${fmtVal(d,a)} → ${fmtVal(d,b)}`); });
+  if(level>=4 && JSON.stringify(BASE.S.events)!==JSON.stringify(S.events)) changed.push('Life events changed');
+  if(BASE.level!==level) changed.push(`Level ${BASE.level} → Level ${level}`);
+  if(BASE.mode!==(cur.mode||'mc')) changed.push(BASE.mode==='hist'?'Method: history → Monte Carlo':'Method: Monte Carlo → history');
+  const sNow = lastSustain;
+  el.innerHTML=`<div class="bhead"><b>Compared with your baseline</b>${q('baseline')}<span class="bbtns"><button type="button" class="btn" id="baseSet">Update baseline</button><button type="button" class="btn" id="baseClr">Clear</button></span></div>
+    <div class="bgrid">
+      <div><span>Success</span>${pts(BASE.success)} → ${pts(cur.success)}${dPts(BASE.success,cur.success)}</div>
+      <div><span>Sustainable income</span>${BASE.sust==null?'—':money(BASE.sust)} → ${sNow==null?'…':money(sNow)}${sNow==null?'':dMon(BASE.sust,sNow)}</div>
+      <div><span>Typical balance at ${cur.H||''}</span>${money(BASE.endMed||0)} → ${money(cur.endMed||0)}${dMon(BASE.endMed,cur.endMed)}</div>
+    </div>
+    <p class="bchg">${changed.length ? 'What changed: '+changed.map(esc).join('; ')+'.' : 'Nothing has changed yet. Adjust any input to see the difference.'}</p>`;
+  el.querySelector('#baseSet').onclick=setBaseline; el.querySelector('#baseClr').onclick=clearBaseline;
+}
+
+function run(){
+  syncEngine();
+  const mode = activeMode();
+  const res = simulate(S, level, seed, mode);
+  if(!res){ document.getElementById('verdict').textContent='This plan is longer than the historical record. Switch to random returns.'; return; }
+  const real = dollars==='real';
+  lastRun = {res, real, mode};
+  const last = res.nY-1;
+
+  // summary numbers
+  let nDry=0; const dryAges=[];
+  for(let i=0;i<res.nP;i++) if(!isNaN(res.dryAge[i])){ nDry++; dryAges.push(res.dryAge[i]); }
+  const success = 1 - nDry/res.nP;
+  const tb = band(res, GET.total, real);
+  const endMed = tb[50][last], endP10 = tb[10][last];
+  dryAges.sort((a,b)=>a-b);
+  const dryMed = dryAges.length ? Math.round(pct(dryAges,50)) : null;
+
+  const pctTxt = Math.round(success*100);
+  lastSummary = {success, endMed:band(res, GET.total, true)[50][last], medReal:band(res, GET.total, true)[50], medNom:band(res, GET.total, false)[50], ages:res.ages.slice(), H:res.H, mode, level};
+  document.getElementById('verdict').textContent = mode==='hist'
+    ? `In ${Math.round(success*res.nP)} of ${res.nP} historical start years, your money lasts to age ${res.H}.`
+    : `In ${pctTxt} of 100 simulated futures, your money lasts to age ${res.H}.`;
+  renderTeaser(mode);
+  const st=document.getElementById('state');
+  const [label,col] = success>=.85 ? ['On solid footing','--pine'] : success>=.70 ? ['Worth a closer look','--ochre'] : ['At real risk of running short','--risk'];
+  st.textContent=label; st.style.color=`var(${col})`;
+
+  const dl = real ? "today's dollars" : 'future dollars';
+  const sd = sustShown;
+  let statsHtml = `
+    <div class="stat hero${sd?' pending':''}" id="sustBox"><div class="l">Sustainable income${q('sustain')}</div><div class="v" id="sustV">${sd?sd.text:'…'}</div><div class="s" id="sustS">${sd?sd.sub:'Finding it…'}</div></div>
+    <div class="stat"><div class="l">Typical balance at ${res.H}${q('endMed')}</div><div class="v">${money(endMed)}</div></div>
+    <div class="stat"><div class="l">Unlucky case, 1 in 10${q('endP10')}</div><div class="v">${money(endP10)}</div></div>`;
+  if(level>=3){
+    const nP=res.nP, endReal=new Float64Array(nP);
+    let ok=0;
+    for(let i=0;i<nP;i++){ const v=GET.total(res,last,i)/res.CI[last][i]; if(isNaN(res.dryAge[i]) && v>=S.legacy) ok++; }
+    statsHtml += `<div class="stat"><div class="l">Leaves ${money(S.legacy)} or more${q('legacyStat')}</div><div class="v">${Math.round(ok/nP*100)}%</div></div>`;
+  }
+  if(res.guard){
+    const m=[...res.MINM].sort((a,b)=>a-b); let cut=0; for(const v of m) if(v<.999) cut++;
+    const low=m[Math.floor(.1*(m.length-1))];
+    statsHtml += `<div class="stat"><div class="l">Spending cuts${q('guardStat')}</div><div class="v">${Math.round(cut/res.nP*10)} in 10</div><div class="s">futures cut at least once. Unlucky case: down to ${Math.round(low*100)}% of plan.</div></div>`;
+  }
+  document.getElementById('stats').innerHTML = statsHtml;
+  renderBase();
+  scheduleSustain(mode);
+  document.getElementById('barnote').textContent = mode==='hist'
+    ? `${res.nP} historical start years, ${res.startYear[0]} to ${res.startYear[res.nP-1]}, shown in ${dl}.`
+    : `${res.nP.toLocaleString()} simulated futures, shown in ${dl}.`;
+
+  PANELS.filter(p=>p.lvl<=level).forEach(p=>{
+    if(p.id==='market'){ drawReturns(res, real, tb); return; }
+    if(p.id==='assets'){ drawAssets(res, real); return; }
+    if(p.id==='history'){ drawHistory(res, real); return; }
+    if(p.id==='stress'){ drawStress(res, real, tb); return; }
+    const color = cssVar(p.color);
+    const b = p.id==='total' ? tb : band(res, GET[p.id], real);
+    drawPanel(p.id, res, b, color, money);
+  });
+
+  renderAssumptions();
+  syncCode();
+  document.getElementById('footer').textContent = 'For planning and education, not financial advice. © 2026 Brad Boyce. All rights reserved.';
+}
+
+(()=>{ const d=document.getElementById('cmpdlg'), o=document.getElementById('openCmp');
+  o.onclick=()=>d.showModal();
+  document.getElementById('cmpClose').onclick=()=>{ d.close(); o.focus(); };
+  d.addEventListener('click',e=>{ if(e.target===d){ d.close(); o.focus(); } });
+})();
+document.getElementById('dToday').onclick=()=>{ dollars='real'; syncDollars(); save(); run(); };
+document.getElementById('dFuture').onclick=()=>{ dollars='nominal'; syncDollars(); save(); run(); };
+function syncDollars(){
+  document.getElementById('dToday').setAttribute('aria-pressed',String(dollars==='real'));
+  document.getElementById('dFuture').setAttribute('aria-pressed',String(dollars==='nominal'));
+}
+try{ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{ buildGrid(); run(); }); }catch(e){}
+new MutationObserver(()=>{ buildGrid(); run(); }).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+/* ===================== HELP (question marks) ===================== */
+const pctS = v=>(v*100).toFixed(1)+'%';
+const HELP = {
+  // Level 1
+  age:{t:'Your age now', b:['Sets where the plan starts. The model moves forward one year at a time, so your age tells it how many years you have left to save and how many years the money must last.']},
+  retAge:{t:'Retire at age', b:['The age when yearly contributions stop and withdrawals begin. If it is at or below your current age, the model treats you as already retired.']},
+  savings:{t:'Retirement savings today', b:['Everything you have set aside for retirement, across all accounts, at today\'s value.','Levels 1 and 2 treat it as one pot invested in your stock and bond mix, all of it pre-tax like a traditional 401(k), so every withdrawal is taxed as income. That is cautious if some of your savings are Roth or brokerage. Level 3 splits it into traditional, Roth, brokerage and cash, because each is taxed differently.']},
+  contrib:{t:'Added each year', b:['What you save each year until retirement, in today\'s dollars. The amount rises with that future\'s inflation, so its buying power stays the same.','It is added at the start of each year and earns that year\'s return.']},
+  spend:{t:'Yearly income needs in retirement, before tax', b:['The income you need in retirement, stated the way you think about a salary: before tax, in today\'s dollars. It rises with each future\'s inflation, so its buying power stays constant.','The model turns it into after-tax spending by taxing it like a salary of the same size, using the real federal brackets and your state rate. In retirement it then withdraws what that spending needs, and the tax you actually pay depends on where the money comes from. Social Security is only partly taxed and there are extra deductions after 65, so retirees often pay less than a worker with the same income.','Social Security and pension count toward this income.','Many people need 70 to 85% of their pre-retirement pay, because saving for retirement and payroll taxes stop.']},
+  stocks:{t:'Stocks in your mix', b:['The share of your investments held in stocks. The rest is bonds.','The mix is rebalanced back to this split every year. More stocks raise the average return and widen the range between good and bad futures.']},
+  // Level 2
+  planAge:{t:'Plan to age', b:['How long the money needs to last. A future counts as a success only if spending is fully covered in every year through this age.','Level 1 uses 95. Planning past your expected lifespan protects against living longer than average.']},
+  infl:{t:'Average inflation', b:['The average yearly rise in prices. Each simulated year draws its own rate around this average, with a spread of 1.2 points, so some futures see long stretches of high inflation.','Spending, contributions and income all grow with that future\'s inflation. Level 1 uses 2.5%.']},
+  ssAmt:{t:'Social Security', b:['Your household\'s yearly benefit in today\'s dollars, for the starting age you choose. It rises with inflation, matching Social Security\'s cost-of-living adjustment, and counts toward your retirement income.','Your statement at ssa.gov/myaccount has the most accurate figure. If you don\'t have it handy, the estimator below builds one from your pay. For a couple, add both benefits together.']},
+  ssAge:{t:'Social Security starts at age', b:['The age you claim. Claiming at 62 cuts the benefit by about 30% versus full retirement age (67 for most people). Waiting to 70 raises it by about 24%.','Enter the benefit amount that matches the age you choose here. The model does not adjust it for you.']},
+  stockRet:{t:'Average stock return', b:[
+    ()=>`The average yearly stock return the simulated futures are built around, before inflation. Level 1 uses ${retPctS(MKT.sMean)}.`,
+    ()=>`<b style="display:inline;font:inherit;font-weight:600">Cautious, ${retPctS(STOCK_RET.cautious)}</b> sits below the historical record. Today's share prices are high relative to company earnings, and several forecasters expect that to mean lower returns ahead.`,
+    ()=>`<b style="display:inline;font:inherit;font-weight:600">Balanced, ${retPctS(STOCK_RET.balanced)}</b> splits the difference, and narrows the gap between these projections and what history actually delivered.`,
+    ()=>`<b style="display:inline;font:inherit;font-weight:600">Historical, ${retPctS(STOCK_RET.historical)}</b> is close to the long-run US average since 1871. It assumes the next few decades resemble the last fifteen, in the one market that did best.`,
+    ()=>`All three keep the same ${pctS(MKT.sVol)} year-to-year spread, so only the average moves and the three stay comparable. Bond, cash and inflation assumptions do not change either.`,
+    'No one knows which is right. Try each and see how much your answer depends on the choice: if the verdict holds across all three, it does not rest on this assumption.']},
+  penAmt:{t:'Pension', b:['A defined-benefit pension, entered as the yearly dollar amount of the first check, as your pension statement quotes it.','Set this to zero if you have no pension. A lump-sum payout belongs in your savings instead.']},
+  penAge:{t:'Pension starts at age', b:['The age your pension payments begin. Before then, spending comes from savings and any Social Security.']},
+  penCola:{t:'Pension raises', b:['Most private pensions pay a fixed dollar amount for life, so their buying power shrinks with inflation. At 3% inflation, a fixed pension loses about a quarter of its value in ten years.','Many public-sector pensions include a cost-of-living raise. Choose "Rises with inflation" if yours does. The raise starts once payments begin.']},
+  // Level 3
+  trad:{t:'Traditional 401(k) and IRA', b:['Pre-tax accounts such as a traditional 401(k), 403(b) or IRA. Every dollar withdrawn counts as ordinary income and is taxed through the federal brackets, plus your state rate.','Required minimum distributions are not modeled in the free levels. Level 5 adds them.']},
+  roth:{t:'Roth 401(k) and IRA', b:['Accounts funded with money already taxed. Qualified withdrawals are tax-free.','Because they are spent last, Roth balances often keep growing late in life and pass to heirs tax-free.']},
+  brok:{t:'Taxable brokerage', b:['A regular investment account. When you sell, only the gain portion is taxed, at the 0, 15 or 20% long-term capital-gains rates, depending on your other income.','It is invested in the same stock and bond mix as your other accounts.']},
+  basis:{t:'Brokerage cost basis', b:['The share of your brokerage balance that is money you put in, rather than growth. That part comes back tax-free when you sell.','As the account grows, the gain share rises. Each sale uses up basis in proportion to how much of the account you sell.']},
+  cash:{t:'Excess savings held as cash', b:['Money in savings accounts, money market funds or CDs beyond the cash you keep on hand for everyday bills and emergencies. Leave that everyday cushion out: the model assumes you keep it and never spends it.',()=>`This excess cash Cash earns a rate that averages ${pctS(MKT.cMean)} a year and varies by about ${pctS(MKT.cVol)}. Interest is not taxed in this model.`,'It is spent first, before any investments are sold.']},
+  contribTo:{t:'New savings go to', b:['The account that receives your yearly contributions until you retire.','Traditional contributions are assumed pre-tax. Roth and brokerage contributions are assumed to come from money already taxed.']},
+  legacy:{t:'Leave behind at least', b:['An amount you want left at your plan age, in today\'s dollars. It does not change how much you spend.','It feeds the legacy statistic, which counts the futures where money never ran short and the ending total meets this goal.']},
+
+  // Level 4
+  ev_name:{t:'Event name', b:['A label for your own reference, such as "Kitchen remodel" or "Aunt\'s estate". It does not affect the math.']},
+  ev_type:{t:'Money in or money out', b:['Money in adds to your savings: an inheritance, the sale of a home or business, a bonus, a legal settlement.','Money out is a cost paid from savings: a home down payment, college, a wedding, a new car, a gift to family.']},
+  ev_amt:{t:'Amount', b:['Enter it in today\'s dollars. The model grows it with each future\'s inflation up to the year it happens, so a $50,000 cost in 15 years stays a $50,000-sized cost in real terms.','Enter the after-tax amount. Money in is invested in your brokerage account, with all of it counted as cost basis. Money out is paid from cash, then brokerage, then traditional, then Roth, with tax on those withdrawals added automatically.','Early-withdrawal penalties on retirement accounts before age 59½ are not modeled.']},
+  ev_year:{t:'Year', b:['The calendar year the event happens. The model converts it to your age, shown at the right.','Events in past years, or after your plan age, are ignored.']},
+  ev_years:{t:'Number of years', b:['How many years in a row the amount repeats, starting in the year above. Use it for college tuition, support for a parent, or a rental income stream.','The amount is per year, in today\'s dollars, so it keeps pace with inflation.']},
+  ev_marks:{t:'Event markers', b:['Triangles along the top of the Total savings chart mark years with life events. Up is net money in, down is net money out.']},
+  a_events:{t:'Life events', b:['One-time or repeating sums you entered in Level 4. They occur in the same year in every simulated future. What differs is the market around them, which matters most for large costs early in retirement.']},
+
+  reroll:{t:'Rerun the statistical sampling', b:[()=>`The ${N_PATHS.toLocaleString()} futures come from a random number generator with a fixed starting point, so moving a slider changes only your inputs, not the market luck.`,'This button draws a fresh set of random markets from the same assumptions. If the result moves by a point or two, that is sampling noise: read 84% as "mid-80s", not exactly 84.','It has no effect in Historical Backtests, which replay each start year exactly.']},
+  cost_p1:{t:'Why Level 5 costs $19', b:['Levels 1 to 4 are free. Level 5 is a one-time payment of $19, with no account, no login and no subscription, ever.','Deeper analysis relies on resources that cost money to provide and keep current, such as fifty states\' tax rules, required-distribution tables, and historical market data, each updated every year.']},
+  cost_p10:{t:'Why Level 6 costs $29', b:['Level 6 is a one-time payment of $29, with no account, no login and no subscription, ever.','Testing your actual portfolio requires live and historical market data for individual stocks and ETFs. That data comes from paid providers, and this price covers it.']},
+  bud_home:{t:'Home', b:['Costs of keeping a roof over your head. Many people pay off their mortgage before retiring, so leave it at zero if yours will be gone.','Repairs and upkeep often run 1 to 2% of a home\'s value each year, averaged over time.']},
+  bud_util:{t:'Utilities', b:['Electric, gas, water, trash, phone, internet and streaming services.']},
+  bud_food:{t:'Food', b:['Groceries and meals out. Many retirees eat out more in the early, active years.']},
+  bud_car:{t:'Transportation', b:['Running costs plus money set aside to replace vehicles. A $36,000 car every six years is about $6,000 a year.','If you plan to drive less later in retirement, this line can come down.']},
+  bud_health:{t:'Health care', b:['Premiums and out-of-pocket costs. From 65, this usually means Medicare Part B, a supplement or Medicare Advantage plan, and a drug plan, for each spouse.','Before 65, private or marketplace coverage is often much more expensive. If you retire early, use a higher figure. Health costs tend to rise faster than general inflation, which this model does not capture.']},
+  bud_life:{t:'Living and fun', b:['Travel, hobbies, clothing and household spending. Travel is often highest in the first decade of retirement.']},
+  bud_give:{t:'Family and giving', b:['Gifts, help for children or parents, and charitable donations.']},
+  bud_other:{t:'Other', b:['Other insurance, plus a cushion for spending that doesn\'t fit elsewhere. Most budgets miss something, so a cushion of 5 to 10% is common.']},
+  bud_total:{t:'From spending to income', b:['Your budget is what you spend after tax. The model asks for income before tax, like a salary, so it finds the salary that leaves this much after federal and state income tax.','Payroll taxes are left out, because they stop when you stop working.']},
+  export:{t:'Export the full analysis', b:['Saves a spreadsheet file (CSV) of the numbers behind every chart, one row per year of age: the percentile bands, tax, each account, the median future account by account with its market returns, and the historical backtest curves.','The top of the file lists your inputs and assumptions, the random seed, and a scenario code. Paste the code back into the app to reproduce the exact same futures, or rebuild the analysis yourself in a spreadsheet.','The file is made on this device and goes only where you save it.']},
+  personas:{t:'Examples', b:['Starting points that resemble common situations. Each fills in the Level 1 numbers, which you can then change.','They are illustrations, not averages. People who plan their own retirement this way usually have more saved than the typical household.']},
+  se_earn:{t:'Your yearly pay now', b:[()=>`Wages or net self-employment income. Social Security only counts pay up to $${SSP.cap.toLocaleString('en-US')} a year (the 2026 limit), so anything above that is ignored.`,'The estimate assumes this pay continues, rising with average wages, until the age you stop working.']},
+  se_start:{t:'Age you started full-time work', b:['Your first year of steady, full-time pay. Social Security averages your highest 35 years, so a later start can leave zero years in that average.']},
+  se_shape:{t:'Earlier pay, compared with now', b:['How your earlier pay compares with today\'s, after adjusting for wage growth over time. Most careers rise, so "somewhat lower" suits many people.','Somewhat lower starts your career at 75% of today\'s level and rises steadily. Much lower starts at 50%.']},
+  se_stop:{t:'Stop working at age', b:['Your last year of earnings. Years after this count as zero. Stopping before 62 does not reduce a benefit directly, but it can leave fewer high-earning years in the 35-year average.']},
+  se_claim:{t:'Start benefits at age', b:[()=>`Full retirement age is ${SSP.fra} for anyone born in 1960 or later. Starting at 62 cuts the benefit by 30% for life. Waiting past ${SSP.fra} adds 8% a year, up to 24% more at 70.`,'Waiting also raises what a surviving spouse would receive.']},
+  se_spouse:{t:'Spousal benefit', b:[()=>`A spouse with little work history can receive up to half of your full-retirement-age benefit. It is reduced if started before ${SSP.fra} and does not grow by waiting past ${SSP.fra}. This estimate assumes your spouse starts at the same age you do.`,'If your spouse has their own work history, estimate their benefit separately and add the two.']},
+  se_cut:{t:'Benefit cut', b:['Social Security\'s trustees project that the retirement trust fund runs short in the early 2030s. If Congress does not act, incoming taxes would cover roughly 80% of scheduled benefits.','Checking this box plans for that reduction. Many planners use it as a cautious case.']},
+  se_aime:{t:'Average indexed monthly earnings', b:['Social Security indexes each year of pay to today\'s wage levels, keeps your highest 35 years, and divides the total by 420 months. Missing years count as zero.']},
+  se_pia:{t:'Full-retirement-age benefit', b:[()=>`The monthly benefit at full retirement age. The 2026 formula replaces 90% of the first $${SSP.b1.toLocaleString('en-US')} of monthly average earnings, 32% up to $${SSP.b2.toLocaleString('en-US')}, and 15% above that. Lower earners get a larger share of their pay replaced.`]},
+
+  // results
+  verdict:{t:'How often your money lasts', b:[()=>`The model runs ${N_PATHS.toLocaleString()} futures. Each one draws its own year-by-year sequence of stock, bond, cash and inflation outcomes.`,'This number is the share of futures in which every year\'s spending is fully covered through your plan age. It measures how often the plan works across a wide range of plausible markets. It is not a guarantee.','The label beneath uses common rules of thumb: 85% or more is on solid footing, 70 to 84% is worth a closer look, and below 70% is at real risk. Many planners accept 75 to 90%, because a plan can be adjusted along the way.']},
+  state:{t:'Status label', b:['85% or more: on solid footing. 70 to 84%: worth a closer look. Below 70%: at real risk of running short.','These cut-offs are common planning rules of thumb, not standards. Many planners are comfortable in the 75 to 90% range, because a plan can be adjusted along the way.']},
+  endMed:{t:'Typical balance', b:['The median total balance at your plan age. Half of the futures end higher and half end lower.','Futures that ran out count as zero.']},
+  endP10:{t:'Unlucky case, 1 in 10', b:['The 10th percentile ending balance. One future in ten ends at or below this amount.','A value of zero means at least one future in ten ran out of money before your plan age.']},
+  sustain:{t:'Sustainable income', b:['The highest yearly retirement income, before tax and in today\'s dollars, that would last to your plan age in 9 out of 10 futures, with everything else in your plan unchanged.','Compare it with the income you entered. If it is higher, you have room to spend more or retire sooner. If it is lower, the gap is how far income would need to come down to reach a 90% chance of success.','It uses the same method you selected. With Historical Backtests, it is the income that lasts in 90% of historical start years.']},
+  legacyStat:{t:'Legacy goal', b:['The share of futures in which money never ran short and the ending total, in today\'s dollars, meets your legacy goal.','Balances are counted before any tax your heirs might owe on traditional accounts.']},
+  dollars:{t:'Today\'s vs future dollars', b:['Today\'s dollars divide every amount by that future\'s accumulated inflation, so $1 means what $1 buys now. This is the fairest way to compare across decades.','Future dollars show the amounts an account statement would show. They look larger because of inflation.','Market growth is always shown in today\'s dollars.']},
+  yaxis:{t:'Chart scale', b:[
+    'The chart normally picks its own top and bottom to fit the results, so the shape always fills the space. That is the clearest view of one plan, but it hides the size of a change: retiring two years later can redraw the axis instead of raising the line.',
+    'Turn Auto scale off to pin either end. Then change an input and the difference in height is the difference in outcome.',
+    'Leave a box empty to let the chart choose that end. You can type 2m or 500k as shorthand.',
+    'The numbers are in whichever dollars you are viewing, so switching between today\'s and future dollars usually needs a different range.']},
+  band80:{t:'The shaded band', b:['At each age, the futures are ranked from worst to best. The band runs from the 10th to the 90th percentile, so 8 futures in 10 fall inside it.','Each age is ranked separately. The edges of the band are not single futures.']},
+  band90:{t:'Outer band', b:['At each age, the futures are ranked from worst to best. The light band runs from the 5th to the 95th percentile, so 9 futures in 10 fall inside it.','Each age is ranked separately. One future can sit near the top at 70 and near the bottom at 85.']},
+  band50:{t:'Middle half', b:['The darker band runs from the 25th to the 75th percentile. Half of all futures fall inside it at each age.']},
+  median:{t:'Median line', b:['The middle result at each age: half the futures are above it, half below. It is a typical outcome, not a forecast, and no single future follows it exactly.']},
+  retline:{t:'Retirement line', b:['The dashed line marks your retirement age. Left of it you are adding money. Right of it you are withdrawing.']},
+
+  // panels
+  panel_total:{t:'Total savings', b:['The sum of all your account balances at the end of each year of age, after that year\'s contributions or withdrawals and investment returns.','A future that runs out drops to zero and stays there, which pulls the lower band down late in life.']},
+  panel_assets:{t:'Assets by class, median outcome', b:['This follows one future, the one whose ending wealth is the median of all simulated futures, and stacks each of its accounts year by year. It shows how money moves between account types as you save, retire and draw down.','Unlike the shaded bands elsewhere, these are values from a single future, so they add up.']},
+  assets_hatch:{t:'Hatched areas', b:['Social Security and a pension are assets too, even though you cannot withdraw them as a lump sum. The hatched areas show what they are worth as savings, using the 4% rule: a $20,000 yearly pension matches roughly $500,000 in savings.','Social Security appears from the age you start collecting it. A fixed pension shrinks in today\'s dollars once payments begin, because inflation erodes each check. These areas have no value to heirs: they stop when you do. Hover the chart to see savings you could leave behind.']},
+  engine:{t:'Two ways to test your plan', b:[`<b style="display:inline;font:inherit;font-weight:600">Monte Carlo Statistical Projections</b> runs your plan through ${N_PATHS.toLocaleString()} imagined futures. Each year\'s stock, bond and inflation numbers are drawn at random from the averages and spreads in the assumptions list. This explores a wide range of possibilities, including futures worse or better than anything seen before, but it is only as good as those assumptions.`,`<b style="display:inline;font:inherit;font-weight:600">Historical Backtests</b> runs your plan through what actually happened. It pretends you start today at your current age in ${HIST_FIRST}, then in ${HIST_FIRST+1}, and so on, replaying real US markets year by year in order. It answers: would this plan have survived the Great Depression, the 1970s, and every other stretch on record?`,'History is a limited record: about 150 years, only a handful of truly separate bad stretches, and only for the US, one of the best-performing markets of the period. The two methods check each other. When they disagree, the Monte Carlo assumptions are usually the more cautious of the two.']},
+  teaser:{t:'Historical check', b:['Your plan, including taxes, income, accounts and life events, replayed against every stretch of real US stock, bond and inflation history since 1871 that is long enough to reach your plan age.','Retirements starting in more recent years have not yet run their full course, so they are left out.']},
+  panel_history:{t:'Backtest your scenario against history', b:['Your plan, with the same taxes, income, accounts and life events, replayed through real US stock, bond and inflation history. Each line is one start year: the year you would be your current age.','Of every complete start year since 1871, the chart shows ten, spread evenly from the worst ending to the best. Red lines ran short. The rest shade from gold to green as the ending rises.','Tap a line or a year to switch to Historical Backtests and follow that start year in the market returns and assets charts. Neighbouring start years share most of their markets, so bad outcomes cluster around a few hard stretches, such as the 1900s, the late 1920s and the mid-1960s.']},
+  a_hist:{t:'Historical market data', b:[`Annual US returns from January ${HIST_FIRST} to January ${HIST_LAST+1}, from Robert Shiller\'s public dataset. Stocks are the S&P composite index with dividends reinvested. Bonds are a 10-year US Treasury bought each January at the prevailing yield and sold a year later. Inflation is the consumer price index.`,'Shiller\'s data uses monthly average prices, which smooths some returns slightly compared with exact year-end prices.']},
+  a_histcash:{t:'Cash in historical mode', b:['The dataset has no short-term interest rate going back to 1871, so cash is assumed to earn inflation plus half a percentage point each year.']},
+  panel_market:{t:'One future, year by year', b:['Each simulated future is a sequence of yearly returns for your stock and bond mix. This chart shows the sequence for one future, year by year. Green bars are gains and red bars are losses.','The top chart is your total savings in that same future. The shaded band behind it is the middle half of all futures, and the dashed line is the typical one. The ages line up, so a drop in savings sits directly above the red bars that caused it.','The dashed line marks retirement. Losses in the first years after it do the most damage, because you are selling investments while prices are down. This is called sequence-of-returns risk.','In today\'s dollars mode, returns are shown after that year\'s inflation.']},
+  pick:{t:'Which future', b:['The futures are ranked by what they leave at your plan age, with the ones that ran out ranked lowest.','Unlucky is the future at the 10th percentile, typical is the median and lucky is the 90th percentile. Another shows a random future each time you press it.','Two futures with the same average return can end very differently if the bad years come early.']},
+  panel_tax:{t:'Taxes incurred in retirement', b:['Estimated tax on traditional withdrawals, on the gain share of brokerage sales, and on Social Security or pension income.','Before retirement it shows only the extra tax from Social Security, a pension, or withdrawals for life events. Tax on your paycheck is outside the model.','It usually drops when Social Security starts, because you need smaller withdrawals and much of the benefit is lightly taxed. It can rise again later, because the Social Security thresholds do not grow with inflation.']},
+  panel_trad:{t:'Traditional panel', b:['Your traditional balance over time. It grows with contributions if they go here, then shrinks once cash and brokerage are used up and withdrawals shift to it.']},
+  panel_roth:{t:'Roth panel', b:['Your Roth balance over time. Because it is spent last, it often keeps growing until the other accounts are empty.']},
+  panel_brok:{t:'Brokerage panel', b:['Your taxable brokerage balance over time. It is the second account tapped in retirement, after cash.']},
+  panel_cash:{t:'Excess savings held as cash', b:['Your cash beyond everyday needs, over time. It is spent first in retirement, so it usually empties within a year or two unless income exceeds spending.','Reaching zero here does not mean an empty checking account. The everyday cushion you keep is outside the model and stays untouched.']},
+
+  // assumptions
+  a_stocks:{t:'Stock returns', b:[()=>`Each year\'s stock return is drawn at random with an average of ${retPctS(stockMeanOf(S,level))} and a standard deviation of ${pctS(MKT.sVol)}, before inflation.${level>=2?' You choose the average in the panel on the left.':` Level 2 lets you choose between ${retPctS(STOCK_RET.cautious)}, ${retPctS(STOCK_RET.balanced)} and ${retPctS(STOCK_RET.historical)}.`}`,'Returns follow a lognormal shape, so a year can lose at most 100% but gains are unlimited. Years are independent: the model does not assume a crash is followed by a rebound.','The spread is the same whichever average you pick. To see markets that are genuinely wilder, rather than merely noisier, use Historical Backtests or the stress tests: there the bad years arrive in the order they really did.']},
+  a_bonds:{t:'Bond returns', b:[()=>`Each year\'s bond return is drawn with an average of ${pctS(MKT.bMean)} and a standard deviation of ${pctS(MKT.bVol)}, before inflation. This resembles a broad intermediate-term bond fund.`]},
+  a_rho:{t:'Stock and bond correlation', b:[()=>`How much stocks and bonds move together. At ${MKT.rho.toFixed(2)}, they are nearly independent, so bonds soften bad stock years in most futures but not all.`,'In some periods, such as 2022, both fell together. Level 6 uses the real history of your funds instead.']},
+  a_cash:{t:'Cash returns', b:[()=>`Cash earns an average of ${pctS(MKT.cMean)} a year with a spread of ${pctS(MKT.cVol)}, and never goes below zero.`]},
+  a_infl:{t:'Inflation', b:[()=>`Each year\'s inflation is drawn around your average with a spread of ${pctS(MKT.inflVol)}, independent of market returns, and never below -3%.`,'Differences in inflation compound over decades, which is why today\'s dollars can differ a lot from future dollars in the same future.']},
+  a_inflL1:{t:'Average inflation', b:['Level 1 assumes prices rise 2.5% a year on average, close to the long-run US figure. Level 2 lets you set it.']},
+  a_rebal:{t:'Rebalancing', b:['Every account is reset to your stock and bond mix once a year. The mix stays the same for your whole life. Glide paths that shift toward bonds with age are planned for a paid level.']},
+  a_timing:{t:'Yearly steps', b:['The model works in whole years. Contributions and withdrawals happen at the start of each year, and returns apply to what remains.']},
+  a_order:{t:'Withdrawal order', b:['Spending comes from cash first, then brokerage, then traditional accounts, then Roth. This common order keeps tax-free money growing longest.','Levels 1 and 2 use a single pre-tax pot, so order does not apply there. Income left over after spending is reinvested and not taxed again.']},
+  filing:{t:'Tax filing status', b:['Sets which federal brackets, standard deduction and Social Security thresholds apply.','Married assumes both of you are the same age, so both get the extra deductions from 65. If one spouse dies, the survivor files as single in later years and usually pays more tax. The free levels do not switch statuses; Level 5 models survivor years.']},
+  stateTax:{t:'State income tax rate', b:['One flat rate charged on your federally taxable income, including the taxed part of Social Security.','Nine states have no income tax. Several others exempt Social Security or part of retirement income, so a lower number may fit you. Level 1 uses 4%. Level 5 applies your own state\'s actual rules.']},
+  spendRule:{t:'Spending rule', b:['Steady means you spend the same inflation-adjusted amount every year, whatever markets do. It is simple, and it is the rule behind the success percentages most calculators show.','Guardrails means you adjust. Each year the model compares your withdrawal to your savings. If that rate climbs 20% above where it started, you cut spending by 10%. If it falls 20% below, you give yourself a 10% raise. Cuts stop at 70% of your plan and raises stop at 150%.','Guardrails make running out much less likely, but you pay for that in lean years. The Spending cuts box shows how often and how deep.']},
+  spendDecl:{t:'Spending eases after 75', b:['Research on actual retirees finds spending usually drifts down in later years, even after inflation, as travel and activity slow. Health costs rise, but less than other spending falls.','A common finding is a drop of about 1 to 2% a year. Leave this at 0 to keep spending steady, the cautious choice.']},
+  guardStat:{t:'Spending cuts', b:['How many futures needed at least one guardrail cut, and how low spending went in the unlucky case (1 in 10), as a share of your planned spending.','A high success rate with frequent deep cuts means the plan survives by living on less. Decide whether you could live with that.']},
+  baseline:{t:'Compare to a baseline', b:['Save the current plan as a baseline, then change anything: retire later, save more, move money around. The baseline stays put, so you see exactly what each change buys you.','The dashed gold line on the total savings chart is the baseline\'s typical future.','The baseline is kept on this device with the rest of your settings. It is not included in scenario codes.']},
+  panel_stress:{t:'Stress tests', b:['Each test gives you ordinary, average markets until the year you retire, then replays one of history\'s worst stretches starting that very year. That isolates the sequence-of-returns risk: bad years right after you stop working do the most damage.','Where the historical record runs out (it ends in '+HIST_LAST+'), the remaining years use average returns again.','The dashed line is your typical Monte Carlo future, for comparison. Stress tests use the same taxes, income, accounts and events as the rest of your plan.']},
+  a_pen:{t:'Early-withdrawal penalty', b:['Traditional 401(k) and IRA withdrawals before 59½ usually owe an extra 10% tax. The model charges it, including on withdrawals for life events before you retire.','It is waived after you retire if you leave your job at 55 or later (the Rule of 55), assuming the money is in that employer\'s 401(k). Roth withdrawals are treated as coming from your contributions, which are penalty-free. Substantially equal payments under 72(t) are not modeled.']},
+  a_tax:{t:'Federal income tax', b:[()=>taxTableHtml(),
+    'The brackets rise with each future\'s inflation, as the law requires. The Social Security thresholds do not; they have been fixed since 1984 and 1993, so more of your benefit becomes taxable over time.',
+    'Brokerage gains are taxed at the capital-gains rates, stacked on top of ordinary income. Before retirement, withdrawals are taxed as if added to a salary equal to your income target.',
+    'Not modeled here: required minimum distributions, Medicare premium surcharges (IRMAA) and the 3.8% investment income tax. Level 5 adds the first two.']},
+  a_divtax:{t:'Yearly tax on brokerage dividends', b:['A taxable brokerage account owes tax each year on the dividends and capital-gains distributions its funds pay out, even when you sell nothing. The model does not deduct this, because it depends on what you hold: a broad stock index fund pays out much less than a dividend or bond fund.','As a result, brokerage balances grow slightly faster here than they would in practice. For a typical stock index fund the difference is often a few tenths of a percentage point a year. Traditional and Roth accounts are not affected.']},
+  a_fees:{t:'Fees', b:['Returns are before fund expenses and advisory fees. If you pay 1% a year in fees, your real average return is roughly 1 point lower than shown.','Level 6 deducts your actual advisor and fund fees and shows what they cost you over retirement.']},
+  a_short:{t:'Running short', b:['A future runs short in the first year that all accounts together cannot cover that year\'s spending after income and tax. From then on its balances stay at zero.']},
+  a_paths:{t:'Number of futures', b:[()=>`Each run simulates ${N_PATHS.toLocaleString()} futures from a fixed random seed, so moving a slider changes only your inputs, not the luck. "Rerun the statistical sampling" draws a fresh set. Results usually shift by a point or two, which shows the sampling noise.`]},
+};
+function q(key){ return HELP[key] ? `<button type="button" class="q" data-help="${key}" aria-label="About: ${HELP[key].t}" aria-expanded="false">?</button>` : ''; }
+
+function renderAssumptions(){
+  const inflAvg = level>=2 ? S.infl/100 : .025;
+  const rows = [
+    ...(activeMode()!=='mc' ? [
+      ['a_hist','Market data',`US history ${HIST_FIRST}–${HIST_LAST}`],
+      ['a_histcash','Cash returns','Inflation + 0.5%'],
+    ] : [
+    ['a_stocks','Stock returns',`${retPctS(stockMeanOf(S, level))} avg, ${pctS(MKT.sVol)} spread`],
+    ['a_bonds','Bond returns',`${pctS(MKT.bMean)} avg, ${pctS(MKT.bVol)} spread`],
+    ['a_rho','Stock and bond correlation',MKT.rho.toFixed(2)],
+    ['a_cash','Cash returns',`${pctS(MKT.cMean)} avg`],
+    ['a_infl','Inflation variation',level===1?`${pctS(MKT.inflVol)} spread`:`${pctS(inflAvg)} avg, ${pctS(MKT.inflVol)} spread`]]),
+    ['a_rebal','Rebalancing','Yearly, fixed mix'],
+    ['a_timing','Time steps','Yearly'],
+    ['a_order','Withdrawal order',level>=3?'Cash, brokerage, traditional, Roth':'Single pot'],
+    ['a_pen','Early-withdrawal penalty', S.retAge>=55 ? '10% before 59½, waived after retiring (Rule of 55)' : '10% before 59½'],
+    ['a_tax','Taxes',`${TAXLAW.year} federal brackets, ${S.filing==='single'?'single':'married'}, plus ${(level>=2?S.stateTax:4).toFixed(1).replace(/\.0$/,'')}% state`],
+    ['a_fees','Fees','Not deducted'],
+    ...(level>=3 ? [['a_divtax','Yearly tax on brokerage dividends','Not deducted']] : []),
+    ['a_short','Running short','Any year not fully covered'],
+    activeMode()==='hist' ? ['a_paths','Start years tested','All complete ones'] : ['a_paths','Futures simulated',N_PATHS.toLocaleString()],
+  ];
+  if(level>=4) rows.push(['a_events','Life events',S.events.length?`${S.events.length} added`:'None added']);
+  if(level===1) rows.splice(8,0,['planAge','Plan to age','95 (set in Level 2)'],['penAmt','Pension','$0 (set in Level 2)'],['a_inflL1','Average inflation','2.5% (set in Level 2)']);
+  document.getElementById('alist').innerHTML = rows.map(([k,l,v])=>`<li><span>${l}${q(k)}</span><span class="v">${v}</span></li>`).join('');
+}
+
+/* popover: hover on mouse, tap or keyboard on everything */
+const pop=document.getElementById('pop');
+let popBtn=null, pinned=false;
+function taxTableHtml(){
+  const L=TAXLAW[S.filing==='single'?'single':'mfj'], who=S.filing==='single'?'single':'married filing jointly';
+  const k=v=>v===Infinity?'':'$'+v.toLocaleString('en-US');
+  let lo=0, rows='';
+  L.brk.forEach(([hi,r])=>{ rows+=`<tr><td>${(r*100).toFixed(0)}%</td><td>${k(lo)}${hi===Infinity?' and up':' to '+k(hi)}</td></tr>`; lo=hi; });
+  let cl=0, crow='';
+  L.cg.forEach(([hi,r])=>{ crow+=`<tr><td>${(r*100).toFixed(0)}%</td><td>${k(cl)}${hi===Infinity?' and up':' to '+k(hi)}</td></tr>`; cl=hi; });
+  const n=L.persons, st=(level>=2?S.stateTax:4);
+  return `<div class="ttab"><p>Real ${TAXLAW.year} federal law for ${who}, recalculated every year of every future.</p>
+  <table><caption>Ordinary income brackets (taxable income)</caption>${rows}</table>
+  <table><caption>Long-term capital gains</caption>${crow}</table>
+  <table><caption>Deductions and Social Security</caption>
+   <tr><td>Standard deduction</td><td>$${L.std.toLocaleString('en-US')}</td></tr>
+   <tr><td>Extra at 65</td><td>$${L.add65.toLocaleString('en-US')}${n>1?' each':''}</td></tr>
+   <tr><td>Senior deduction, through ${TAXLAW.senior.lastYear}</td><td>$${TAXLAW.senior.amt.toLocaleString('en-US')}${n>1?' each':''}, reduced 6% of income over $${L.senPhase.toLocaleString('en-US')}</td></tr>
+   <tr><td>Social Security taxed</td><td>up to 50% above $${L.ss1.toLocaleString('en-US')}, 85% above $${L.ss2.toLocaleString('en-US')} of combined income</td></tr>
+   <tr><td>State</td><td>${st.toFixed(1).replace(/\.0$/,'')}% of taxable income</td></tr>
+  </table></div>`;
+}
+function showHelp(btn,pin){
+  const h=HELP[btn.dataset.help]; if(!h) return;
+  if(popBtn && popBtn!==btn) popBtn.setAttribute('aria-expanded','false');
+  popBtn=btn; pinned=!!pin;
+  pop.innerHTML=`<b>${h.t}</b>`+h.b.map(x=>{ const v=typeof x==='function'?x():x; return v.trim().startsWith('<div') ? v : `<p>${v}</p>`; }).join('');
+  pop.hidden=false; btn.setAttribute('aria-expanded','true');
+  if(!btn.id) btn.id='qb_'+Math.random().toString(36).slice(2,8);
+  pop.setAttribute('aria-labelledby',btn.id);
+  pop.style.maxHeight='';
+  const r=btn.getBoundingClientRect(), pw=pop.offsetWidth, ph=pop.offsetHeight, vw=window.innerWidth, vh=window.innerHeight;
+  let left=Math.min(Math.max(12, r.left + r.width/2 - pw/2), vw - pw - 12);
+  // never cover the button itself: use the side with room, and scroll inside if neither side is tall enough
+  const below=vh - r.bottom - 20, above=r.top - 20;
+  let top;
+  if(ph <= below) top=r.bottom + 8;
+  else if(ph <= above) top=r.top - ph - 8;
+  else if(below >= above){ pop.style.maxHeight=below+'px'; top=r.bottom + 8; }
+  else { pop.style.maxHeight=above+'px'; top=r.top - Math.min(ph,above) - 8; }
+  pop.style.left=left+'px'; pop.style.top=top+'px';
+}
+function hideHelp(){ if(popBtn) popBtn.setAttribute('aria-expanded','false'); popBtn=null; pinned=false; pop.hidden=true; }
+document.addEventListener('pointerover',e=>{ const b=e.target.closest('.q'); if(b && e.pointerType==='mouse' && !pinned) showHelp(b,false); });
+document.addEventListener('pointerout',e=>{ const b=e.target.closest('.q'); if(b && e.pointerType==='mouse' && !pinned && !b.contains(e.relatedTarget)) hideHelp(); });
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.q');
+  if(b){ e.preventDefault(); e.stopPropagation(); if(popBtn===b && pinned) hideHelp(); else showHelp(b,true); return; }
+  if(!pop.contains(e.target)) hideHelp();
+});
+let lastPtr=0; document.addEventListener('pointerdown',()=>{ lastPtr=Date.now(); },true);
+document.addEventListener('focusin',e=>{ if(Date.now()-lastPtr<800) return; const b=e.target.closest && e.target.closest('.q'); if(b && !pinned) showHelp(b,false); });
+document.addEventListener('focusout',e=>{ if(e.target.closest && e.target.closest('.q') && !pinned) hideHelp(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !pop.hidden){ const b=popBtn; hideHelp(); b && b.focus(); } });
+window.addEventListener('scroll',e=>{ if(e.target===pop || pop.contains(e.target)) return; if(!pinned) hideHelp(); else if(popBtn) showHelp(popBtn,true); },{passive:true,capture:true});
+window.addEventListener('resize',hideHelp);
+
+document.getElementById('verdictQ').innerHTML = q('verdict');
+document.querySelector('[data-q="dollars"]').outerHTML = q('dollars');
+document.querySelector('[data-q="engine"]').outerHTML = q('engine');
+document.querySelectorAll('[data-eng]').forEach(b=>b.onclick=()=>{ engine=b.dataset.eng; if(engine!=='hist'){ selYear=null; if(retPick==='year') retPick='bad'; } save(); buildGrid(); run(); });
+
+/* ===================== START ===================== */
+load();
+syncDollars();
+renderRail();
+buildInputs();
+buildGrid();
+if(window.Chart){ run(); }
+else { document.getElementById('verdict').textContent='The chart library did not load. Check your connection and reload the page.'; }
+</script>
+</body>
+</html>
