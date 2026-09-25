@@ -113,8 +113,9 @@ aside.inputs{background:var(--surface);border:1px solid var(--line);border-radiu
 .grp > summary:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 .grp > summary:hover h2{color:var(--pine)}
 .grp h2{font-family:var(--display);font-weight:700;font-size:15px;margin:0 0 6px;display:flex;justify-content:space-between;align-items:center}
-.grp h2::before{content:"B8";flex:none;margin-right:7px;font-size:11px;color:var(--muted)}
-.grp[open] h2::before{content:"BE"}
+.grp h2::before{content:"";flex:none;width:6px;height:6px;margin:0 9px 2px 2px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .15s}
+.grp[open] h2::before{transform:rotate(45deg);margin-bottom:4px}
+.grp > summary:hover h2::before{border-color:var(--pine)}
 .grp h2 span{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted)}
 .field{margin:0 0 12px}
 .field .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
@@ -434,8 +435,9 @@ let level = 1, dollars = 'real', seed = 20260924, splitDone = false;
    scenarios can be compared at the same height. A view setting like `dollars`: kept on this
    device, deliberately left out of scenario codes, which describe the plan and not the view. */
 let yAxis = {auto:true, min:null, max:null};
-/* Which settings groups are collapsed. Missing means open, so a first visit looks as it always
-   has; by Level 4 the panel is long enough that closing the settled ones is the point. */
+/* Which settings groups the reader has opened or closed. No entry means they have not said, and
+   the default is to open only the group for the level they are on: at Level 1 that is the whole
+   panel as it always looked, and at Level 4 it is one group instead of four screens of inputs. */
 let openGroups = {};
 
 /* ===================== PERSISTENCE (this device only) ===================== */
@@ -465,7 +467,7 @@ function applySnapshot(o){
   if(o.BUD && typeof o.BUD==='object'){ budInit(); Object.keys(BUD).forEach(k=>{ if(isFinite(+o.BUD[k])) BUD[k]=Math.max(0,+o.BUD[k]); }); }
   if(o.dollars==='real'||o.dollars==='nominal') dollars = o.dollars;
   if(o.openGroups && typeof o.openGroups==='object'){
-    openGroups={}; [1,2,3,4,5].forEach(g=>{ if(o.openGroups[g]===false) openGroups[g]=false; });
+    openGroups={}; [1,2,3,4,5].forEach(g=>{ if(typeof o.openGroups[g]==='boolean') openGroups[g]=o.openGroups[g]; });
   }
   if(o.yAxis && typeof o.yAxis==='object') yAxis = {auto:o.yAxis.auto!==false, min:cleanY(o.yAxis.min), max:cleanY(o.yAxis.max)};
   if(typeof o.splitDone==='boolean') splitDone = o.splitDone;
@@ -729,10 +731,18 @@ function parseBound(s){
 const inputsEl = document.getElementById('inputs');
 /* A settings group, collapsible and remembering whether it was left open. */
 function makeGroup(g){
-  const sec=document.createElement('details'); sec.className='grp';
-  sec.open = openGroups[g]!==false;
-  sec.innerHTML=`<summary><h2>${GROUPS[g].title}<span>${GROUPS[g].sub}</span></h2></summary>`;
-  sec.addEventListener('toggle',()=>{ openGroups[g]=sec.open; save(); });
+  const open = typeof openGroups[g]==='boolean' ? openGroups[g] : (g===level);
+  // Born with the attribute rather than opened afterwards: setting .open fires a toggle event,
+  // which would record merely drawing the group as a choice the reader had made.
+  const wrap=document.createElement('div');
+  wrap.innerHTML=`<details class="grp"${open?' open':''}><summary><h2>${GROUPS[g].title}<span>${GROUPS[g].sub}</span></h2></summary></details>`;
+  const sec=wrap.firstElementChild;
+  // Record the reader's choice, not the browser's: a toggle event also fires when a group that is
+  // already open is inserted, which would silently turn every default into a stored preference.
+  // A click on the summary covers mouse and keyboard alike, and the state is read once it applies.
+  sec.querySelector('summary').addEventListener('click',()=>{
+    setTimeout(()=>{ openGroups[g]=sec.open; save(); },0);
+  });
   return sec;
 }
 function buildInputs(){
