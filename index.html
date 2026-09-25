@@ -108,7 +108,13 @@ aside.inputs{background:var(--surface);border:1px solid var(--line);border-radiu
 @media (max-width:900px){aside.inputs{position:static;max-height:none}}
 .grp{padding:12px 0 4px;border-bottom:1px solid var(--line)}
 .grp:last-of-type{border-bottom:0}
-.grp h2{font-family:var(--display);font-weight:700;font-size:15px;margin:0 0 6px;display:flex;justify-content:space-between;align-items:baseline}
+.grp > summary{list-style:none;cursor:pointer;border-radius:6px}
+.grp > summary::-webkit-details-marker{display:none}
+.grp > summary:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.grp > summary:hover h2{color:var(--pine)}
+.grp h2{font-family:var(--display);font-weight:700;font-size:15px;margin:0 0 6px;display:flex;justify-content:space-between;align-items:center}
+.grp h2::before{content:"B8";flex:none;margin-right:7px;font-size:11px;color:var(--muted)}
+.grp[open] h2::before{content:"BE"}
 .grp h2 span{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted)}
 .field{margin:0 0 12px}
 .field .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
@@ -428,11 +434,14 @@ let level = 1, dollars = 'real', seed = 20260924, splitDone = false;
    scenarios can be compared at the same height. A view setting like `dollars`: kept on this
    device, deliberately left out of scenario codes, which describe the plan and not the view. */
 let yAxis = {auto:true, min:null, max:null};
+/* Which settings groups are collapsed. Missing means open, so a first visit looks as it always
+   has; by Level 4 the panel is long enough that closing the settled ones is the point. */
+let openGroups = {};
 
 /* ===================== PERSISTENCE (this device only) ===================== */
 const LS_KEY = 'diyr:v2';
 let BASE = null;
-function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify({S,level,dollars,splitDone,eventsSeeded,engine,BUD,BASE,seed,yAxis})); }catch(e){} }
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify({S,level,dollars,splitDone,eventsSeeded,engine,BUD,BASE,seed,yAxis,openGroups})); }catch(e){} }
 function load(){
   try{
     const raw = localStorage.getItem(LS_KEY); if(!raw) return;
@@ -455,6 +464,9 @@ function applySnapshot(o){
   if(['mc','hist'].includes(o.engine)) engine = o.engine;
   if(o.BUD && typeof o.BUD==='object'){ budInit(); Object.keys(BUD).forEach(k=>{ if(isFinite(+o.BUD[k])) BUD[k]=Math.max(0,+o.BUD[k]); }); }
   if(o.dollars==='real'||o.dollars==='nominal') dollars = o.dollars;
+  if(o.openGroups && typeof o.openGroups==='object'){
+    openGroups={}; [1,2,3,4,5].forEach(g=>{ if(o.openGroups[g]===false) openGroups[g]=false; });
+  }
   if(o.yAxis && typeof o.yAxis==='object') yAxis = {auto:o.yAxis.auto!==false, min:cleanY(o.yAxis.min), max:cleanY(o.yAxis.max)};
   if(typeof o.splitDone==='boolean') splitDone = o.splitDone;
   return true;
@@ -715,13 +727,20 @@ function parseBound(s){
 
 /* ===================== INPUT PANEL ===================== */
 const inputsEl = document.getElementById('inputs');
+/* A settings group, collapsible and remembering whether it was left open. */
+function makeGroup(g){
+  const sec=document.createElement('details'); sec.className='grp';
+  sec.open = openGroups[g]!==false;
+  sec.innerHTML=`<summary><h2>${GROUPS[g].title}<span>${GROUPS[g].sub}</span></h2></summary>`;
+  sec.addEventListener('toggle',()=>{ openGroups[g]=sec.open; save(); });
+  return sec;
+}
 function buildInputs(){
   inputsEl.innerHTML='';
   [1,2,3,4].forEach(g=>{
     if(g>level) return;
     if(g===4){ inputsEl.appendChild(buildEvents()); return; }
-    const sec=document.createElement('div'); sec.className='grp';
-    sec.innerHTML=`<h2>${GROUPS[g].title}<span>${GROUPS[g].sub}</span></h2>`;
+    const sec=makeGroup(g);
     if(g===1) sec.insertAdjacentHTML('beforeend',PERSONA_HTML_T());
     if(g===3) sec.insertAdjacentHTML('beforeend','<p class="note">Spending draws from cash first, then brokerage, then traditional, then Roth.</p>');
     INPUTS.filter(d=>d.lvl===g && (!d.only || d.only.includes(level))).forEach(d=>{
@@ -852,11 +871,10 @@ function seedEvents(){
   ];
 }
 function buildEvents(){
-  const sec=document.createElement('div'); sec.className='grp';
-  sec.innerHTML=`<h2>${GROUPS[4].title}<span>${GROUPS[4].sub}</span></h2>
-    <p class="note">Amounts are in today's dollars and after tax. Money in is invested in your brokerage account. Money out is paid in the same order as retirement spending.</p>
+  const sec=makeGroup(4);
+  sec.insertAdjacentHTML('beforeend',`<p class="note">Amounts are in today's dollars and after tax. Money in is invested in your brokerage account. Money out is paid in the same order as retirement spending.</p>
     <div id="evList"></div>
-    <button type="button" class="btn addev" id="addEv"><span aria-hidden="true">+</span> Add a life event</button>`;
+    <button type="button" class="btn addev" id="addEv"><span aria-hidden="true">+</span> Add a life event</button>`);
   const list=sec.querySelector('#evList');
   const draw=()=>{
     list.innerHTML = S.events.length ? '' : '<p class="note">No events yet. Add an inheritance, a home purchase, college costs or anything else that moves a large sum in or out.</p>';
@@ -1229,6 +1247,7 @@ function splitSavings(){
   splitDone=true;
 }
 function setLevel(k){
+  openGroups[k]=true;
   if(k>=3 && level<3 && !splitDone) splitSavings();
   if(k<3 && level>=3) S.savings=S.trad+S.roth+S.brok+S.cash;
   if(k===4) seedEvents();
