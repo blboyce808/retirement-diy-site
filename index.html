@@ -108,14 +108,12 @@ aside.inputs{background:var(--surface);border:1px solid var(--line);border-radiu
 @media (max-width:900px){aside.inputs{position:static;max-height:none}}
 .grp{padding:12px 0 4px;border-bottom:1px solid var(--line)}
 .grp:last-of-type{border-bottom:0}
-.grp > summary{list-style:none;cursor:pointer;border-radius:6px}
-.grp > summary::-webkit-details-marker{display:none}
+.grp > summary{cursor:pointer;border-radius:6px;margin-bottom:6px}
 .grp > summary:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 .grp > summary:hover h2{color:var(--pine)}
-.grp h2{font-family:var(--display);font-weight:700;font-size:15px;margin:0 0 6px;display:flex;justify-content:space-between;align-items:center}
-.grp h2::before{content:"";flex:none;width:6px;height:6px;margin:0 9px 2px 2px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);transition:transform .15s}
-.grp[open] h2::before{transform:rotate(45deg);margin-bottom:4px}
-.grp > summary:hover h2::before{border-color:var(--pine)}
+.grp > summary::marker{color:var(--muted);font-size:15px}
+.grp h2{font-family:var(--display);font-weight:700;font-size:15px;margin:0;display:inline-flex;width:calc(100% - 4px);justify-content:space-between;align-items:baseline;vertical-align:top}
+.gbody{overflow:hidden}
 .grp h2 span{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted)}
 .field{margin:0 0 12px}
 .field .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
@@ -439,6 +437,9 @@ let yAxis = {auto:true, min:null, max:null};
    the default is to open only the group for the level they are on: at Level 1 that is the whole
    panel as it always looked, and at Level 4 it is one group instead of four screens of inputs. */
 let openGroups = {};
+/* Set for one render only: the group to show folding shut, and the one to show opening, so a level
+   change is something the reader watches happen rather than a panel that has silently rearranged. */
+let pendingCollapse = null, pendingOpen = null;
 
 /* ===================== PERSISTENCE (this device only) ===================== */
 const LS_KEY = 'diyr:v2';
@@ -730,18 +731,44 @@ function parseBound(s){
 /* ===================== INPUT PANEL ===================== */
 const inputsEl = document.getElementById('inputs');
 /* A settings group, collapsible and remembering whether it was left open. */
+/* Height animation for a group. <details> gives no transition of its own, so the body is measured
+   and moved between 0 and its natural height, and the element is only really closed once the
+   collapse has finished playing. */
+function animateGroup(sec, open){
+  const body=sec.querySelector('.gbody');
+  const still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!body || still){ sec.open=open; return; }
+  const from = open ? 0 : body.scrollHeight;
+  sec.open = true;                       // stay open while a collapse plays out
+  const to = open ? body.scrollHeight : 0;
+  body.style.height = from+'px';
+  requestAnimationFrame(()=>{
+    body.style.transition='height .26s ease';
+    body.style.height = to+'px';
+    setTimeout(()=>{
+      body.style.transition=''; body.style.height='';
+      sec.open = open;
+    }, 270);
+  });
+}
+function groupEl(g){ return document.querySelector(`#inputs details.grp[data-g="${g}"]`); }
 function makeGroup(g){
-  const open = typeof openGroups[g]==='boolean' ? openGroups[g] : (g===level);
+  const open = (g===pendingOpen || g===pendingCollapse) ? (g===pendingCollapse)
+             : typeof openGroups[g]==='boolean' ? openGroups[g] : (g===level);
   // Born with the attribute rather than opened afterwards: setting .open fires a toggle event,
   // which would record merely drawing the group as a choice the reader had made.
   const wrap=document.createElement('div');
-  wrap.innerHTML=`<details class="grp"${open?' open':''}><summary><h2>${GROUPS[g].title}<span>${GROUPS[g].sub}</span></h2></summary></details>`;
+  wrap.innerHTML=`<details class="grp" data-g="${g}"${open?' open':''}><summary><h2>${GROUPS[g].title}<span>${GROUPS[g].sub}</span></h2></summary><div class="gbody"></div></details>`;
   const sec=wrap.firstElementChild;
+  sec.body=sec.querySelector('.gbody');
   // Record the reader's choice, not the browser's: a toggle event also fires when a group that is
   // already open is inserted, which would silently turn every default into a stored preference.
   // A click on the summary covers mouse and keyboard alike, and the state is read once it applies.
-  sec.querySelector('summary').addEventListener('click',()=>{
-    setTimeout(()=>{ openGroups[g]=sec.open; save(); },0);
+  sec.querySelector('summary').addEventListener('click',e=>{
+    e.preventDefault();                  // drive it ourselves so the change is visible
+    const want = !sec.open;
+    openGroups[g]=want; save();
+    animateGroup(sec, want);
   });
   return sec;
 }
@@ -751,15 +778,15 @@ function buildInputs(){
     if(g>level) return;
     if(g===4){ inputsEl.appendChild(buildEvents()); return; }
     const sec=makeGroup(g);
-    if(g===1) sec.insertAdjacentHTML('beforeend',PERSONA_HTML_T());
-    if(g===3) sec.insertAdjacentHTML('beforeend','<p class="note">Spending draws from cash first, then brokerage, then traditional, then Roth.</p>');
+    if(g===1) sec.body.insertAdjacentHTML('beforeend',PERSONA_HTML_T());
+    if(g===3) sec.body.insertAdjacentHTML('beforeend','<p class="note">Spending draws from cash first, then brokerage, then traditional, then Roth.</p>');
     INPUTS.filter(d=>d.lvl===g && (!d.only || d.only.includes(level))).forEach(d=>{
       const f=document.createElement('div'); f.className='field';
       const hint = d.hint ? `<span class="hint">${d.hint}</span>` : '';
       if(d.type==='select'){
         const opts=d.options.map(([v,l])=>`<option value="${v}" ${S[d.id]===v?'selected':''}>${l}</option>`).join('');
         f.innerHTML=`<div class="top"><div class="lab"><label for="in_${d.id}">${d.label}</label>${q(d.id)}${hint}</div><select class="sel" id="in_${d.id}">${opts}</select></div>`;
-        sec.appendChild(f);
+        sec.body.appendChild(f);
         f.querySelector('select').addEventListener('change',e=>{ S[d.id]=e.target.value; changed(); });
         return;
       }
@@ -769,7 +796,7 @@ function buildInputs(){
         <input type="range" id="rg_${d.id}" aria-label="${d.label}" min="${d.min}" max="${d.max}" step="${d.step}" value="${Math.min(S[d.id],d.max)}">`;
       if(d.extra==='ssEst') f.insertAdjacentHTML('beforeend','<button type="button" class="estbtn" id="openSS"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="10" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="4" y="3" width="6" height="2.2" rx=".4" fill="currentColor"/><circle cx="4.8" cy="7.6" r=".8" fill="currentColor"/><circle cx="7" cy="7.6" r=".8" fill="currentColor"/><circle cx="9.2" cy="7.6" r=".8" fill="currentColor"/><circle cx="4.8" cy="10.2" r=".8" fill="currentColor"/><circle cx="7" cy="10.2" r=".8" fill="currentColor"/><circle cx="9.2" cy="10.2" r=".8" fill="currentColor"/></svg>Not sure? Estimate Social Security here</button>');
       if(d.extra==='budEst') f.insertAdjacentHTML('beforeend','<button type="button" class="estbtn" id="openBud"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="10" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="4" y="3" width="6" height="2.2" rx=".4" fill="currentColor"/><circle cx="4.8" cy="7.6" r=".8" fill="currentColor"/><circle cx="7" cy="7.6" r=".8" fill="currentColor"/><circle cx="9.2" cy="7.6" r=".8" fill="currentColor"/><circle cx="4.8" cy="10.2" r=".8" fill="currentColor"/><circle cx="7" cy="10.2" r=".8" fill="currentColor"/><circle cx="9.2" cy="10.2" r=".8" fill="currentColor"/></svg>Not sure? Build a retirement budget here</button>');
-      sec.appendChild(f);
+      sec.body.appendChild(f);
       const tx=f.querySelector('#tx_'+d.id), rg=f.querySelector('#rg_'+d.id);
       rg.addEventListener('input',()=>{ S[d.id]=parseFloat(rg.value); tx.value=fmtInput(d,S[d.id]); changed(); });
       const commit=()=>{
@@ -882,7 +909,7 @@ function seedEvents(){
 }
 function buildEvents(){
   const sec=makeGroup(4);
-  sec.insertAdjacentHTML('beforeend',`<p class="note">Amounts are in today's dollars and after tax. Money in is invested in your brokerage account. Money out is paid in the same order as retirement spending.</p>
+  sec.body.insertAdjacentHTML('beforeend',`<p class="note">Amounts are in today's dollars and after tax. Money in is invested in your brokerage account. Money out is paid in the same order as retirement spending.</p>
     <div id="evList"></div>
     <button type="button" class="btn addev" id="addEv"><span aria-hidden="true">+</span> Add a life event</button>`);
   const list=sec.querySelector('#evList');
@@ -1257,11 +1284,19 @@ function splitSavings(){
   splitDone=true;
 }
 function setLevel(k){
-  openGroups[k]=true;
+  const prev = level;
+  // No preference is written here: the default already opens the group for the level being worked
+  // on, and writing one would freeze that group open when the reader moves on again.
+  if(prev!==k){ pendingOpen = k; if(typeof openGroups[prev]!=='boolean') pendingCollapse = prev; }
   if(k>=3 && level<3 && !splitDone) splitSavings();
   if(k<3 && level>=3) S.savings=S.trad+S.roth+S.brok+S.cash;
   if(k===4) seedEvents();
   level=k; save(); renderRail(); buildInputs(); buildGrid(); run();
+  const shut=pendingCollapse!=null ? groupEl(pendingCollapse) : null;
+  const show=pendingOpen!=null && pendingOpen!==pendingCollapse ? groupEl(pendingOpen) : null;
+  pendingCollapse = pendingOpen = null;
+  if(shut && shut.open) animateGroup(shut, false);
+  if(show && !show.open) animateGroup(show, true);
 }
 
 /* ===================== PANELS ===================== */
