@@ -112,7 +112,7 @@ aside.inputs{background:var(--surface);border:1px solid var(--line);border-radiu
 .grp > summary:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 .grp > summary:hover h2{color:var(--pine)}
 .grp > summary::marker{color:var(--muted);font-size:15px}
-.grp h2{font-family:var(--display);font-weight:700;font-size:15px;margin:0;display:inline-flex;width:calc(100% - 4px);justify-content:space-between;align-items:baseline;vertical-align:top}
+.grp h2{font-family:var(--display);font-weight:700;font-size:15px;margin:0;display:inline-flex;width:calc(100% - 1.6em);justify-content:space-between;align-items:baseline;vertical-align:top}
 .gbody{overflow:hidden}
 .grp h2 span{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted)}
 .field{margin:0 0 12px}
@@ -437,9 +437,6 @@ let yAxis = {auto:true, min:null, max:null};
    the default is to open only the group for the level they are on: at Level 1 that is the whole
    panel as it always looked, and at Level 4 it is one group instead of four screens of inputs. */
 let openGroups = {};
-/* Set for one render only: the group to show folding shut, and the one to show opening, so a level
-   change is something the reader watches happen rather than a panel that has silently rearranged. */
-let pendingCollapse = null, pendingOpen = null;
 
 /* ===================== PERSISTENCE (this device only) ===================== */
 const LS_KEY = 'diyr:v2';
@@ -734,27 +731,28 @@ const inputsEl = document.getElementById('inputs');
 /* Height animation for a group. <details> gives no transition of its own, so the body is measured
    and moved between 0 and its natural height, and the element is only really closed once the
    collapse has finished playing. */
-function animateGroup(sec, open){
-  const body=sec.querySelector('.gbody');
-  const still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(!body || still){ sec.open=open; return; }
+const FOLD_MS = 320;
+function stillPreferred(){ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+function animateGroup(sec, open, done){
+  const body=sec && sec.querySelector('.gbody');
+  if(!body || stillPreferred()){ if(sec) sec.open=open; if(done) done(); return; }
   const from = open ? 0 : body.scrollHeight;
   sec.open = true;                       // stay open while a collapse plays out
-  const to = open ? body.scrollHeight : 0;
   body.style.height = from+'px';
-  requestAnimationFrame(()=>{
-    body.style.transition='height .26s ease';
-    body.style.height = to+'px';
+  body.style.overflow = 'hidden';
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{   // let the start height take effect first
+    body.style.transition = `height ${FOLD_MS}ms cubic-bezier(.4,0,.2,1)`;
+    body.style.height = (open ? body.scrollHeight : 0)+'px';
     setTimeout(()=>{
-      body.style.transition=''; body.style.height='';
+      body.style.transition=''; body.style.height=''; body.style.overflow='';
       sec.open = open;
-    }, 270);
-  });
+      if(done) done();
+    }, FOLD_MS + 20);
+  }));
 }
 function groupEl(g){ return document.querySelector(`#inputs details.grp[data-g="${g}"]`); }
 function makeGroup(g){
-  const open = (g===pendingOpen || g===pendingCollapse) ? (g===pendingCollapse)
-             : typeof openGroups[g]==='boolean' ? openGroups[g] : (g===level);
+  const open = typeof openGroups[g]==='boolean' ? openGroups[g] : (g===level);
   // Born with the attribute rather than opened afterwards: setting .open fires a toggle event,
   // which would record merely drawing the group as a choice the reader had made.
   const wrap=document.createElement('div');
@@ -1287,16 +1285,19 @@ function setLevel(k){
   const prev = level;
   // No preference is written here: the default already opens the group for the level being worked
   // on, and writing one would freeze that group open when the reader moves on again.
-  if(prev!==k){ pendingOpen = k; if(typeof openGroups[prev]!=='boolean') pendingCollapse = prev; }
   if(k>=3 && level<3 && !splitDone) splitSavings();
   if(k<3 && level>=3) S.savings=S.trad+S.roth+S.brok+S.cash;
   if(k===4) seedEvents();
-  level=k; save(); renderRail(); buildInputs(); buildGrid(); run();
-  const shut=pendingCollapse!=null ? groupEl(pendingCollapse) : null;
-  const show=pendingOpen!=null && pendingOpen!==pendingCollapse ? groupEl(pendingOpen) : null;
-  pendingCollapse = pendingOpen = null;
-  if(shut && shut.open) animateGroup(shut, false);
-  if(show && !show.open) animateGroup(show, true);
+
+  // The panel is rebuilt wholesale, so a fold has to finish before the rebuild wipes the element
+  // playing it. Everything else - rail, charts, results - updates at once; only the settings
+  // panel waits, which is the part the reader is being shown.
+  if(prev!==k) delete openGroups[k];   // pressing a level means: show me that level's settings
+  const leaving = (prev!==k && typeof openGroups[prev]!=='boolean') ? groupEl(prev) : null;
+  const rebuild = ()=>{ buildInputs(); };
+  level=k; save(); renderRail(); buildGrid(); run();
+  if(leaving && leaving.open && !stillPreferred()) animateGroup(leaving, false, rebuild);
+  else rebuild();
 }
 
 /* ===================== PANELS ===================== */
