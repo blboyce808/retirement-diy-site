@@ -73,6 +73,10 @@ table.cmp thead th.us{color:var(--pine)}
   table.cmp td::before{content:attr(data-l);color:var(--muted);font-weight:500;font-size:12px}
   table.cmp td.us{border-radius:6px}
 }
+.moved{margin:0 0 18px;padding:10px 12px;border:1px solid var(--line);border-left:3px solid var(--pine);border-radius:8px;background:var(--surface);font-size:13.5px;line-height:1.45;max-width:70ch}
+.moved[hidden]{display:none}
+.moved b{font-family:var(--display)}
+.moved a{color:var(--pine);font-weight:600;word-break:break-word}
 .privacy{margin:0 0 22px;color:var(--muted);font-size:13.5px;max-width:64ch;display:flex;gap:8px;align-items:flex-start}
 .privacy svg{flex:none;margin-top:3px}
 
@@ -302,6 +306,11 @@ footer{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:80ch}
     <svg width="14" height="16" viewBox="0 0 14 16" aria-hidden="true"><path fill="currentColor" d="M7 0l7 3v4.5C14 11.6 11 15 7 16 3 15 0 11.6 0 7.5V3zm0 1.6L1.5 4v3.5C1.5 10.8 3.8 13.6 7 14.4c3.2-.8 5.5-3.6 5.5-6.9V4z"/></svg>
     <span>Every calculation runs on this device. Your numbers are never uploaded, and no account is needed.</span>
   </p>
+
+  <p class="moved" id="movedNote" hidden><b>Retirement.diy has its own web page now.</b>
+    Anyone can open it, with no Claude account and nothing to install:
+    <a href="https://blboyce808.github.io/retirement-diy-site/" target="_blank" rel="noopener">blboyce808.github.io/retirement-diy-site</a>.
+    This copy keeps working and stays up to date.</p>
 
   <nav class="rail" id="rail" aria-label="Level of detail"></nav>
   <div class="paidinfo" id="paidinfo" hidden></div>
@@ -1088,7 +1097,8 @@ async function exportCSV(){
 }
 /* A plain page can hand the file straight over. Inside a frame a download is usually blocked and
    fails silently, so there the clipboard is the honest route rather than claiming a save happened. */
-function canDownload(){ try{ return window.self===window.top; }catch(e){ return false; } }
+function inFrame(){ try{ return window.self!==window.top; }catch(e){ return true; } }
+function canDownload(){ return !inFrame(); }
 function saveOrCopy(csv, fname, msg){
   if(canDownload() && saveFile(csv, fname)){
     msg.textContent='Saved as '+fname+'. This file contains your personal financial data. Save or share it with care.';
@@ -2130,6 +2140,9 @@ document.querySelector('[data-q="engine"]').outerHTML = q('engine');
 document.querySelectorAll('[data-eng]').forEach(b=>b.onclick=()=>{ engine=b.dataset.eng; if(engine!=='hist'){ selYear=null; if(retPick==='year') retPick='bad'; } save(); buildGrid(); run(); });
 
 /* ===================== START ===================== */
+// The pointer to the web page is for readers inside the Claude artifact; on the page itself,
+// where nothing is embedding us, it would only point at where they already are.
+if(inFrame()) document.getElementById('movedNote').hidden=false;
 load();
 syncDollars();
 renderRail();
