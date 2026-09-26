@@ -499,7 +499,7 @@ const N_PATHS = 2000;
    Built from Robert Shiller's monthly S&P composite, dividend, CPI and long-rate series (1871 to 2022). */
 const HIST = [[1871,0.1532,0.0504,0.0152],[1872,0.1094,0.0384,0.0229],[1873,-0.0262,0.0635,-0.044],[1874,0.0451,0.083,-0.0695],[1875,0.0515,0.0854,-0.0573],[1876,-0.1368,0.0561,0.0083],[1877,-0.0168,0.0526,-0.1563],[1878,0.1583,0.0522,-0.1029],[1879,0.4807,0.0571,0.2065],[1880,0.2568,0.0643,-0.0571],[1881,0.0036,0.0431,0.0807],[1882,0.0355,0.0354,-0.0187],[1883,-0.0524,0.0371,-0.0761],[1884,-0.1199,0.0438,-0.1029],[1885,0.2906,0.0467,-0.035],[1886,0.1171,0.0223,0.0],[1887,-0.006,0.0239,0.0476],[1888,0.0319,0.0535,-0.0454],[1889,0.0696,0.0368,-0.0476],[1890,-0.0595,0.0191,0.025],[1891,0.1839,0.0377,-0.0603],[1892,0.06,0.0247,0.0778],[1893,-0.1862,0.0413,-0.1329],[1894,0.0367,0.0553,-0.0409],[1895,0.0516,0.024,0.0137],[1896,0.0315,0.0513,-0.0285],[1897,0.1991,0.0378,0.0294],[1898,0.285,0.0529,0.015],[1899,0.0371,0.0271,0.1686],[1900,0.2014,0.0354,-0.0241],[1901,0.1925,0.0248,0.0246],[1902,0.0819,0.0226,0.0962],[1903,-0.1701,0.0254,-0.0439],[1904,0.3111,0.0279,0.0229],[1905,0.2089,0.0386,0.0],[1906,0.0059,0.0162,0.0449],[1907,-0.2394,0.0217,-0.0215],[1908,0.3837,0.047,0.0323],[1909,0.1591,0.0264,0.1074],[1910,-0.0351,0.0339,-0.0677],[1911,0.0345,0.0376,-0.0108],[1912,0.0719,0.008,0.0734],[1913,-0.0484,0.0659,0.0204],[1914,-0.0529,0.0357,0.01],[1915,0.3042,0.0565,0.0297],[1916,0.0794,0.0273,0.125],[1917,-0.1807,0.0177,0.1966],[1918,0.1755,0.0508,0.1786],[1919,0.1947,0.0115,0.1697],[1920,-0.136,0.0412,-0.0155],[1921,0.0946,0.1088,-0.1105],[1922,0.2859,0.0386,-0.0059],[1923,0.0507,0.0658,0.0298],[1924,0.2594,0.0556,0.0],[1925,0.2502,0.0522,0.0347],[1926,0.1106,0.0629,-0.0223],[1927,0.3629,0.0342,-0.0114],[1928,0.4645,0.0129,-0.0116],[1929,-0.0899,0.0598,0.0],[1930,-0.219,0.0291,-0.0702],[1931,-0.4247,0.0077,-0.1006],[1932,-0.0679,0.0652,-0.0979],[1933,0.5525,0.0478,0.0233],[1934,-0.0792,0.0571,0.0303],[1935,0.5344,0.039,0.0147],[1936,0.3201,0.0241,0.0217],[1937,-0.3125,0.0363,0.0071],[1938,0.1668,0.0416,-0.0141],[1939,0.0279,0.0357,-0.0071],[1940,-0.0894,0.0434,0.0144],[1941,-0.088,-0.0212,0.1135],[1942,0.2027,0.0238,0.0764],[1943,0.2335,0.0239,0.0296],[1944,0.1916,0.0336,0.023],[1945,0.3842,0.0383,0.0225],[1946,-0.1179,0.0171,0.1813],[1947,0.0254,0.0073,0.1023],[1948,0.0942,0.0349,0.0127],[1949,0.1659,0.0223,-0.0208],[1950,0.3315,0.0033,0.0809],[1951,0.2116,0.017,0.0433],[1952,0.1415,0.015,0.0038],[1953,0.0268,0.0562,0.0113],[1954,0.4562,0.0145,-0.0074],[1955,0.2848,0.0034,0.0037],[1956,0.0691,-0.0137,0.0299],[1957,-0.0564,0.0633,0.0362],[1958,0.3951,-0.0382,0.014],[1959,0.0756,-0.0102,0.0103],[1960,0.0625,0.1131,0.0171],[1961,0.1894,0.0206,0.0067],[1962,-0.0281,0.0595,0.0133],[1963,0.2088,0.0132,0.0164],[1964,0.1578,0.0402,0.0097],[1965,0.114,0.0115,0.0192],[1966,-0.0647,0.0483,0.0346],[1967,0.1598,-0.0202,0.0365],[1968,0.1048,0.0207,0.044],[1969,-0.0839,-0.0499,0.0618],[1970,0.0703,0.1822,0.0529],[1971,0.1381,0.0822,0.0327],[1972,0.176,0.0255,0.0365],[1973,-0.1609,0.0301,0.0939],[1974,-0.2085,0.0374,0.118],[1975,0.3857,0.0598,0.0672],[1976,0.111,0.1116,0.0522],[1977,-0.0884,0.0252,0.0684],[1978,0.1593,0.0115,0.0928],[1979,0.1661,-0.0039,0.1391],[1980,0.2529,0.0157,0.1183],[1981,-0.0698,0.0279,0.0839],[1982,0.2881,0.3795,0.0371],[1983,0.2014,0.0393,0.0419],[1984,0.0752,0.1325,0.0353],[1985,0.2585,0.2441,0.0389],[1986,0.3094,0.2289,0.0146],[1987,-0.0206,-0.0258,0.0405],[1988,0.1763,0.0616,0.0467],[1989,0.2277,0.1454,0.052],[1990,-0.0083,0.0896,0.0565],[1991,0.3157,0.1499,0.026],[1992,0.0757,0.0988,0.0326],[1993,0.1155,0.1244,0.0252],[1994,0.0108,-0.0705,0.028],[1995,0.3495,0.2249,0.0273],[1996,0.2705,-0.0052,0.0304],[1997,0.2771,0.138,0.0157],[1998,0.3128,0.1144,0.0167],[1999,0.1548,-0.081,0.0274],[2000,-0.0515,0.1725,0.0373],[2001,-0.1345,0.0601,0.0114],[2002,-0.2004,0.1238,0.026],[2003,0.2826,0.0331,0.0193],[2004,0.0596,0.0363,0.0297],[2005,0.1001,0.0276,0.0399],[2006,0.1322,0.0198,0.0208],[2007,-0.0134,0.1243,0.0428],[2008,-0.3515,0.1346,0.0003],[2009,0.3273,-0.0659,0.0263],[2010,0.1613,0.0633,0.0163],[2011,0.0331,0.15,0.0292],[2012,0.1603,0.0246,0.016],[2013,0.2535,-0.0554,0.0158],[2014,0.1335,0.109,-0.0009],[2015,-0.0334,0.0017,0.0137],[2016,0.2091,-0.0063,0.025],[2017,0.2471,0.0124,0.0207],[2018,-0.047,0.0155,0.0155],[2019,0.2788,0.1055,0.0249],[2020,0.1753,0.0756,0.014],[2021,0.2211,-0.0453,0.0748],[2022,-0.1201,-0.1169,0.0641]];
 const HIST_FIRST = HIST[0][0], HIST_LAST = HIST[HIST.length-1][0];
-const BUILD = '5287378';            // deploy.sh stamps the published copy with the source commit
+const BUILD = 'b4d1ad0';            // deploy.sh stamps the published copy with the source commit
 const PAID_PREVIEW = true;   // paid features are open while the license system is built
 let engine = 'mc';           // 'mc' Monte Carlo, 'hist' every historical start year
 let selYear = null;          // historical start year picked on the history chart
@@ -525,7 +525,7 @@ const INPUTS = [
   {id:'retAge', lvl:1, label:'Retire at age', min:30,max:80,step:1,def:62,fmt:'age'},
   {id:'savings', lvl:1, only:[1,2], label:'Retirement savings today', min:0,max:5e6,step:5000,def:500000,fmt:'usd'},
   {id:'contrib', lvl:1, label:'Added each year until you retire', hint:"In today's dollars", min:0,max:150000,step:1000,def:12000,fmt:'usd'},
-  {id:'spend', lvl:1, label:'Yearly income needs in retirement, before tax', hint:"Like a salary, in today's dollars", extra:'budEst', min:10000,max:400000,step:1000,def:81000,fmt:'usd'},
+  {id:'spend', lvl:1, label:'Yearly spending in retirement, after tax', hint:"What you actually spend, in today's dollars", extra:'budEst', min:10000,max:400000,step:500,def:73500,fmt:'usd'},
   {id:'stocks', lvl:1, label:'Stocks in your mix', hint:'The rest is bonds, rebalanced yearly', min:0,max:100,step:5,def:60,fmt:'pct0'},
   {id:'ssAmt', lvl:1, label:'Social Security', hint:"Per year, today's dollars", min:0,max:80000,step:500,def:36000,fmt:'usd', extra:'ssEst'},
   {id:'ssAge', lvl:1, label:'Social Security starts at age', min:62,max:70,step:1,def:67,fmt:'age'},
@@ -588,12 +588,23 @@ let openGroups = {};
 let firstRender = true;   // the basics open on arrival, whatever level was last used
 
 /* ===================== PERSISTENCE (this device only) ===================== */
-const LS_KEY = 'diyr:v2';
+const LS_KEY = 'diyr:v3', LS_KEY_OLD = 'diyr:v2';
+/* Until September 2026 the spending figure was entered before tax and converted as if it were a
+   salary. Plans and codes saved then still hold that larger number, so convert once on the way in,
+   using the tax rules that applied at the level they were saved at. */
+function grossToSpend(o){
+  const g = +((o.S||{}).spend) || 0;
+  if(!g) return g;
+  const L = TAXLAW[((o.S||{}).filing==='single') ? 'single' : 'mfj'];
+  const lvl = [1,2,3,4,5].includes(o.level) ? o.level : 1;
+  const st = (lvl>=2 ? (+o.S.stateTax || 4) : 4)/100;
+  return Math.round(g - salaryTax(g, L, st));
+}
 let BASE = null;
-function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify({S,level,dollars,splitDone,eventsSeeded,engine,BUD,BASE,seed,yAxis,openGroups})); }catch(e){} }
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify({v:3,S,level,dollars,splitDone,eventsSeeded,engine,BUD,BASE,seed,yAxis,openGroups})); }catch(e){} }
 function load(){
   try{
-    const raw = localStorage.getItem(LS_KEY); if(!raw) return;
+    const raw = localStorage.getItem(LS_KEY) || localStorage.getItem(LS_KEY_OLD); if(!raw) return;
     const o = JSON.parse(raw);
     applySnapshot(o);
     BASE = cleanBase(o.BASE);
@@ -601,6 +612,8 @@ function load(){
 }
 function applySnapshot(o){
   if(!o || typeof o!=='object') return false;
+  if(o.v!==3 && o.S && isFinite(+o.S.spend))
+    o = Object.assign({}, o, {S: Object.assign({}, o.S, {spend: grossToSpend(o)})});
   if(Number.isInteger(o.seed) && o.seed>=0 && o.seed<2**32) seed=o.seed;
   if(o.S) INPUTS.forEach(d=>{
     const v=o.S[d.id]; if(v===undefined) return;
@@ -629,12 +642,12 @@ function applySnapshot(o){
   return true;
 }
 function encodeScenario(){
-  const json = JSON.stringify({S,level,splitDone,eventsSeeded:true,seed});
-  return 'DIYR2.' + btoa(unescape(encodeURIComponent(json))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const json = JSON.stringify({v:3,S,level,splitDone,eventsSeeded:true,seed});
+  return 'DIYR3.' + btoa(unescape(encodeURIComponent(json))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
 function decodeScenario(code){
   code = code.trim();
-  if(!code.startsWith('DIYR2.')) throw new Error('That code does not start with DIYR2.');
+  if(!/^DIYR[23]\./.test(code)) throw new Error('That code does not start with DIYR3.');
   let b = code.slice(6).replace(/-/g,'+').replace(/_/g,'/'); while(b.length%4) b+='=';
   return JSON.parse(decodeURIComponent(escape(atob(b))));
 }
@@ -725,8 +738,7 @@ function simulate(s, lvl, seedVal, mode){
   const L = TAXLAW[s.filing==='single' ? 'single' : 'mfj'];
   const st = stateRateOf(s, lvl);
   const ssAmt = s.ssAmt, ssAge = s.ssAge;
-  // the before-tax income target is turned into after-tax spending as if it were a salary of that size
-  const netSpend = s.spend - salaryTax(s.spend, L, st);
+  const netSpend = s.spend;   // what the reader enters is what gets spent
   const contribTo = lvl>=3 ? s.contribTo : 'trad';
   const decl = lvl>=2 ? (s.spendDecl||0)/100 : 0;
   const rule = lvl>=2 && ['guard','pct','oneN','vpw'].includes(s.spendRule) ? s.spendRule : 'fixed';
@@ -1084,6 +1096,7 @@ function buildInputs(){
         <span class="num">${pre?`<span>${pre}</span>`:''}<input id="tx_${d.id}" inputmode="decimal" autocomplete="off" value="${fmtInput(d,S[d.id])}">${post?`<span>${post}</span>`:''}</span></div>
         <input type="range" id="rg_${d.id}" aria-label="${d.label}" min="${d.min}" max="${d.max}" step="${d.step}" value="${Math.min(S[d.id],d.max)}">`;
       if(d.extra==='ssEst') f.insertAdjacentHTML('beforeend','<button type="button" class="estbtn" id="openSS"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="10" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="4" y="3" width="6" height="2.2" rx=".4" fill="currentColor"/><circle cx="4.8" cy="7.6" r=".8" fill="currentColor"/><circle cx="7" cy="7.6" r=".8" fill="currentColor"/><circle cx="9.2" cy="7.6" r=".8" fill="currentColor"/><circle cx="4.8" cy="10.2" r=".8" fill="currentColor"/><circle cx="7" cy="10.2" r=".8" fill="currentColor"/><circle cx="9.2" cy="10.2" r=".8" fill="currentColor"/></svg>Not sure? Estimate Social Security here</button>');
+      if(d.id==='spend') f.insertAdjacentHTML('beforeend','<p class="note" id="grossNote"></p>');
       if(d.extra==='budEst') f.insertAdjacentHTML('beforeend','<button type="button" class="estbtn" id="openBud"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1" width="10" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><rect x="4" y="3" width="6" height="2.2" rx=".4" fill="currentColor"/><circle cx="4.8" cy="7.6" r=".8" fill="currentColor"/><circle cx="7" cy="7.6" r=".8" fill="currentColor"/><circle cx="9.2" cy="7.6" r=".8" fill="currentColor"/><circle cx="4.8" cy="10.2" r=".8" fill="currentColor"/><circle cx="7" cy="10.2" r=".8" fill="currentColor"/><circle cx="9.2" cy="10.2" r=".8" fill="currentColor"/></svg>Not sure? Build a retirement budget here</button>');
       sec.body.appendChild(f);
       const tx=f.querySelector('#tx_'+d.id), rg=f.querySelector('#rg_'+d.id);
@@ -1136,7 +1149,7 @@ function buildInputs(){
   const rr=document.getElementById('reroll'); if(rr) rr.onclick=()=>{ seed=(Math.random()*1e9)|0; save(); run(); };
   const bs=document.getElementById('baseSet'); if(bs) bs.onclick=setBaseline;
   document.getElementById('reset').onclick=()=>{ S=Object.assign({},DEF,{events:[],income:[]}); splitDone=false; eventsSeeded=false; if(level>=3) splitSavings(); if(level>=4) seedEvents(); save(); buildInputs(); run(); };
-  syncRuleNote(); syncSplitNote();   // run() may have fired before this panel existed
+  syncGrossNote(); syncRuleNote(); syncSplitNote();   // run() may have fired before this panel existed
   tools.querySelector('details').addEventListener('toggle',syncCode);
   document.getElementById('copyCode').onclick=()=>{
     const ta=document.getElementById('codeOut'), m=document.getElementById('codeMsg');
@@ -1312,12 +1325,12 @@ function buildEvents(sc, first){
 
 /* ===================== EXAMPLE STARTING POINTS ===================== */
 const PERSONAS = {
-  p40:  {label:'The early retiree, age 40: retire at 45, $2.2M saved', v:{age:40, retAge:45, savings:2200000, contrib:60000, spend:87000,  stocks:80, ssAmt:24000, ssAge:67, filing:'mfj'}},
-  p50:  {label:'Mid-career, age 50: retire at 62, $500K saved',       v:{age:50, retAge:62, savings:500000,  contrib:12000, spend:81000, stocks:60, ssAmt:36000, ssAge:67, filing:'mfj'}},
-  p55:  {label:'Late saver, age 55: retire at 67, $100K saved',       v:{age:55, retAge:67, savings:100000,  contrib:25000, spend:57000,  stocks:60, ssAmt:32000, ssAge:67, filing:'mfj'}},
-  p58:  {label:'Five years out, age 58: retire at 63, $1.5M saved',   v:{age:58, retAge:63, savings:1500000, contrib:30000, spend:105000, stocks:60, ssAmt:40000, ssAge:67, filing:'mfj'}},
-  p64:  {label:'Retiring this year, age 64: $1.8M saved',             v:{age:64, retAge:64, savings:1800000, contrib:0,     spend:105000, stocks:50, ssAmt:40000, ssAge:67, filing:'mfj'}},
-  p70:  {label:'Already retired, age 70: $1.4M saved',               v:{age:70, retAge:70, savings:1400000, contrib:0,     spend:105000, stocks:50, ssAmt:45000, ssAge:70, filing:'mfj'}},
+  p40:  {label:'The early retiree, age 40: retire at 45, $2.2M saved', v:{age:40, retAge:45, savings:2200000, contrib:60000, spend:78500,  stocks:80, ssAmt:24000, ssAge:67, filing:'mfj'}},
+  p50:  {label:'Mid-career, age 50: retire at 62, $500K saved',       v:{age:50, retAge:62, savings:500000,  contrib:12000, spend:73500, stocks:60, ssAmt:36000, ssAge:67, filing:'mfj'}},
+  p55:  {label:'Late saver, age 55: retire at 67, $100K saved',       v:{age:55, retAge:67, savings:100000,  contrib:25000, spend:53500,  stocks:60, ssAmt:32000, ssAge:67, filing:'mfj'}},
+  p58:  {label:'Five years out, age 58: retire at 63, $1.5M saved',   v:{age:58, retAge:63, savings:1500000, contrib:30000, spend:94000, stocks:60, ssAmt:40000, ssAge:67, filing:'mfj'}},
+  p64:  {label:'Retiring this year, age 64: $1.8M saved',             v:{age:64, retAge:64, savings:1800000, contrib:0,     spend:94000, stocks:50, ssAmt:40000, ssAge:67, filing:'mfj'}},
+  p70:  {label:'Already retired, age 70: $1.4M saved',               v:{age:70, retAge:70, savings:1400000, contrib:0,     spend:94000, stocks:50, ssAmt:45000, ssAge:70, filing:'mfj'}},
 };
 const PERSONA_HTML_T = ()=>`<div class="personas"><select class="sel psel" id="personaSel" aria-label="Start from an example"><option value="">Start from an example…</option>`+
   Object.entries(PERSONAS).map(([k,p])=>`<option value="${k}">${p.label}</option>`).join('')+`</select>${q('personas')}</div>`;
@@ -1436,7 +1449,7 @@ function buildCSV(){
   if(mode==='mc') rows.push(['Random seed', seed], ['Random number generator', 'mulberry32; normal draws by the polar method; yearly lognormal returns']);
   rows.push(['Scenario code (paste into the app to reproduce these exact results)', encodeScenario()]);
   rows.push([`Share lasting to age ${res.H}`, p2(nOk/res.nP)+'%']);
-  if(lastSustain!==null) rows.push(['Sustainable income (before tax, lasting in 90%)', lastSustain]);
+  if(lastSustain!==null) rows.push(['Sustainable spending (after tax, lasting in 90%)', lastSustain]);
   rows.push([]);
   rows.push(['Input','Value']);
   INPUTS.filter(d=>d.lvl<=level && (!d.only || d.only.includes(level))).forEach(d=>{
@@ -1578,9 +1591,9 @@ function openBudget(){
   const recalc=()=>{
     dlg.querySelectorAll('[data-k]').forEach(el=>{ let v=parseFloat(el.value.replace(/[^0-9.]/g,'')); BUD[el.dataset.k]=isFinite(v)?Math.max(0,Math.min(1e6,v)):0; });
     BUDGET_GROUPS.forEach(g=>{ let t=0; g.rows.forEach(r=>t+=(+BUD[r[0]]||0)*(r[2]==='m'?12:1)); dlg.querySelector('#bsub_'+g.id).textContent=money(t)+'/yr'; });
-    const spend=budYearly(), gross=Math.round(budGross(spend)/1000)*1000;
-    dlg.querySelector('#budOut').innerHTML=`<p class="ssbig">$${gross.toLocaleString('en-US')} a year<span>before tax, needed to cover $${Math.round(spend).toLocaleString('en-US')} of spending, taxed like a salary of that size (${gross>0?Math.round((1-spend/gross)*100):0}% overall)${q('bud_total')}</span></p>`;
-    const b=dlg.querySelector('#budUse'); b.textContent=`Use $${gross.toLocaleString('en-US')} a year`; b.dataset.v=gross;
+    const spend=Math.round(budYearly()/100)*100;
+    dlg.querySelector('#budOut').innerHTML=`<p class="ssbig">$${spend.toLocaleString('en-US')} a year<span>after tax, which is exactly what the plan asks for. Roughly $${Math.round(budGross(spend)/1000)*1000>0?(Math.round(budGross(spend)/1000)*1000).toLocaleString('en-US'):0} before tax at your rates${q('bud_total')}</span></p>`;
+    const b=dlg.querySelector('#budUse'); b.textContent=`Use $${spend.toLocaleString('en-US')} a year`; b.dataset.v=spend;
   };
   dlg.querySelectorAll('[data-k]').forEach(el=>{
     el.addEventListener('change',()=>{ recalc(); el.value=Math.round(BUD[el.dataset.k]).toLocaleString('en-US'); save(); });
@@ -1647,6 +1660,14 @@ function splitIsAssumed(){
 }
 /* Say in words what the chosen rule will do with the reader's own number, since the difference
    between setting your spending and being handed it is the whole point of the choice. */
+/* The salary-equivalent figure, which used to be the input. Shown so a reader can still compare
+   with what they earn now and with a Social Security statement, both quoted before tax. */
+function syncGrossNote(){
+  const el=document.getElementById('grossNote'); if(!el) return;
+  const L=TAXLAW[S.filing==='single'?'single':'mfj'];
+  const gross=grossFromNet(S.spend, L, stateRateOf(S, level));
+  el.textContent = `Like earning about $${(Math.round(gross/500)*500).toLocaleString('en-US')} before tax at your rates.`;
+}
 function syncRuleNote(){
   const el=document.getElementById('ruleNote'); if(!el) return;
   const target = '$'+Math.round(S.spend).toLocaleString('en-US');
@@ -2357,7 +2378,7 @@ function scheduleSustain(mode){
           : gapYrs>0 && gapYrs<100 ? `because your savings cannot cover the ${gapYrs} year${gapYrs===1?'':'s'} before your first Social Security or other income arrives.`
           : 'because your savings are too small for the years ahead.');
     }
-    else { const diff=v-S.spend; sub=`Before tax, lasting in 9 of 10 ${unit}. ` + (Math.abs(diff)<1000 ? 'About what you planned.' : diff>0 ? `${money(diff)} more than you planned.` : `${money(-diff)} less than you planned.`); }
+    else { const diff=v-S.spend; sub=`After tax, lasting in 9 of 10 ${unit}. ` + (Math.abs(diff)<1000 ? 'About what you planned.' : diff>0 ? `${money(diff)} more than you planned.` : `${money(-diff)} less than you planned.`); }
     const text = v===null ? 'None' : (capped?'Over ':'') + money(v) + ' a year';
     const from = sustShown && sustShown.v!==null ? sustShown.v : 0;
     const changed = !sustShown || sustShown.text!==text;
@@ -2430,7 +2451,7 @@ function renderBase(){
   el.innerHTML=`<div class="bhead"><b>Compared with your baseline</b>${q('baseline')}<span class="bbtns"><button type="button" class="btn" id="baseSet">Update baseline</button><button type="button" class="btn" id="baseClr">Clear</button></span></div>
     <div class="bgrid">
       <div><span>Success</span>${pts(BASE.success)} → ${pts(cur.success)}${dPts(BASE.success,cur.success)}</div>
-      <div><span>Sustainable income</span>${BASE.sust==null?'—':money(BASE.sust)} → ${sNow==null?'…':money(sNow)}${sNow==null?'':dMon(BASE.sust,sNow)}</div>
+      <div><span>Sustainable spending</span>${BASE.sust==null?'—':money(BASE.sust)} → ${sNow==null?'…':money(sNow)}${sNow==null?'':dMon(BASE.sust,sNow)}</div>
       <div><span>Typical balance at ${cur.H||''}</span>${money(BASE.endMed||0)} → ${money(cur.endMed||0)}${dMon(BASE.endMed,cur.endMed)}</div>
     </div>
     <p class="bchg">${changed.length ? 'What changed: '+changed.map(esc).join('; ')+'.' : 'Nothing has changed yet. Adjust any input to see the difference.'}</p>`;
@@ -2497,7 +2518,7 @@ function run(){
   let statsHtml = varRule ? `
     <div class="stat hero" id="sustBox"><div class="l">Typical spending${q('spendTypical')}</div><div class="v">${money(spendStats.med)} a year</div><div class="s">after tax, in the middle future. The rule sets this, not the income you asked for.</div></div>`
   : `
-    <div class="stat hero${sd?' pending':''}" id="sustBox"><div class="l">Sustainable income${q('sustain')}</div><div class="v" id="sustV">${sd?sd.text:'…'}</div><div class="s" id="sustS">${sd?sd.sub:'Finding it…'}</div></div>
+    <div class="stat hero${sd?' pending':''}" id="sustBox"><div class="l">Sustainable spending${q('sustain')}</div><div class="v" id="sustV">${sd?sd.text:'…'}</div><div class="s" id="sustS">${sd?sd.sub:'Finding it…'}</div></div>
     <div class="stat"><div class="l">Typical balance at ${res.H}${q('endMed')}</div><div class="v">${money(endMed)}</div></div>
     <div class="stat"><div class="l">Unlucky case, 1 in 10${q('endP10')}</div><div class="v">${money(endP10)}</div></div>`;
   if(varRule){
@@ -2536,6 +2557,7 @@ function run(){
   });
 
   renderAssumptions();
+  syncGrossNote();
   syncRuleNote();
   syncSplitNote();
   syncCode();
@@ -2564,7 +2586,12 @@ const HELP = {
   retAge:{t:'Retire at age', b:['The age when yearly contributions stop and withdrawals begin. If it is at or below your current age, the model treats you as already retired.']},
   savings:{t:'Retirement savings today', b:['Everything you have set aside for retirement, across all accounts, at today\'s value.','Levels 1 and 2 treat it as one pot invested in your stock and bond mix, all of it pre-tax like a traditional 401(k), so every withdrawal is taxed as income. That is cautious if some of your savings are Roth or brokerage. Level 3 splits it into traditional, Roth, brokerage and cash, because each is taxed differently.']},
   contrib:{t:'Added each year', b:['What you save each year until retirement, in today\'s dollars. The amount rises with that future\'s inflation, so its buying power stays the same.','It is added at the start of each year and earns that year\'s return.']},
-  spend:{t:'Yearly income needs in retirement, before tax', b:['The income you need in retirement, stated the way you think about a salary: before tax, in today\'s dollars. It rises with each future\'s inflation, so its buying power stays constant.','The model turns it into after-tax spending by taxing it like a salary of the same size, using the real federal brackets and your state rate. In retirement it then withdraws what that spending needs, and the tax you actually pay depends on where the money comes from. Social Security is only partly taxed and there are extra deductions after 65, so retirees often pay less than a worker with the same income.','Social Security and pension count toward this income.','Many people need 70 to 85% of their pre-retirement pay, because saving for retirement and payroll taxes stop.']},
+  spend:{t:'Yearly spending in retirement, after tax', b:[
+    'What you expect to spend in a year, in today’s dollars, once tax is paid. A budget, not a salary: rent or mortgage, food, insurance, travel, everything.',
+    'It rises with each future’s inflation, so its buying power stays the same. The plan then works out what has to be withdrawn to leave you this much after tax, which depends on which accounts the money comes from. Social Security and other income count towards it.',
+    'The line underneath shows what this is worth as a salary, for comparison with what you earn now. That figure used to be what this box asked for; it is now worked out from your plan instead, because the tax a retiree pays has little to do with the tax on a salary.',
+    'Not sure? The budget planner below builds the figure from what you actually spend.',
+    'Many people need 70 to 85% of their pre-retirement pay, because saving for retirement and payroll taxes stop.']},
   stocks:{t:'Stocks in your mix', b:['The share of your investments held in stocks. The rest is bonds.','The mix is rebalanced back to this split every year. More stocks raise the average return and widen the range between good and bad futures.']},
   // Level 2
   planAge:{t:'Plan to age', b:['How long the money needs to last. A future counts as a success only if spending is fully covered in every year through this age.','Level 1 uses 95. Planning past your expected lifespan protects against living longer than average.']},
@@ -2627,7 +2654,9 @@ const HELP = {
   bud_life:{t:'Living and fun', b:['Travel, hobbies, clothing and household spending. Travel is often highest in the first decade of retirement.']},
   bud_give:{t:'Family and giving', b:['Gifts, help for children or parents, and charitable donations.']},
   bud_other:{t:'Other', b:['Other insurance, plus a cushion for spending that doesn\'t fit elsewhere. Most budgets miss something, so a cushion of 5 to 10% is common.']},
-  bud_total:{t:'From spending to income', b:['Your budget is what you spend after tax. The model asks for income before tax, like a salary, so it finds the salary that leaves this much after federal and state income tax.','Payroll taxes are left out, because they stop when you stop working.']},
+  bud_total:{t:'Your yearly spending', b:[
+    'The total of everything above, which is what the plan asks for: spending after tax, in today’s dollars.',
+    'The smaller line shows what that is worth as a salary, since payroll taxes stop when you stop working and the comparison is not one for one.']},
   export:{t:'Export the full analysis', b:['Saves a spreadsheet file (CSV) of the numbers behind every chart, one row per year of age: the percentile bands, tax, each account, the median future account by account with its market returns, and the historical backtest curves.','The top of the file lists your inputs and assumptions, the random seed, and a scenario code. Paste the code back into the app to reproduce the exact same futures, or rebuild the analysis yourself in a spreadsheet.','The file is made on this device and goes only where you save it.']},
   personas:{t:'Examples', b:['Starting points that resemble common situations. Each fills in the Level 1 numbers, which you can then change.','They are illustrations, not averages. People who plan their own retirement this way usually have more saved than the typical household.']},
   se_earn:{t:'Your yearly pay now', b:[()=>`Wages or net self-employment income. Social Security only counts pay up to $${SSP.cap.toLocaleString('en-US')} a year (the 2026 limit), so anything above that is ignored.`,'The estimate assumes this pay continues, rising with average wages, until the age you stop working.'], src:['SSA, contribution and benefit base','https://www.ssa.gov/oact/cola/cbb.html']},
@@ -2645,7 +2674,10 @@ const HELP = {
   state:{t:'Status label', b:['85% or more: on solid footing. 70 to 84%: worth a closer look. Below 70%: at real risk of running short.','These cut-offs are common planning rules of thumb, not standards. Many planners are comfortable in the 75 to 90% range, because a plan can be adjusted along the way.']},
   endMed:{t:'Typical balance', b:['The median total balance at your plan age. Half of the futures end higher and half end lower.','Futures that ran out count as zero.']},
   endP10:{t:'Unlucky case, 1 in 10', b:['The 10th percentile ending balance. One future in ten ends at or below this amount.','A value of zero means at least one future in ten ran out of money before your plan age.']},
-  sustain:{t:'Sustainable income', b:['The highest yearly retirement income, before tax and in today\'s dollars, that would last to your plan age in 9 out of 10 futures, with everything else in your plan unchanged.','Compare it with the income you entered. If it is higher, you have room to spend more or retire sooner. If it is lower, the gap is how far income would need to come down to reach a 90% chance of success.','It uses the same method you selected. With Historical Backtests, it is the income that lasts in 90% of historical start years.']},
+  sustain:{t:'Sustainable spending', b:[
+    'The most you could spend each year, after tax and in today’s dollars, and still have the money last to your plan age in 9 futures out of 10, with everything else unchanged.',
+    'Compare it with the spending you entered. Higher means room to spend more or retire sooner; lower means the gap you would have to close.',
+    'It uses whichever method you have selected. With Historical Backtests it is the spending that survives 90% of historical start years.']},
   legacyStat:{t:'Legacy goal', b:['The share of futures in which money never ran short and the ending total, in today\'s dollars, meets your legacy goal.','Balances are counted before any tax your heirs might owe on traditional accounts.']},
   dollars:{t:'Today\'s vs future dollars', b:['Today\'s dollars divide every amount by that future\'s accumulated inflation, so $1 means what $1 buys now. This is the fairest way to compare across decades.','Future dollars show the amounts an account statement would show. They look larger because of inflation.','Market growth is always shown in today\'s dollars.']},
   yaxis:{t:'Chart scale', b:[
