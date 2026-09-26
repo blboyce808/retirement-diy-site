@@ -13,8 +13,9 @@ no analytics, no tracking, no ads and no affiliate links. You do not have to tak
 this is the whole application, one self-contained HTML file. Read it, or open your browser's
 network tab and watch it ask for nothing.
 
-The only outside requests the page makes are for the charting library and two web fonts, both
-from public CDNs. Bundling those so the page makes no outside requests at all is planned.
+The page makes no outside requests at all. The charting library and the heading font are embedded
+in the file, so nothing is fetched from a CDN, a font service or an analytics provider. Disconnect
+from the internet and reload it: everything still works.
 
 ## What it does
 
