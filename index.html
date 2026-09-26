@@ -47,6 +47,8 @@
   --bg:#EDF0EA; --surface:#F8F9F5; --ink:#1C2A33; --muted:#5B6A70; --line:#D3D9D0;
   --pine:#2E6A5C; --steel:#3C6788; --ochre:#9C6C18; --plum:#7B4868; --slate:#5F7077; --risk:#A8432A;
   --focus:#3C6788;
+  /* the aside: the one warm thing on a cool page, so it reads as a hand rather than a control */
+  --cueBg:#FBE4EC; --cueEdge:#EEBBCF;
   --display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
   --body:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   box-sizing:border-box;
@@ -57,11 +59,13 @@
   :root:not([data-theme="light"]){
     --bg:#10181D; --surface:#172228; --ink:#E3E8E3; --muted:#93A3A6; --line:#2A3A41;
     --pine:#6BB39F; --steel:#7DA9CB; --ochre:#D6A652; --plum:#C18AAE; --slate:#9AABB1; --risk:#E07A5C; --focus:#7DA9CB;
+    --cueBg:#3B2430; --cueEdge:#6E4557;
   }
 }
 :root[data-theme="dark"]{
   --bg:#10181D; --surface:#172228; --ink:#E3E8E3; --muted:#93A3A6; --line:#2A3A41;
   --pine:#6BB39F; --steel:#7DA9CB; --ochre:#D6A652; --plum:#C18AAE; --slate:#9AABB1; --risk:#E07A5C; --focus:#7DA9CB;
+  --cueBg:#3B2430; --cueEdge:#6E4557;
 }
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*::before,*::after{box-sizing:inherit}
@@ -139,9 +143,7 @@ aside.inputs{background:var(--surface);border:1px solid var(--line);border-radiu
 .grp > summary:hover h2{color:var(--pine)}
 .grp > summary::marker{color:var(--muted);font-size:15px}
 .grp h2{font-family:var(--display);font-weight:700;font-size:15px;margin:0;display:inline-flex;width:calc(100% - 1.6em);justify-content:space-between;align-items:baseline;vertical-align:top}
-/* Room under the header for the cue to sit above the first question without covering the
-   section's own name. It reads as breathing room the rest of the time. */
-.gbody{overflow:hidden;padding-top:20px}
+.gbody{overflow:hidden;padding-top:6px}
 .grp h2 span{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted)}
 .field{margin:0 0 12px}
 .field .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
@@ -207,14 +209,12 @@ details.share textarea{width:100%;min-height:62px;margin:8px 0 6px;padding:8px;b
 .field.mcoff input[type=range],.field.mcoff .seg{opacity:.45}
 .hwhy{border-left:3px solid var(--line);padding-left:8px}
 .field[hidden]{display:none}
-/* the aside: a note laid on the panel, not a row in it. It never takes a click, so the
-   field underneath stays reachable through it. */
-#inputs{position:relative}
-.nextcue{position:absolute;z-index:6;pointer-events:none;display:flex;align-items:flex-end;gap:5px;
-  color:var(--plum);padding:2px 10px 3px 4px;border-radius:11px;
-  background:var(--surface);background:color-mix(in srgb, var(--surface) 82%, transparent);
-  box-shadow:0 4px 14px rgba(0,0,0,.16);backdrop-filter:blur(2px);
-  transition:top .2s ease,left .2s ease;animation:cuein .3s ease-out}
+/* the aside: a row of its own. Floating it looked better until it sat on top of the very
+   label it was pointing at, which is the one thing it must never do. */
+.nextcue{display:flex;align-items:flex-end;gap:5px;pointer-events:none;
+  color:var(--plum);margin:14px 0 4px;padding:4px 12px 5px 6px;border-radius:12px;
+  background:var(--cueBg);border:1px solid var(--cueEdge);box-shadow:0 2px 7px rgba(0,0,0,.07);
+  animation:cuein .3s ease-out}
 .nextcue[hidden]{display:none}
 .nextcue svg{width:38px;height:22px;flex:none;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .nextcue span{font-family:'Segoe Script','Bradley Hand','Snell Roundhand',cursive;font-weight:700;font-size:16px;line-height:1.1;transform:rotate(-2deg)}
@@ -531,7 +531,7 @@ const N_PATHS = 2000;
    Built from Robert Shiller's monthly S&P composite, dividend, CPI and long-rate series (1871 to 2022). */
 const HIST = [[1871,0.1532,0.0504,0.0152],[1872,0.1094,0.0384,0.0229],[1873,-0.0262,0.0635,-0.044],[1874,0.0451,0.083,-0.0695],[1875,0.0515,0.0854,-0.0573],[1876,-0.1368,0.0561,0.0083],[1877,-0.0168,0.0526,-0.1563],[1878,0.1583,0.0522,-0.1029],[1879,0.4807,0.0571,0.2065],[1880,0.2568,0.0643,-0.0571],[1881,0.0036,0.0431,0.0807],[1882,0.0355,0.0354,-0.0187],[1883,-0.0524,0.0371,-0.0761],[1884,-0.1199,0.0438,-0.1029],[1885,0.2906,0.0467,-0.035],[1886,0.1171,0.0223,0.0],[1887,-0.006,0.0239,0.0476],[1888,0.0319,0.0535,-0.0454],[1889,0.0696,0.0368,-0.0476],[1890,-0.0595,0.0191,0.025],[1891,0.1839,0.0377,-0.0603],[1892,0.06,0.0247,0.0778],[1893,-0.1862,0.0413,-0.1329],[1894,0.0367,0.0553,-0.0409],[1895,0.0516,0.024,0.0137],[1896,0.0315,0.0513,-0.0285],[1897,0.1991,0.0378,0.0294],[1898,0.285,0.0529,0.015],[1899,0.0371,0.0271,0.1686],[1900,0.2014,0.0354,-0.0241],[1901,0.1925,0.0248,0.0246],[1902,0.0819,0.0226,0.0962],[1903,-0.1701,0.0254,-0.0439],[1904,0.3111,0.0279,0.0229],[1905,0.2089,0.0386,0.0],[1906,0.0059,0.0162,0.0449],[1907,-0.2394,0.0217,-0.0215],[1908,0.3837,0.047,0.0323],[1909,0.1591,0.0264,0.1074],[1910,-0.0351,0.0339,-0.0677],[1911,0.0345,0.0376,-0.0108],[1912,0.0719,0.008,0.0734],[1913,-0.0484,0.0659,0.0204],[1914,-0.0529,0.0357,0.01],[1915,0.3042,0.0565,0.0297],[1916,0.0794,0.0273,0.125],[1917,-0.1807,0.0177,0.1966],[1918,0.1755,0.0508,0.1786],[1919,0.1947,0.0115,0.1697],[1920,-0.136,0.0412,-0.0155],[1921,0.0946,0.1088,-0.1105],[1922,0.2859,0.0386,-0.0059],[1923,0.0507,0.0658,0.0298],[1924,0.2594,0.0556,0.0],[1925,0.2502,0.0522,0.0347],[1926,0.1106,0.0629,-0.0223],[1927,0.3629,0.0342,-0.0114],[1928,0.4645,0.0129,-0.0116],[1929,-0.0899,0.0598,0.0],[1930,-0.219,0.0291,-0.0702],[1931,-0.4247,0.0077,-0.1006],[1932,-0.0679,0.0652,-0.0979],[1933,0.5525,0.0478,0.0233],[1934,-0.0792,0.0571,0.0303],[1935,0.5344,0.039,0.0147],[1936,0.3201,0.0241,0.0217],[1937,-0.3125,0.0363,0.0071],[1938,0.1668,0.0416,-0.0141],[1939,0.0279,0.0357,-0.0071],[1940,-0.0894,0.0434,0.0144],[1941,-0.088,-0.0212,0.1135],[1942,0.2027,0.0238,0.0764],[1943,0.2335,0.0239,0.0296],[1944,0.1916,0.0336,0.023],[1945,0.3842,0.0383,0.0225],[1946,-0.1179,0.0171,0.1813],[1947,0.0254,0.0073,0.1023],[1948,0.0942,0.0349,0.0127],[1949,0.1659,0.0223,-0.0208],[1950,0.3315,0.0033,0.0809],[1951,0.2116,0.017,0.0433],[1952,0.1415,0.015,0.0038],[1953,0.0268,0.0562,0.0113],[1954,0.4562,0.0145,-0.0074],[1955,0.2848,0.0034,0.0037],[1956,0.0691,-0.0137,0.0299],[1957,-0.0564,0.0633,0.0362],[1958,0.3951,-0.0382,0.014],[1959,0.0756,-0.0102,0.0103],[1960,0.0625,0.1131,0.0171],[1961,0.1894,0.0206,0.0067],[1962,-0.0281,0.0595,0.0133],[1963,0.2088,0.0132,0.0164],[1964,0.1578,0.0402,0.0097],[1965,0.114,0.0115,0.0192],[1966,-0.0647,0.0483,0.0346],[1967,0.1598,-0.0202,0.0365],[1968,0.1048,0.0207,0.044],[1969,-0.0839,-0.0499,0.0618],[1970,0.0703,0.1822,0.0529],[1971,0.1381,0.0822,0.0327],[1972,0.176,0.0255,0.0365],[1973,-0.1609,0.0301,0.0939],[1974,-0.2085,0.0374,0.118],[1975,0.3857,0.0598,0.0672],[1976,0.111,0.1116,0.0522],[1977,-0.0884,0.0252,0.0684],[1978,0.1593,0.0115,0.0928],[1979,0.1661,-0.0039,0.1391],[1980,0.2529,0.0157,0.1183],[1981,-0.0698,0.0279,0.0839],[1982,0.2881,0.3795,0.0371],[1983,0.2014,0.0393,0.0419],[1984,0.0752,0.1325,0.0353],[1985,0.2585,0.2441,0.0389],[1986,0.3094,0.2289,0.0146],[1987,-0.0206,-0.0258,0.0405],[1988,0.1763,0.0616,0.0467],[1989,0.2277,0.1454,0.052],[1990,-0.0083,0.0896,0.0565],[1991,0.3157,0.1499,0.026],[1992,0.0757,0.0988,0.0326],[1993,0.1155,0.1244,0.0252],[1994,0.0108,-0.0705,0.028],[1995,0.3495,0.2249,0.0273],[1996,0.2705,-0.0052,0.0304],[1997,0.2771,0.138,0.0157],[1998,0.3128,0.1144,0.0167],[1999,0.1548,-0.081,0.0274],[2000,-0.0515,0.1725,0.0373],[2001,-0.1345,0.0601,0.0114],[2002,-0.2004,0.1238,0.026],[2003,0.2826,0.0331,0.0193],[2004,0.0596,0.0363,0.0297],[2005,0.1001,0.0276,0.0399],[2006,0.1322,0.0198,0.0208],[2007,-0.0134,0.1243,0.0428],[2008,-0.3515,0.1346,0.0003],[2009,0.3273,-0.0659,0.0263],[2010,0.1613,0.0633,0.0163],[2011,0.0331,0.15,0.0292],[2012,0.1603,0.0246,0.016],[2013,0.2535,-0.0554,0.0158],[2014,0.1335,0.109,-0.0009],[2015,-0.0334,0.0017,0.0137],[2016,0.2091,-0.0063,0.025],[2017,0.2471,0.0124,0.0207],[2018,-0.047,0.0155,0.0155],[2019,0.2788,0.1055,0.0249],[2020,0.1753,0.0756,0.014],[2021,0.2211,-0.0453,0.0748],[2022,-0.1201,-0.1169,0.0641]];
 const HIST_FIRST = HIST[0][0], HIST_LAST = HIST[HIST.length-1][0];
-const BUILD = '1e4a115';            // deploy.sh stamps the published copy with the source commit
+const BUILD = 'b489bcf';            // deploy.sh stamps the published copy with the source commit
 const PAID_PREVIEW = true;   // paid features are open while the license system is built
 let engine = 'mc';           // 'mc' Monte Carlo, 'hist' every historical start year
 let selYear = null;          // historical start year picked on the history chart
@@ -1185,42 +1185,28 @@ function syncInk(){
     if(f) f.classList.toggle('untouched', !touched[k]);
   });
 }
-let cueBox = null, cueTarget = null, cueHold = 0, cueWired = false;
+let cueBox = null, cueTarget = null, cueHold = 0;
 function ensureCue(){
-  if(cueBox && cueBox.isConnected) return cueBox;
-  cueBox=document.createElement('div'); cueBox.className='nextcue'; cueBox.hidden=true;
+  if(cueBox) return cueBox;
+  cueBox=document.createElement('div'); cueBox.className='nextcue';
   cueBox.innerHTML=`<svg viewBox="0 0 46 26" aria-hidden="true">`
     + `<path d="M3 4.5C9.5 2.6 19 5.2 26 11.4c3.1 2.7 5.6 5.7 7.4 8.9"/>`
     + `<path d="M27.8 19.4c2.6.3 4.6.8 6.4 1.6.2-2 .7-4 1.5-6.2"/></svg>`
     + `<span>${CUE_TEXT}</span>`;
-  inputsEl.appendChild(cueBox);
-  if(!cueWired){
-    cueWired=true;
-    // a fold finishing, or the window changing shape, moves the thing it is pointing at. The frame
-    // after, because the group sets its own open flag once the animation has run
-    inputsEl.addEventListener('transitionend', ()=>requestAnimationFrame(placeCue));
-    window.addEventListener('resize', placeCue);
-  }
   return cueBox;
 }
-/* It floats over the panel rather than sitting in it: inserted, it shoved every field below down a
-   row each time it moved, and a panel that shuffles while you read it is worse than no cue. */
+/* It takes a row of its own, directly above the question. A folded group clips its fields rather
+   than removing them, so they still report a perfectly good box while being invisible: when the
+   question is inside one - which is what pressing a level button does to The basics - the cue goes
+   above the whole group instead, so there is still something to follow. */
 function placeCue(){
-  const c=cueBox; if(!c) return;
-  const t=cueTarget;
-  if(!t || !t.isConnected){ c.hidden=true; return; }
-  // A folded group clips its fields rather than removing them, so they still report a perfectly
-  // good box while being invisible. When the question is inside one - which is what pressing a
-  // level button does to The basics - the cue moves to the group's own header and tucks under it,
-  // pointing down into what needs opening. Vanishing instead left a reader who had answered
-  // nothing with nothing to follow.
-  const grp = t.closest('details.grp'), folded = grp && !grp.open;
-  const anchor = folded ? grp.querySelector('summary') : t;
-  if(!anchor){ c.hidden=true; return; }
-  c.hidden=false;
-  const a=anchor.getBoundingClientRect(), h=inputsEl.getBoundingClientRect();
-  c.style.left=Math.round(a.left-h.left)+'px';
-  c.style.top=Math.round(Math.max(0, folded ? a.bottom-h.top-4 : a.top-h.top-c.offsetHeight+3))+'px';
+  const c=cueBox, t=cueTarget;
+  if(!c) return;
+  if(!t || !t.isConnected){ if(c.parentNode) c.remove(); return; }
+  const grp = t.closest('details.grp');
+  const anchor = (grp && !grp.open) ? grp : t;
+  if(c.nextElementSibling===anchor) return;        // already where it belongs
+  anchor.parentNode.insertBefore(c, anchor);
 }
 /* The first question still holding an example value, or nothing once they are all answered. */
 function firstUnanswered(){
@@ -1350,7 +1336,7 @@ function buildInputs(){
   document.getElementById('loadCode').onclick=()=>{
     const m=document.getElementById('codeMsg');
     try{ const o=decodeScenario(document.getElementById('codeIn').value); applySnapshot(o); save(); renderRail(); buildInputs(); buildGrid(); run(); document.getElementById('codeMsg').textContent='Scenario loaded.'; }
-    catch(e){ m.textContent='That code could not be read. Check that it was copied in full.'; }
+    catch(e){ m.textContent='That code did not survive the trip. They are long, and mail apps love to break long things in half, so check you have the whole thing.'; }
   };
 }
 
@@ -1449,7 +1435,10 @@ function buildPension(){
       + (level===1 && others ? `<p class="note">Plus ${others} other income stream${others===1?'':'s'} you set at Level 2, still counted.</p>` : '');
     wrap.querySelectorAll('[data-has]').forEach(btn=>btn.addEventListener('click',()=>{
       const want = btn.dataset.has==='yes';
-      touched.pension=true;
+      // Pressing the answer that is already showing is still an answer, and it has to move the cue
+      // on. Recording it below the early return left the reader stuck on the question until they
+      // said yes, which is not the same as asking them.
+      if(!touched.pension){ touched.pension=true; save(); syncCue(); }
       if(want === !!pensionCard()) return;
       if(want){
         const base = lastPension || {name:'Pension', amt:24000, cola:true, taxable:true,
@@ -1481,7 +1470,7 @@ function buildIncome(sc, first){
     <button type="button" class="btn addev" id="addInc"><span aria-hidden="true">+</span> Add an income stream</button>`);
   const list=sec.querySelector('#incList');
   const draw=()=>{
-    list.innerHTML = S.income.some(c=>!isPension(c)) ? '' : '<p class="note">None yet. Add rent, an annuity, consulting work, a trust distribution or anything else paid to you year after year.</p>';
+    list.innerHTML = S.income.some(c=>!isPension(c)) ? '' : '<p class="note">None yet. Add rent, an annuity, consulting work, a trust distribution, or anything else that turns up year after year without you having to sell something first.</p>';
     S.income.forEach((c,ix)=>{
       if(isPension(c)) return;   // edited in The basics instead
       const card=document.createElement('div'); card.className='ev';
@@ -1528,7 +1517,7 @@ function buildEvents(sc, first){
     <button type="button" class="btn addev" id="addEv"><span aria-hidden="true">+</span> Add a life event</button>`);
   const list=sec.querySelector('#evList');
   const draw=()=>{
-    list.innerHTML = S.events.length ? '' : '<p class="note">No events yet. Add an inheritance, a home purchase, college costs or anything else that moves a large sum in or out.</p>';
+    list.innerHTML = S.events.length ? '' : '<p class="note">No events yet. Add an inheritance, a home purchase, college costs: the lump sums life hands you, and the ones it hands you a bill for.</p>';
     S.events.forEach((ev,ix)=>{
       const card=document.createElement('div'); card.className='ev';
       const age = Math.round(S.age) + (ev.year - CUR_YEAR);
@@ -1758,7 +1747,7 @@ function buildCSV(){
 }
 async function exportCSV(){
   const msg=document.getElementById('exportMsg');
-  if(!lastRun){ msg.textContent='Nothing to export yet.'; return; }
+  if(!lastRun){ msg.textContent='Nothing to export yet. The numbers are still being worked out.'; return; }
   const csv=buildCSV();
   const fname=`retirement-diy-projection-${new Date().toISOString().slice(0,10)}.csv`;
   if(dlNS){
@@ -2759,7 +2748,7 @@ function run(){
   const keep = spendStats && spendStats.target>0 ? spendStats.p10/spendStats.target : 1;
   const [label,col] = varRule
     ? (keep>=.9 ? ['Spending holds up','--pine'] : keep>=.75 ? ['Leaner in bad futures','--ochre'] : ['Spending falls a long way','--risk'])
-    : success>=.85 ? ['On solid footing','--pine'] : success>=.70 ? ['Worth a closer look','--ochre'] : ['At real risk of running short','--risk'];
+    : success>=.85 ? ['Holds up in most futures','--pine'] : success>=.70 ? ['Worth a closer look','--ochre'] : ['At real risk of running short','--risk'];
   st.textContent=label; st.style.color=`var(${col})`;
 
   const dl = real ? "today's dollars" : 'future dollars';
@@ -2846,7 +2835,7 @@ const HELP = {
   stocks:{t:'Stocks in your mix', b:['The share of your investments held in stocks. The rest is bonds.','The mix is rebalanced back to this split every year. More stocks raise the average return and widen the range between good and bad futures.']},
   // Level 2
   planAge:{t:'Plan to age', b:['How long the money needs to last. A future counts as a success only if spending is fully covered in every year through this age.','Level 1 uses 95. Planning past your expected lifespan protects against living longer than average.']},
-  infl:{t:'Average inflation', b:['The average yearly rise in prices. Each simulated year draws its own rate around this average, with a spread of 1.2 points, so some futures see long stretches of high inflation.','Spending, contributions and income all grow with that future\'s inflation. Level 1 uses 2.5%.']},
+  infl:{t:'Average inflation', b:['The average yearly rise in prices. Each simulated year draws its own rate around this average, with a spread of 1.2 points, so some futures see long stretches of high inflation.','Spending, contributions and income all grow with that future’s inflation. Level 1 uses 2.5%.','For scale: prices roughly tripled between 1966 and 1982. An average cannot show you what that felt like year by year, which is what the backtests are for.']},
   ssAmt:{t:'Social Security', b:['Your household\'s yearly benefit in today\'s dollars, for the starting age you choose. It rises with inflation, matching Social Security\'s cost-of-living adjustment, and counts toward your retirement income.','Your statement at ssa.gov/myaccount has the most accurate figure. If you don\'t have it handy, the estimator below builds one from your pay. For a couple, add both benefits together.'], src:['SSA, retirement benefits','https://www.ssa.gov/benefits/retirement/planner/taxes.html']},
   ssAge:{t:'Social Security starts at age', b:['The age you claim. Claiming at 62 cuts the benefit by about 30% versus full retirement age (67 for most people). Waiting to 70 raises it by about 24%.','Enter the benefit amount that matches the age you choose here. The model does not adjust it for you.']},
   stockRet:{t:'Average stock return', b:[
@@ -2929,7 +2918,7 @@ const HELP = {
   endP10:{t:'Unlucky case, 1 in 10', b:['The 10th percentile ending balance. One future in ten ends at or below this amount.','A value of zero means at least one future in ten ran out of money before your plan age.']},
   sustain:{t:'Sustainable spending', b:[
     'The most you could spend each year, after tax and in today’s dollars, and still have the money last to your plan age in 9 futures out of 10, with everything else unchanged.',
-    'Compare it with the spending you entered. Higher means room to spend more or retire sooner; lower means the gap you would have to close.',
+    'Compare it with the spending you entered. The difference between the two is the slack in the plan, in whichever direction it runs.',
     'It uses whichever method you have selected. With Historical Backtests it is the spending that survives 90% of historical start years.']},
   legacyStat:{t:'Legacy goal', b:['The share of futures in which money never ran short and the ending total, in today\'s dollars, meets your legacy goal.','Balances are counted before any tax your heirs might owe on Trad. 401k and IRA balances.']},
   dollars:{t:'Today\'s vs future dollars', b:['Today\'s dollars divide every amount by that future\'s accumulated inflation, so $1 means what $1 buys now. This is the fairest way to compare across decades.','Future dollars show the amounts an account statement would show. They look larger because of inflation.','Market growth is always shown in today\'s dollars.']},
@@ -3000,10 +2989,10 @@ const HELP = {
   spendDecl:{t:'Spending eases after 75', b:['Research on actual retirees finds spending usually drifts down in later years, even after inflation, as travel and activity slow. Health costs rise, but less than other spending falls.','A common finding is a drop of about 1 to 2% a year. Leave this at 0 to keep spending steady, the cautious choice.']},
   guardStat:{t:'Spending cuts', b:['How many futures needed at least one guardrail cut, and how low spending went in the unlucky case (1 in 10), as a share of your planned spending.','A high success rate with frequent deep cuts means the plan survives by living on less. Decide whether you could live with that.']},
   baseline:{t:'Compare to a baseline', b:['Save the current plan as a baseline, then change anything: retire later, save more, move money around. The baseline stays put, so you see exactly what each change buys you.','The dashed gold line on the total savings chart is the baseline\'s typical future.','The baseline is kept on this device with the rest of your settings. It is not included in scenario codes.']},
-  panel_stress:{t:'Stress tests', b:['Each test gives you ordinary, average markets until the year you retire, then replays one of history\'s worst stretches starting that very year. That isolates the sequence-of-returns risk: bad years right after you stop working do the most damage.','Where the historical record runs out (it ends in '+HIST_LAST+'), the remaining years use average returns again.','The dashed line is your typical Monte Carlo future, for comparison. Stress tests use the same taxes, income, accounts and events as the rest of your plan.']},
-  a_pen:{t:'Early-withdrawal penalty', b:['Trad. 401k and IRA withdrawals before 59½ usually owe an extra 10% tax. The model charges it, including on withdrawals for life events before you retire.','It is waived after you retire if you leave your job at 55 or later (the Rule of 55), assuming the money is in that employer\'s 401(k). Roth withdrawals are treated as coming from your contributions, which are penalty-free. Substantially equal payments under 72(t) are not modeled.'], src:['IRS Tax Topic 558, early distributions','https://www.irs.gov/taxtopics/tc558']},
+  panel_stress:{t:'Stress tests', b:['Each test gives you ordinary, average markets until the year you retire, then replays one of history\'s worst stretches starting that very year. That isolates the sequence-of-returns risk: bad years right after you stop working do the most damage.','Where the historical record runs out (it ends in '+HIST_LAST+'), the remaining years use average returns again.','The dashed line is your typical Monte Carlo future, for comparison. Stress tests use the same taxes, income, accounts and events as the rest of your plan.','History supplies the bad starts free of charge: 1929, 1937, 1966, 1973, 2000, 2008. Nobody who retired into one of them knew at the time which one they had drawn.']},
+  a_pen:{t:'Early-withdrawal penalty', b:['Trad. 401k and IRA withdrawals before 59½ usually owe an extra 10% tax. The model charges it, including on withdrawals for life events before you retire.','It is waived after you retire if you leave your job at 55 or later (the Rule of 55), assuming the money is in that employer\'s 401(k). Roth withdrawals are treated as coming from your contributions, which are penalty-free. Substantially equal payments under 72(t) are not modeled. The rule is named after the paragraph it happens to sit in, which tells you most of what you need to know about how tax law gets its names.'], src:['IRS Tax Topic 558, early distributions','https://www.irs.gov/taxtopics/tc558']},
   a_tax:{t:'Federal income tax', b:[()=>taxTableHtml(),
-    'The tax brackets rise with each future\'s inflation, as the law requires. The Social Security thresholds do not; they have been fixed since 1984 and 1993, so more of your benefit becomes taxable over time.',
+    'The tax brackets rise with each future’s inflation, as the law requires. The Social Security thresholds do not: $25,000 and $32,000 have been sitting there since 1984 and 1993, untouched by four decades of prices. Every year a little more of your benefit becomes taxable, and nobody has to vote for it.',
     'Brokerage gains are taxed at the capital-gains rates, stacked on top of ordinary income. Before retirement, withdrawals are taxed as if added to a salary equal to your income target.',
     'Not modeled here: required minimum distributions, Medicare premium surcharges (IRMAA) and the 3.8% investment income tax. Level 5 adds the first two.'], src:['IRS, federal income tax rates and brackets','https://www.irs.gov/filing/federal-income-tax-rates-and-brackets']},
   a_divtax:{t:'Yearly tax on brokerage dividends', b:['A taxable brokerage account owes tax each year on the dividends and capital-gains distributions its funds pay out, even when you sell nothing. The model does not deduct this, because it depends on what you hold: a broad stock index fund pays out much less than a dividend or bond fund.','As a result, brokerage balances grow slightly faster here than they would in practice. For a typical stock index fund the difference is often a few tenths of a percentage point a year. Neither Trad. 401k and IRA nor Roth accounts are affected.']},
@@ -3030,7 +3019,7 @@ const HELP = {
     'Not modelled: a step-up in basis on inherited assets, the year-of-death joint return, inherited IRA rules, or any life insurance that might pay out.']},
   irmaa:{t:'Medicare surcharges (IRMAA)', b:[
     'From 65, Medicare charges more for Part B and Part D when your income was above a threshold two years earlier. The surcharge is per person, so a couple pays it twice.',
-    'It steps rather than tapers. One dollar over a line costs a full year of the higher premium, which is why a large withdrawal or a Roth conversion can be expensive in a way that shows up two years later.',
+    'It steps rather than tapers. One dollar over a line costs a full year of the higher premium, which is why a large withdrawal or a Roth conversion can be expensive in a way that shows up two years later. Medicare is reading a tax return you filed while thinking about something else entirely.',
     'Only the surcharge is modelled here. The standard premium everyone pays belongs in your income needs, and the budget planner has a line for it.',
     'Thresholds and amounts are the published 2025 figures used as the 2026 base and rising with inflation. They are set each autumn, so check them before relying on a close call.'], src:['Medicare.gov, Medicare costs','https://www.medicare.gov/basics/costs/medicare-costs']},
   a_irmaa:{t:'Medicare surcharges', b:[
@@ -3062,7 +3051,7 @@ const HELP = {
   a_conv:{t:'Roth conversions', b:['Converted amounts are taxed as ordinary income in the year they move, at the federal tax brackets and your state rate, with the tax paid from cash and brokerage.']},
   rmd:{t:'Required minimum distributions', b:[
     ()=>`From age ${rmdStartAge(CUR_YEAR-Math.round(S.age))} the law requires a share of your Trad. 401k and IRA to come out every year, whether or not you need the money. The share rises with age: about 3.8% at 73, 5% at 80, 8% at 90.`,
-    'The withdrawal is taxed as ordinary income. Whatever is left after tax and spending stays invested, so the money is not lost, but it moves out of a sheltered account and its future growth becomes taxable.',
+    'The withdrawal is taxed as ordinary income. Whatever is left after tax and spending stays invested, so the money is not lost, but it moves out of a sheltered account and its future growth becomes taxable. Tax deferred was never tax forgiven, and the Treasury keeps a calendar.',
     'This is what makes Roth conversions worth considering: money moved to a Roth in your low-income years is never subject to these distributions.',
     'Set this to "Ignore them" to see the difference they make. That is not a choice you have in real life; it is here so the effect is visible. The effect is not always bad: taking money out earlier can mean paying tax in lower tax brackets, and what is reinvested comes back with the tax already paid.'], src:['IRS Publication 590-B','https://www.irs.gov/publications/p590b']},
   a_rmd:{t:'Required minimum distributions', b:[
