@@ -444,6 +444,32 @@ Everything else about the plan is held fixed. It is not reported for the portfol
 rules, where the question is meaningless because the rule itself decides spending and no amount can
 ever fail.</p>
 
+<h3>Brokerage distributions</h3>
+<p>A taxable account owes tax every year on what it distributes, whether or not anything is sold. On
+the balance held at the start of each year, split by the same stock share as the rest of the
+portfolio:</p>
+<div class="fx">qualified dividends = brokerage · w · 1.5%&nbsp;&nbsp;&nbsp;coupon interest = brokerage · (1 &minus; w) · 4%</div>
+<p>The dividends are stacked as long-term gains and the interest as ordinary income, both inside the
+same yearly tax calculation as everything else, so they push Social Security across its thresholds,
+consume bracket room a conversion would otherwise have filled, and enter the MAGI series that sets a
+Medicare surcharge two years later. Neither is subtracted from the balance: both are already inside
+the year's total return and are assumed reinvested. What the plan loses is the tax, which it has to
+find like any other cost. Because the distribution has now been taxed, it raises the basis, capped at
+the balance, so the same money is never taxed again when the shares are sold.</p>
+<p>1.5% is a forward figure for the dividend yield, not today's: the S&amp;P 500 paid 1.05% in
+September 2026 against a 1.61% long-run average, and a broad total-market fund yields slightly more
+than the index. It is deliberately far below the 4% of the deep past, because buybacks have
+structurally replaced a good deal of dividend payout. The bond side needs no separate constant: a par
+bond's coupon is its yield, so the taxable income is the 4% bond assumption, and unlike the bond's
+total return it never goes negative in a year when rates rise. Neither figure is under the reader's
+control, for the same reason volatility is not.</p>
+<div class="note"><b>The bond side dominates.</b> At a 60/40 mix the taxable income is about 0.9% of
+the account from stocks and 1.6% from bonds, and the bond half is taxed as ordinary income rather
+than at long-term rates. That is the arithmetic behind holding bonds in a sheltered account, and it
+is large enough to change conclusions: adding this moved the preferred Roth conversion setting on a
+$3M plan from filling the 12% bracket to filling the 24%, because money sitting in a brokerage now
+leaks tax every year while money in a Roth does not.</div>
+
 <h3>Ending wealth after tax</h3>
 <p>Every balance the page draws is a face value, and pre-tax money has never been taxed, so an
 ending total mixes dollars that are not worth the same. The after-tax figure prices the pre-tax
@@ -469,10 +495,6 @@ is frequently not the one that leaves the most.</div>
 <ul>
   <li><strong>Fees of any kind.</strong> No fund expenses, no advisory fee. Subtract them from the
     return you choose: a 1% fee is roughly a point off the compound rate.</li>
-  <li><strong>Dividend and distribution tax inside the brokerage account.</strong> Real taxable
-    accounts owe tax annually on distributions even when nothing is sold, so brokerage balances here
-    grow slightly faster than they would in practice &mdash; a few tenths of a point a year for a
-    broad index fund.</li>
   <li><strong>A glide path.</strong> The stock share is fixed and rebalanced to it every year.</li>
   <li><strong>Healthcare inflation</strong> running ahead of general inflation, and long-term care.</li>
   <li><strong>ACA premium subsidies</strong> before 65, which can be worth thousands and which
