@@ -695,7 +695,7 @@ const N_PATHS = 2000;
    Built from Robert Shiller's monthly S&P composite, dividend, CPI and long-rate series (1871 to 2022). */
 const HIST = [[1871,0.1532,0.0504,0.0152],[1872,0.1094,0.0384,0.0229],[1873,-0.0262,0.0635,-0.044],[1874,0.0451,0.083,-0.0695],[1875,0.0515,0.0854,-0.0573],[1876,-0.1368,0.0561,0.0083],[1877,-0.0168,0.0526,-0.1563],[1878,0.1583,0.0522,-0.1029],[1879,0.4807,0.0571,0.2065],[1880,0.2568,0.0643,-0.0571],[1881,0.0036,0.0431,0.0807],[1882,0.0355,0.0354,-0.0187],[1883,-0.0524,0.0371,-0.0761],[1884,-0.1199,0.0438,-0.1029],[1885,0.2906,0.0467,-0.035],[1886,0.1171,0.0223,0.0],[1887,-0.006,0.0239,0.0476],[1888,0.0319,0.0535,-0.0454],[1889,0.0696,0.0368,-0.0476],[1890,-0.0595,0.0191,0.025],[1891,0.1839,0.0377,-0.0603],[1892,0.06,0.0247,0.0778],[1893,-0.1862,0.0413,-0.1329],[1894,0.0367,0.0553,-0.0409],[1895,0.0516,0.024,0.0137],[1896,0.0315,0.0513,-0.0285],[1897,0.1991,0.0378,0.0294],[1898,0.285,0.0529,0.015],[1899,0.0371,0.0271,0.1686],[1900,0.2014,0.0354,-0.0241],[1901,0.1925,0.0248,0.0246],[1902,0.0819,0.0226,0.0962],[1903,-0.1701,0.0254,-0.0439],[1904,0.3111,0.0279,0.0229],[1905,0.2089,0.0386,0.0],[1906,0.0059,0.0162,0.0449],[1907,-0.2394,0.0217,-0.0215],[1908,0.3837,0.047,0.0323],[1909,0.1591,0.0264,0.1074],[1910,-0.0351,0.0339,-0.0677],[1911,0.0345,0.0376,-0.0108],[1912,0.0719,0.008,0.0734],[1913,-0.0484,0.0659,0.0204],[1914,-0.0529,0.0357,0.01],[1915,0.3042,0.0565,0.0297],[1916,0.0794,0.0273,0.125],[1917,-0.1807,0.0177,0.1966],[1918,0.1755,0.0508,0.1786],[1919,0.1947,0.0115,0.1697],[1920,-0.136,0.0412,-0.0155],[1921,0.0946,0.1088,-0.1105],[1922,0.2859,0.0386,-0.0059],[1923,0.0507,0.0658,0.0298],[1924,0.2594,0.0556,0.0],[1925,0.2502,0.0522,0.0347],[1926,0.1106,0.0629,-0.0223],[1927,0.3629,0.0342,-0.0114],[1928,0.4645,0.0129,-0.0116],[1929,-0.0899,0.0598,0.0],[1930,-0.219,0.0291,-0.0702],[1931,-0.4247,0.0077,-0.1006],[1932,-0.0679,0.0652,-0.0979],[1933,0.5525,0.0478,0.0233],[1934,-0.0792,0.0571,0.0303],[1935,0.5344,0.039,0.0147],[1936,0.3201,0.0241,0.0217],[1937,-0.3125,0.0363,0.0071],[1938,0.1668,0.0416,-0.0141],[1939,0.0279,0.0357,-0.0071],[1940,-0.0894,0.0434,0.0144],[1941,-0.088,-0.0212,0.1135],[1942,0.2027,0.0238,0.0764],[1943,0.2335,0.0239,0.0296],[1944,0.1916,0.0336,0.023],[1945,0.3842,0.0383,0.0225],[1946,-0.1179,0.0171,0.1813],[1947,0.0254,0.0073,0.1023],[1948,0.0942,0.0349,0.0127],[1949,0.1659,0.0223,-0.0208],[1950,0.3315,0.0033,0.0809],[1951,0.2116,0.017,0.0433],[1952,0.1415,0.015,0.0038],[1953,0.0268,0.0562,0.0113],[1954,0.4562,0.0145,-0.0074],[1955,0.2848,0.0034,0.0037],[1956,0.0691,-0.0137,0.0299],[1957,-0.0564,0.0633,0.0362],[1958,0.3951,-0.0382,0.014],[1959,0.0756,-0.0102,0.0103],[1960,0.0625,0.1131,0.0171],[1961,0.1894,0.0206,0.0067],[1962,-0.0281,0.0595,0.0133],[1963,0.2088,0.0132,0.0164],[1964,0.1578,0.0402,0.0097],[1965,0.114,0.0115,0.0192],[1966,-0.0647,0.0483,0.0346],[1967,0.1598,-0.0202,0.0365],[1968,0.1048,0.0207,0.044],[1969,-0.0839,-0.0499,0.0618],[1970,0.0703,0.1822,0.0529],[1971,0.1381,0.0822,0.0327],[1972,0.176,0.0255,0.0365],[1973,-0.1609,0.0301,0.0939],[1974,-0.2085,0.0374,0.118],[1975,0.3857,0.0598,0.0672],[1976,0.111,0.1116,0.0522],[1977,-0.0884,0.0252,0.0684],[1978,0.1593,0.0115,0.0928],[1979,0.1661,-0.0039,0.1391],[1980,0.2529,0.0157,0.1183],[1981,-0.0698,0.0279,0.0839],[1982,0.2881,0.3795,0.0371],[1983,0.2014,0.0393,0.0419],[1984,0.0752,0.1325,0.0353],[1985,0.2585,0.2441,0.0389],[1986,0.3094,0.2289,0.0146],[1987,-0.0206,-0.0258,0.0405],[1988,0.1763,0.0616,0.0467],[1989,0.2277,0.1454,0.052],[1990,-0.0083,0.0896,0.0565],[1991,0.3157,0.1499,0.026],[1992,0.0757,0.0988,0.0326],[1993,0.1155,0.1244,0.0252],[1994,0.0108,-0.0705,0.028],[1995,0.3495,0.2249,0.0273],[1996,0.2705,-0.0052,0.0304],[1997,0.2771,0.138,0.0157],[1998,0.3128,0.1144,0.0167],[1999,0.1548,-0.081,0.0274],[2000,-0.0515,0.1725,0.0373],[2001,-0.1345,0.0601,0.0114],[2002,-0.2004,0.1238,0.026],[2003,0.2826,0.0331,0.0193],[2004,0.0596,0.0363,0.0297],[2005,0.1001,0.0276,0.0399],[2006,0.1322,0.0198,0.0208],[2007,-0.0134,0.1243,0.0428],[2008,-0.3515,0.1346,0.0003],[2009,0.3273,-0.0659,0.0263],[2010,0.1613,0.0633,0.0163],[2011,0.0331,0.15,0.0292],[2012,0.1603,0.0246,0.016],[2013,0.2535,-0.0554,0.0158],[2014,0.1335,0.109,-0.0009],[2015,-0.0334,0.0017,0.0137],[2016,0.2091,-0.0063,0.025],[2017,0.2471,0.0124,0.0207],[2018,-0.047,0.0155,0.0155],[2019,0.2788,0.1055,0.0249],[2020,0.1753,0.0756,0.014],[2021,0.2211,-0.0453,0.0748],[2022,-0.1201,-0.1169,0.0641],[2023,0.233,-0.004,0.0309],[2024,0.2618,-0.0006,0.03],[2025,0.1737,0.0772,0.0239]];
 const HIST_FIRST = HIST[0][0], HIST_LAST = HIST[HIST.length-1][0];
-const BUILD = 'dcf517c';            // deploy.sh stamps the published copy with the source commit
+const BUILD = '758885a';            // deploy.sh stamps the published copy with the source commit
 let engine = 'mc';           // 'mc' Monte Carlo, 'hist' every historical start year
 let selYear = null;          // historical start year picked on the history chart
 const CUR_YEAR = new Date().getFullYear();
@@ -764,10 +764,12 @@ const INPUTS = [
    type:'select', def:'on', options:[['on','Model them'],['off','Ignore them']]},
   {id:'rmd', lvl:5, label:'Required minimum distributions', hint:'The law empties Trad. 401k and IRA accounts whether you need the money or not',
    type:'select', def:'on', options:[['on','Model them'],['off','Ignore them']]},
-  {id:'heirRate', lvl:6, wide:true, sec:'legacy6', label:'Income tax bracket your heirs are in',
-   hint:'What they would pay on money coming out of a Trad. 401k or IRA', type:'select', def:'22',
-   options:[['0','They would pay no income tax'],['12','12%, a modest income'],['22','22%, a typical working household'],
-            ['24','24%'],['32','32%, a high earner'],['35','35%'],['37','37%, the top bracket']]},
+  {id:'heirs', lvl:6, sec:'legacy6', label:'People sharing it',
+   hint:'How many people the Trad. 401k and IRA money is divided between', min:1,max:6,step:1,def:2,fmt:'age'},
+  {id:'heirInc', lvl:6, sec:'legacy6', label:'What each of them earns',
+   hint:"Their own household income today, before tax", min:0,max:500000,step:5000,def:120000,fmt:'usd'},
+  {id:'heirFiling', lvl:6, sec:'legacy6', label:'How they file',
+   type:'select', def:'mfj', options:[['mfj','Married'],['single','Single']]},
   {id:'charShare', lvl:6, sec:'legacy6', label:'Share of Trad. 401k and IRA left to charity',
    hint:'A charity pays no income tax on it. Anything left to people does', min:0,max:100,step:5,def:0,fmt:'pct0'},
   {id:'legacy', lvl:3, label:'Leave behind at least', hint:"Today's dollars, at your plan age", min:0,max:3e6,step:10000,def:250000,fmt:'usd'},
@@ -1303,6 +1305,38 @@ function band(res, get, real){
 }
 /* The median after-tax ending total, in today's money, on the same footing as the balance stat
    beside it so the two can be read against each other. */
+/* The rate beneficiaries would actually pay, rather than one the reader has to guess at. Since 2020
+   most people who inherit a retirement account must empty it within ten years, so the money arrives
+   as a decade of extra income stacked on whatever they already earn - which is what makes a
+   concentrated inheritance expensive and a divided one cheap. Dividing by the number of heirs and
+   spreading over ten years, each slug is run through the same tax function the rest of the page uses:
+
+     rate = 10 · n · [ tax(income + pot/n/10) - tax(income) ] / pot
+
+   It is worth 3 points on a $1.5M pot and 7 on a $6M one, going from one heir to four - and exactly
+   nothing when the per-person slug stays inside a single bracket either way, which is the honest shape
+   of the thing. Everything is in today's money, on this year's brackets: projecting an heir's tax
+   return decades out would be false precision on top of a guess.
+
+   The context is memoised because the chart asks for a rate once per path per year, and only the pot
+   changes between those calls. */
+let heirMemo = null;
+function heirCtx(){
+  const key = [S.heirs, S.heirInc, S.heirFiling].join('|');
+  if(!heirMemo || heirMemo.key !== key){
+    const law = TAXLAW[S.heirFiling==='single' ? 'single' : 'mfj'];
+    const inc = Math.max(0, +S.heirInc||0);
+    heirMemo = {key, law, inc, n: Math.max(1, Math.round(+S.heirs||1)),
+                base: incomeTax(inc, 0, 0, law, 1, 0, TAXLAW.year, 0)};
+  }
+  return heirMemo;
+}
+function heirEffRate(pot){
+  if(!(pot > 0) || level < 6) return 0;
+  const c = heirCtx(), perYear = pot / c.n / 10;
+  const extra = incomeTax(c.inc + perYear, 0, 0, c.law, 1, 0, TAXLAW.year, 0) - c.base;
+  return Math.min(1, Math.max(0, extra * 10 * c.n / pot));
+}
 /* Who ends up with the money, which is a different question from what it is worth to you, and the
    answer is not a rescaling of it. Three things change at death:
 
@@ -1321,7 +1355,6 @@ function legacySplit(r){
   const zero = {heirs:0, charity:0, tax:0, total:0};
   if(!r) return zero;
   const L = r.nY-1, share = Math.min(1, Math.max(0, (+S.charShare||0)/100));
-  const rate = level>=6 ? Math.min(1, Math.max(0, (+S.heirRate||0)/100)) : 0;
   /* One future, decomposed, rather than three separate medians. Taking the median of each part
      independently produces figures that do not add up - the path sitting at the middle of what
      heirs receive is not the path sitting at the middle of what charity receives - and three
@@ -1335,6 +1368,8 @@ function legacySplit(r){
   if(!pick) return zero;
   const i = pick[1], f = r.CI[L][i], trad = r.TRAD[L][i]||0;
   const toChar = trad*share, toHeir = trad - toChar;
+  // the rate follows what they actually inherit, so giving more away lowers the bill on the rest
+  const rate = heirEffRate(toHeir);
   return {
     heirs:   (toHeir*(1-rate) + (r.ROTH[L][i]||0) + (r.BROK[L][i]||0) + (r.CASH[L][i]||0))/f,
     charity: toChar/f,
@@ -1351,20 +1386,6 @@ function endNetMed(r){
 }
 const GET = {
   total:(r,k,i)=>r.TRAD[k][i]+r.ROTH[k][i]+r.BROK[k][i]+r.CASH[k][i],
-  /* What beneficiaries would receive if death happened in this year rather than at the plan age.
-     The balances already account for every year of spending up to that point, so no separate run is
-     needed: dying at 75 leaves the age-75 balance, taxed the way an inheritance is taxed.
-
-     This is the one figure in the model that needs no per-year tax context, which is why the whole
-     curve is cheap. The brokerage's basis steps up at death, so its gain needs no rate at all, and
-     the heir's bracket is a constant the reader set rather than something the year decides. Called
-     once per path per year, so it is deliberately plain arithmetic. */
-  bequest:(r,k,i)=>{
-    const share = Math.min(1, Math.max(0, (+S.charShare||0)/100));
-    const rate  = level>=6 ? Math.min(1, Math.max(0, (+S.heirRate||0)/100)) : 0;
-    const toHeir = (r.TRAD[k][i]||0)*(1-share);
-    return toHeir*(1-rate) + (r.ROTH[k][i]||0) + (r.BROK[k][i]||0) + (r.CASH[k][i]||0);
-  },
   trad:(r,k,i)=>r.TRAD[k][i], roth:(r,k,i)=>r.ROTH[k][i], brok:(r,k,i)=>r.BROK[k][i], cash:(r,k,i)=>r.CASH[k][i],
   tax:(r,k,i)=>r.TAX[k][i],
 };
@@ -1467,6 +1488,9 @@ const DIMMED = {
   survSS:    () => survOff(),
   survInc:   () => survOff(),
   survSpend: () => survOff(),
+  heirs:      () => +S.charShare>=100 && NO_HEIR,
+  heirInc:    () => +S.charShare>=100 && NO_HEIR,
+  heirFiling: () => +S.charShare>=100 && NO_HEIR,
   convKeep:  () => (!S.rothConv || S.rothConv==='off') && NO_CONV,
   convEnd:   () => (!S.rothConv || S.rothConv==='off') && NO_CONV,
 };
@@ -1477,6 +1501,7 @@ function survOff(){ return S.filing==='single' ? NO_SPOUSE
    parameter on screen is noise. Everything else greys instead. An independent setting that some
    other choice happens to override - spending, the decline after 75, the survivor switch itself -
    must stay visible, or a reader who goes looking for it concludes it was never built. */
+const NO_HEIR = 'Every dollar of Trad. 401k and IRA money is going to charity, which pays no income tax on it, so there is nothing for anyone to be taxed on.';
 const HIDE_WHEN_OFF = ['spendPct','convKeep','convEnd','survAge','survSS','survInc','survSpend'];
 function syncDimmed(){
   let revealed = null;
@@ -2343,7 +2368,7 @@ const PANELS = [
   {id:'stress', lvl:2, title:'Stress tests: retiring into a crash', color:'--risk', wide:true, desc:'What happens if another Great Depression or Great Recession hits right after you retire. It’s a hair-raising historical example which you can consider here.'},
   {id:'market', lvl:2, title:'One future, year by year', color:'--slate', wide:true, desc:'Pick a future to see its market returns and what they do to your savings.'},
   {id:'tax', lvl:2, title:'Taxes incurred in retirement', color:'--plum', wide:true, desc:'Estimated tax on your withdrawals and retirement income.'},
-  {id:'bequest', lvl:6, title:'What you would leave, by the age you die', color:'--pine', wide:true, desc:'Your plan runs to one age. This is what beneficiaries would receive if it ended at any of the others.'},
+  {id:'bequest', lvl:6, title:'Who ends up with it, by the age you die', color:'--pine', wide:true, desc:'Your plan runs to one age. This is how the money would divide if it ended at any of the others.'},
   {id:'seq', lvl:5, title:'Withdrawal order, compared', color:'--plum', wide:true, desc:'The Withdrawal order setting from the panel, with what each choice would do to this plan. Tap one to adopt it.'},
   {id:'conv', lvl:5, title:'Roth conversions, compared', color:'--ochre', wide:true, desc:'The Roth conversions setting from the panel, with what each choice would do to this plan. Tap one to adopt it.'},
   {id:'trad', lvl:3, title:'Trad. 401k and IRA', color:'--steel', desc:'Taxed as income. Spent after cash and brokerage.'},
@@ -2367,7 +2392,7 @@ function buildGrid(){
     const el=document.createElement('div'); el.className='panel'+(p.wide?' wide':'');
     el.innerHTML=`<h3><i style="background:var(${p.color})"></i><span id="ttl_${p.id}">${p.title}</span>${q('panel_'+p.id)}</h3><p class="desc">${p.desc}</p>${p.id==='market'?MARKET_CTRL:''}${p.id==='total'?Y_CTRL:''}${p.id==='flow'?FLOW_CTRL:''}${p.id==='tax'?'<p class="taxtot" id="taxTotal"></p>':''}${p.id==='seq' ? '<div class="scards" id="seqCards"></div>' : p.id==='conv' ? '<div class="scards" id="convCards"></div>' : p.id==='market'
       ? `<div class="stklab">Total savings in this future</div><div class="cv cvtop"><canvas id="cv_mbal" role="img" aria-label="Total savings in the selected future"></canvas></div><div class="stklab">Market return each year</div><div class="cv cvbot"><canvas id="cv_market" role="img" aria-label="Yearly market returns in the selected future"></canvas></div><div class="legend clg" id="lg_market"></div>`
-      : `<div class="cv"><canvas id="cv_${p.id}" role="img" aria-label="${p.title} over time"></canvas></div>`}${p.id==='total'?'<div class="legend clg" id="legend"></div>':''}${p.id==='assets'?'<div class="legend clg" id="lg_assets"></div>':''}${p.id==='flow'?'<div class="legend clg" id="lg_flow"></div>':''}${p.id==='history'?'<div class="hlg" id="lg_history"></div><p class="rsum" id="histnote"></p>':''}${p.id==='stress'?'<div class="scards" id="stressCards"></div>':''}`;
+      : `<div class="cv"><canvas id="cv_${p.id}" role="img" aria-label="${p.title} over time"></canvas></div>`}${p.id==='total'?'<div class="legend clg" id="legend"></div>':''}${p.id==='assets'?'<div class="legend clg" id="lg_assets"></div>':''}${p.id==='bequest'?'<div class="legend clg" id="lg_bequest"></div>':''}${p.id==='flow'?'<div class="legend clg" id="lg_flow"></div>':''}${p.id==='history'?'<div class="hlg" id="lg_history"></div><p class="rsum" id="histnote"></p>':''}${p.id==='stress'?'<div class="scards" id="stressCards"></div>':''}`;
     g.appendChild(el);
   });
   document.querySelectorAll('[data-q="pick"]').forEach(el=>el.outerHTML=q('pick'));
@@ -2718,6 +2743,60 @@ function hatch(color){
   return x.createPattern(c,'repeat');
 }
 const SWR = .04;
+/* Who ends up with the money, for every age the reader might die at.
+
+   The first version of this panel plotted the level - what heirs would receive, as a line with a
+   band - and it was very nearly the total savings chart drawn again: measured across the default
+   plan it sat between 0.80 and 0.96 of that curve at every age, so the shape carried nothing the
+   reader had not already seen one panel earlier. What it was hiding is the interesting part. The tax
+   wedge runs from about a fifth of the estate down to a twentieth by the plan age, because the mix
+   of accounts shifts as the pre-tax pot is drawn down, and a wedge is invisible when you plot a
+   level. So this stacks the three destinations instead, which is a quantity no other chart shows.
+
+   One future, the middle one by ending balance, matching the figures above the charts and the
+   accounts chart beside it. The rate follows what heirs actually inherit at each age, so the wedge
+   narrows on its own as the pre-tax pot shrinks. */
+function drawBequest(res, real){
+  const idx = rankPaths(res);
+  const i = idx[Math.round(.5*(res.nP-1))];
+  const labels = res.ages;
+  const share = Math.min(1, Math.max(0, (+S.charShare||0)/100));
+  const scale = k => real ? 1/res.CI[k][i] : 1;
+  const heirs = [], charity = [], taxed = [];
+  labels.forEach((a, k) => {
+    const trad = res.TRAD[k][i]||0, toChar = trad*share, toHeir = trad - toChar;
+    const rate = heirEffRate(toHeir), f = scale(k);
+    heirs.push((toHeir*(1-rate) + (res.ROTH[k][i]||0) + (res.BROK[k][i]||0) + (res.CASH[k][i]||0))*f);
+    charity.push(toChar*f);
+    taxed.push(toHeir*rate*f);
+  });
+  const series = [{label:'To the people you leave it to', color:cssVar('--pine'), data:heirs}];
+  if(share > 0) series.push({label:'To charity', color:cssVar('--steel'), data:charity});
+  series.push({label:'Income tax on Trad. 401k and IRA money', color:cssVar('--risk'), data:taxed});
+
+  const muted=cssVar('--muted'), line=cssVar('--line'), surface=cssVar('--surface'), ink=cssVar('--ink');
+  const datasets = series.map((sr,j)=>({label:sr.label, data:sr.data, fill:j===0?'origin':'-1',
+    backgroundColor:rgba(sr.color,.55), borderColor:sr.color, borderWidth:1, pointRadius:0, tension:.2}));
+  const lg = document.getElementById('lg_bequest');
+  if(lg) lg.innerHTML = series.map(sr=>`<span><i style="background:${rgba(sr.color,.55)};border:1px solid ${sr.color}"></i>${sr.label}</span>`).join('');
+  if(charts.bequest) charts.bequest.destroy();
+  const cv = document.getElementById('cv_bequest'); if(!cv) return;
+  charts.bequest = new Chart(cv,{type:'line', data:{labels,datasets},
+    options:{animation:false,maintainAspectRatio:false,responsive:true,interaction:{mode:'index',intersect:false},
+      scales:{
+        x:{grid:{display:false},border:{color:line},ticks:{color:muted,maxTicksLimit:7,maxRotation:0,font:{size:11}},title:{display:true,text:'If you died at this age',color:muted,font:{size:11}}},
+        y:{stacked:true,beginAtZero:true,grid:{color:line},border:{display:false},ticks:{color:muted,maxTicksLimit:5,font:{size:11},callback:v=>money(v)}}
+      },
+      plugins:{legend:{display:false},retire:{index:res.R-res.A,color:muted},
+        tooltip:{backgroundColor:surface,titleColor:ink,bodyColor:ink,footerColor:ink,borderColor:line,borderWidth:1,padding:10,
+          itemSort:(a,b)=>b.datasetIndex-a.datasetIndex,
+          callbacks:{title:it=>'If you died at '+it[0].label,
+            label:it=>`${it.dataset.label}: ${money(it.parsed.y)}`,
+            footer:it=>{ const tot=it.reduce((m,x)=>m+x.parsed.y,0), tx=it.find(x=>x.datasetIndex===series.length-1);
+              return tot>0 && tx ? 'Tax takes '+Math.round(tx.parsed.y/tot*100)+'% of the estate' : ''; }}}
+      }},
+    plugins:[retirePlugin]});
+}
 function drawAssets(res, real){
   const idx=rankPaths(res);
   let i=idx[Math.round(.5*(res.nP-1))];
@@ -3238,6 +3317,7 @@ function run(){
   PANELS.filter(p=>p.lvl<=level).forEach(p=>{
     if(p.id==='seq'){ drawSeq(); return; }
     if(p.id==='conv'){ drawConv(); return; }
+    if(p.id==='bequest'){ drawBequest(res, real); return; }
     if(p.id==='flow'){ drawFlow(res, real); return; }
     if(p.id==='market'){ drawReturns(res, real, tb); return; }
     if(p.id==='assets'){ drawAssets(res, real); return; }
@@ -3373,12 +3453,18 @@ const HELP = {
     'The median total balance at your plan age. Half of the futures end higher and half end lower.',
     'Futures that ran out count as zero.',
     'Counted before any tax still owed on Trad. 401k and IRA money, which has never been taxed. A balance made up of pre-tax money is worth less than the same figure held in a Roth, so this is not what the money would buy. Level 5 works out the difference.']},
-  heirRate:{t:'Income tax bracket your heirs are in', b:[
-    'Money in a Trad. 401k or IRA has never been taxed. Whoever inherits it pays income tax at their own rate as they take it out, not at yours.',
-    'Nobody can know this figure in advance, which is the honest answer and the reason this is a short list of brackets rather than a dial. It depends on who inherits, what they earn at the time, where they live, and tax law decades from now. 22% is set as a middle. Move it and watch which way the answer leans rather than trusting any one figure.',
-    'One thing worth knowing about the timing: since 2020 most people who inherit a retirement account have to empty it within ten years. That squeezes the income into a short window, often while they are still working, which tends to push them into higher brackets than the one they normally sit in. This model applies a single rate and does not simulate those ten years, so it is on the gentle side.',
-    'Roth money and a taxable brokerage are not affected. Roth comes out tax-free, and a brokerage gets a fresh cost basis at death, so its growth is never taxed at all.'],
-   src:['IRS, retirement topics for beneficiaries','https://www.irs.gov/retirement-plans/required-minimum-distributions-for-ira-beneficiaries']},
+  heirs:{t:'People sharing it', b:[
+    'How many people the Trad. 401k and IRA money is divided between. It changes the tax, and not by a little.',
+    'The reason is the ten-year rule. Since 2020 most people who inherit a retirement account have to empty it within ten years, so the money lands on them as a decade of extra income on top of whatever they already earn. Split between four people it is four smaller slugs, each of which may stay inside the bracket they were already in. Left to one person it is one large slug, and the top of it can be taxed several brackets higher.',
+    'On a $1.5M pre-tax pot left to people earning $120,000, going from one heir to four moves the effective rate from about 21.5% to 18.5%. On a $6M pot it moves from 31% to 24%. But if the pot is small relative to what they earn, dividing it changes nothing at all, because the whole slug fits inside one bracket either way.',
+    'It has no effect on Roth money, a brokerage, or anything left to charity.']},
+  heirInc:{t:'What each of them earns', b:[
+    'The household income of the people inheriting, today, before tax. The inherited money stacks on top of this, which is what decides the rate it is taxed at.',
+    'You are guessing, and that is expected. It is the same guess as naming their tax bracket would be, only in a form the tax code can actually use, so the model does the bracket arithmetic instead of asking you to. If they are at very different income levels, use something near the middle.',
+    'Everything is worked out on this year\'s brackets and in today\'s money. Projecting a specific person\'s tax return decades from now would be inventing precision on top of a guess.']},
+  heirFiling:{t:'How they file', b:[
+    'Married or single, for the people inheriting. It matters because a married couple\'s brackets are roughly twice as wide, so the same inherited amount is taxed less heavily.',
+    'This is about them, not about you. Your own filing status is at Level 1.']},
   charShare:{t:'Share of Trad. 401k and IRA left to charity', b:[
     'A charity pays no income tax on money from a Trad. 401k or IRA. A person pays their full rate on it.',
     'So the same gift is worth different amounts depending on which pot it comes out of. This setting moves a share of the pre-tax pot to charity and leaves the rest, along with all the Roth and brokerage money, to people. Set it to zero if nothing is going to charity.',
@@ -3517,12 +3603,13 @@ const HELP = {
     '<b style="display:inline;font:inherit;font-weight:600">Trad. 401k and IRA first</b> pays income tax earlier but leaves a smaller Trad. 401k and IRA balance, so the required distributions that start in your seventies are smaller too.',
     '<b style="display:inline;font:inherit;font-weight:600">Proportional</b> takes a slice of everything, keeping the mix steady and spreading taxable income evenly across the years rather than bunching it.',
     'The panel runs your plan under all three, so you can see the difference for your own numbers rather than taking a rule of thumb on trust. Which wins depends on the size of your Trad. 401k and IRA balance, your other income and how long the money has to last.']},
-  panel_bequest:{t:'What you would leave, by the age you die', b:[
-    'Your plan age is an assumption. This chart drops it and asks the question the other way round: for every age you might die at, what would beneficiaries actually receive, after the income tax on pre-tax money and with the brokerage getting its fresh cost basis.',
-    'Nothing extra is simulated to draw it. Each year\'s balance already has every year of spending up to that point taken out of it, so dying at 75 simply means the age-75 balance, taxed the way an inheritance is taxed.',
-    'The shape is the useful part, and it is worth reading before the numbers. While the money compounds faster than you spend it, the line climbs, so waiting leaves more. Once withdrawals outrun growth it flattens and turns down, so waiting leaves less. If the plan runs short the line reaches zero and stays there, and every age past that point leaves nothing at all. Where the peak sits, and how sharply it falls away, says more about the plan than any single figure does.',
-    'The band is the spread across futures at each age, exactly as on the other charts: the middle line is the median, and nine futures in ten fall inside the shaded area. It is not the same arithmetic as the figures above the charts, which take one future apart so that heirs, charity and tax add up to its balance. Expect the two to differ a little at your plan age.',
-    'What this is not: a suggestion about when to give anything away, or a view on how long you will live. It is the same plan, read at a different ending.']},
+  panel_bequest:{t:'Who ends up with it, by the age you die', b:[
+    'Your plan runs to one age. This drops that assumption and asks, for every age you might die at, how the money would divide: what the people you leave it to receive, what goes to charity if you have set a share, and what income tax takes on the way.',
+    'Nothing extra is simulated to draw it. Each year\'s balance already has every year of spending up to that point taken out of it, so dying at 75 simply means the age-75 balance, divided the way an inheritance is divided.',
+    'The red band is the part worth watching, and it is why this chart shows a split rather than a total. It is the income tax still owed on Trad. 401k and IRA money, and it narrows as that pot is drawn down: on a typical plan it starts near a fifth of the estate and falls to a twentieth by the plan age. Anything that moves money out of the pre-tax pot early, a Roth conversion above all, shrinks that band.',
+    'An earlier version of this panel drew what heirs would receive as a single line. It turned out to be the total savings chart over again, between 0.80 and 0.96 of it at every age, so the shape said nothing new. The split is the part that is genuinely not shown anywhere else.',
+    'One future, the middle one by ending balance, so this agrees with the figures above the charts and with the accounts chart. The retirement age is marked as on the other charts.',
+    'What this is not: a view on how long you will live, or a suggestion about when to give anything away. It is the same plan, read at a different ending.']},
   panel_conv:{t:'Roth conversions, compared', b:[
     'This is the Roth conversions setting from the panel, not a separate question. It is here rather than beside the dropdown because each card has to show what that choice would actually do, which means running the whole plan again for every one of them.',
     'The same plan four times over: converting nothing, and filling each of three brackets each year from the year you retire to your cut-off age. Tap a card to use that setting.',
@@ -3591,8 +3678,9 @@ function assumptionRows(){
         : `Fill the ${S.rothConv}% tax bracket to age ${Math.round(S.convEnd)}, keeping ${+S.convKeep} yr liquid`]] : []),
     ...(level>=3 ? [['a_divtax','Yearly tax on brokerage distributions',
         `Dividends at ${(MKT.divS*100).toFixed(1)}% and bond interest at ${(MKT.bMean*100).toFixed(0)}%, taxed each year`]] : []),
-    ...(level>=6 ? [['a_heir','Tax your heirs would pay', S.heirRate==='0' ? 'None'
-        : `${S.heirRate}% on Trad. 401k and IRA money`],
+    ...(level>=6 ? [['a_heir','Tax your heirs would pay',
+        `${Math.round(+S.heirs||1)} ${(+S.heirs||1)===1?'person':'people'} on ${money(+S.heirInc||0)} each, `
+        + `${S.heirFiling==='single'?'single':'married'}, over the 10 years the law allows`],
       ['a_stepup','Brokerage at death','Cost basis steps up, so its growth is never taxed'],
       ['a_char','Left to charity', +S.charShare > 0
         ? `${+S.charShare}% of Trad. 401k and IRA, untaxed` : 'None'],

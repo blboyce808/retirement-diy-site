@@ -500,6 +500,18 @@ heir's rate:</p>
 <div class="fx">to charity = trad · c</div>
 <div class="fx">tax = trad · (1 &minus; c) · h</div>
 <div class="fx">to heirs = trad · (1 &minus; c) · (1 &minus; h) + roth + brokerage + cash</div>
+<p>And <code>h</code> is worked out rather than chosen. Since 2020 most beneficiaries must empty an
+inherited retirement account within ten years, so what they inherit arrives as a decade of extra
+ordinary income stacked on whatever they already earn. For <code>n</code> people sharing a pot
+<code>P</code>, each taking <code>P/n</code> across ten years on their own income <code>y</code>:</p>
+<div class="fx">h = 10 · n · [ tax(y + P / n / 10) &minus; tax(y) ] / P</div>
+<p>which is why the number of heirs changes the answer at all: the same pot divided four ways is four
+smaller slugs, each of which may stay inside the bracket that person was already in. On a $1.5M pot
+left to people earning $120,000 the rate falls from 21.5% to 18.5% going from one heir to four; on a
+$6M pot, from 31.2% to 24.0%. It is equally why the effect sometimes vanishes: on that $1.5M pot left
+to someone earning $250,000 it is 24.0% however it is divided, because every slug lands inside one
+bracket. Note also that <code>h</code> is evaluated on the amount actually inherited, so giving part
+of the pot to charity lowers the rate on what is left.</p>
 <p>Those three sum to the ending balance by construction, and they are reported from a <em>single</em>
 path &mdash; the middle future by ending balance, the same one the account charts draw &mdash; rather
 than as three independent medians. Three medians would not add up, because the path sitting at the
@@ -510,12 +522,15 @@ The brokerage is the reason: the owner owes long-term gains tax to sell those sh
 does not. Whether that outweighs the heir's rate on the pre-tax pot depends entirely on the mix of
 accounts, which is the comparison the level exists to make.</p>
 
-<div class="note warn"><b>Caveat: <code>h</code> is unknowable, and this is not estate planning.</b>
-The heir's rate depends on who inherits, what they earn at the time, where they live and tax law
-decades hence. It is offered as a short list of brackets rather than a dial for that reason, and the
-right use of it is to move it and see which way the answer leans. The model also applies it as a flat
-rate: since 2020 most beneficiaries must empty an inherited retirement account within ten years, which
-compresses the income and pushes it up their brackets, so a single rate is the gentle version.
+<div class="note warn"><b>Caveat: the inputs to <code>h</code> are guesses, and this is not estate
+planning.</b> Computing the rate removes the arithmetic from the reader but not the uncertainty: who
+inherits, what they earn at the time, where they live and what the brackets look like decades hence are
+all unknown, and asking for an income rather than a bracket only puts the same guess in a form the tax
+code can use. The right use of it is to move the inputs and see which way the answer leans, not to
+trust any single figure. What it does not model: a beneficiary's own deductions, other investment
+income or state tax, the year they actually inherit, or the fact that a spouse, a minor child, a
+disabled beneficiary or anyone within ten years of the account holder's age may stretch withdrawals
+across a lifetime instead of ten years.
 Everything that actually governs who inherits &mdash; wills, trusts, beneficiary designations,
 titling, probate, state law &mdash; is legal machinery this page does not touch and does not model. On
 most retirement accounts the beneficiary form overrides the will, and this tool has never seen
@@ -534,9 +549,12 @@ yours.</div>
   <li><strong>Estate and inheritance tax, federal or state.</strong> The federal exemption is $15M a
     person in 2026 and reaches very few households, but several states tax estates from a far lower
     threshold and a handful tax the recipient instead. None of that is here.</li>
-  <li><strong>The ten-year rule on inherited retirement accounts.</strong> Level 6 applies a single
-    rate to the pre-tax balance rather than simulating a beneficiary's own ten years of forced
-    withdrawals, which would push them up their own brackets. The single rate is the gentle version.</li>
+  <li><strong>A beneficiary's tax position beyond an income and a filing status.</strong> The
+    ten-year rule <em>is</em> modelled, but through a single income figure: their own deductions, other
+    investment income, state tax and the year they actually inherit are not. Nor is a beneficiary who
+    may still stretch withdrawals over a lifetime rather than ten years &mdash; a spouse, a minor
+    child, a disabled or chronically ill person, or anyone within ten years of the account holder's
+    age.</li>
   <li><strong>Serial correlation of any kind</strong> in random mode. Years are independent draws.
     Momentum, mean reversion and volatility clustering are all absent; the backtests contain whatever
     of them history contained.</li>
