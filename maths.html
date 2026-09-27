@@ -390,11 +390,9 @@ half a year's return on the amount withdrawn.</div>
 basis does not, so the gain fraction rises over time exactly as it should. What the model does not do
 is add reinvested dividends to basis, because it does not model dividends separately at all
 (&sect;11).</div>
-<div class="note warn"><b>Known wrinkle.</b> Contributions are added before the check for whether a
-path has already run short, so a path that fails <em>before</em> retirement will continue to receive
-contributions into a zeroed account for the remaining working years. It cannot affect the headline
-number, which only records whether a path ever failed, but it makes the balance chart for such a path
-misleading.</div>
+<div class="note"><b>Nothing survives a failure.</b> A path that has run short receives no further
+contributions, so its balances stay at zero for the rest of the plan. The failure year itself keeps
+its contribution, which arrived before the shortfall.</div>
 
 <h2 id="out">10. Turning paths into answers</h2>
 
