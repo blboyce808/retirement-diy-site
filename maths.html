@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>The arithmetic, in full &mdash; Retirement.diy</title>
+<style>
+  :root{
+    --bg:#EDF0EA; --surface:#F8F9F5; --ink:#1C2A33; --muted:#5B6A70; --line:#D3D9D0;
+    --pine:#2E6A5C; --ochre:#9C6C18; --risk:#A8432A; --plum:#7B4868;
+    --code:#F1F3EE;
+    --display:"Avenir Next","Segoe UI",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+    --bg:#10181D; --surface:#172228; --ink:#E3E8E3; --muted:#93A3A6; --line:#2A3A41;
+    --pine:#6BB39F; --ochre:#D6A652; --risk:#E07A5C; --plum:#C18AAE; --code:#101A20;
+  }}
+  *{box-sizing:border-box}
+  body{margin:0;padding:34px 20px 80px;background:var(--bg);color:var(--ink);
+       font:16px/1.62 -apple-system,"Segoe UI",system-ui,sans-serif;
+       font-variant-numeric:tabular-nums}
+  main{max-width:74ch;margin:0 auto}
+  h1{font-family:var(--display);font-size:29px;line-height:1.2;margin:0 0 4px;letter-spacing:-.01em}
+  h2{font-family:var(--display);font-size:20px;margin:38px 0 8px;padding-bottom:5px;
+     border-bottom:2px solid var(--line)}
+  h3{font-family:var(--display);font-size:16px;margin:24px 0 5px}
+  p,li{max-width:74ch}
+  p{margin:0 0 12px}
+  .lede{color:var(--muted);margin:0 0 4px}
+  .fx{background:var(--code);border-left:3px solid var(--pine);padding:10px 14px;margin:12px 0;
+      font-family:"SF Mono",Consolas,"Liberation Mono",monospace;font-size:13.5px;line-height:1.75;
+      overflow-x:auto;white-space:pre}
+  code{background:var(--code);padding:1px 4px;border-radius:3px;
+       font-family:"SF Mono",Consolas,"Liberation Mono",monospace;font-size:13px}
+  .note{border-left:3px solid var(--ochre);background:var(--surface);padding:10px 14px;margin:14px 0;
+        font-size:14.5px}
+  .note b{color:var(--ochre)}
+  .warn{border-left-color:var(--risk)}
+  .warn b{color:var(--risk)}
+  table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}
+  th,td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+  th{font-weight:600;color:var(--muted);font-size:13px}
+  td.n,th.n{text-align:right}
+  a{color:var(--pine)}
+  .toc{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:22px 0 30px}
+  .toc ol{margin:0;padding-left:20px;columns:2;column-gap:28px}
+  .toc li{margin:1px 0;break-inside:avoid}
+  .foot{margin-top:46px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
+  var{font-style:italic;font-family:Georgia,"Times New Roman",serif}
+</style>
+</head>
+<body>
+<main>
+
+<h1>The arithmetic, in full</h1>
+<p class="lede">Every calculation Retirement.diy performs, written out so that somebody could check it
+or reproduce it from scratch. This describes what the engine actually does, including the places
+where it departs from what a textbook would say &mdash; those are marked.</p>
+<p class="lede">Companion to the <a href="index.html">calculator</a> and its &ldquo;How this
+works&rdquo; summary. Last revised 26 September 2026.</p>
+
+<div class="toc"><ol>
+  <li><a href="#conv">Conventions and timing</a></li>
+  <li><a href="#returns">Where returns come from</a></li>
+  <li><a href="#bond">The bond instrument</a></li>
+  <li><a href="#tax">Tax</a></li>
+  <li><a href="#income">Guaranteed income</a></li>
+  <li><a href="#spend">What gets spent</a></li>
+  <li><a href="#withdraw">Funding the year</a></li>
+  <li><a href="#l5">Level 5: RMDs, conversions, IRMAA, survivors</a></li>
+  <li><a href="#close">Closing the year</a></li>
+  <li><a href="#out">Turning paths into answers</a></li>
+  <li><a href="#notmod">What is not modelled</a></li>
+  <li><a href="#check">What has been checked</a></li>
+</ol></div>
+
+<h2 id="conv">1. Conventions and timing</h2>
+
+<p>The model steps one year at a time. Write <var>A</var> for the reader's current age,
+<var>R</var> for the retirement age, <var>H</var> for the plan age. The number of steps is</p>
+<div class="fx">n<sub>Y</sub> = H &minus; A + 1</div>
+<p>and the loop runs over <var>k</var> = 1 &hellip; n<sub>Y</sub>&minus;1, with the age during
+step <var>k</var> being</p>
+<div class="fx">a = A + k &minus; 1</div>
+
+<p>Index 0 holds the opening balances, before anything happens. Every recorded balance at index
+<var>k</var> is the balance <em>after</em> that year's contributions, income, spending, withdrawals
+and growth. Flows happen during the year; balances are quoted at the end of it. Charts that plot a
+flow against an age therefore read it one index later than the balance for the same age.</p>
+
+<p>Each path carries a cumulative inflation index <var>f</var>, starting at <var>f</var> = 1 and
+multiplied at the close of every year. So the first simulated year uses <var>f</var> = 1: today's
+dollars and that year's dollars are the same thing. All internal arithmetic is in nominal dollars of
+the year concerned, and &ldquo;today's dollars&rdquo; anywhere in the interface means a nominal
+figure divided by that path's <var>f</var>.</p>
+
+<p>Three modes fill the return series, and nothing else about the engine changes between them:</p>
+<table>
+  <tr><th>Mode</th><th>Paths</th><th>Returns for year <var>k</var></th></tr>
+  <tr><td><code>mc</code></td><td class="n">2,000</td><td>drawn at random (&sect;2)</td></tr>
+  <tr><td><code>hist</code></td><td class="n">n<sub>Y</sub> windows</td>
+      <td>row <var>i</var>+<var>k</var>&minus;1 of the historical table, so path <var>i</var> begins
+      in the <var>i</var>-th year on record</td></tr>
+  <tr><td><code>stress</code></td><td class="n">1</td><td>a fixed prescribed sequence</td></tr>
+</table>
+<p>In historical mode the number of paths is the number of complete windows,
+<code>n<sub>P</sub> = 155 &minus; (n<sub>Y</sub>&minus;1) + 1</code>, which for a 30-year plan over
+1871&ndash;2025 is 126.</p>
+
+<h2 id="returns">2. Where returns come from</h2>
+
+<h3>Random draws</h3>
+<p>Stock and bond returns are lognormal. The figure the reader picks is the <strong>compound</strong>
+rate <var>g</var>, so no half-variance is subtracted from it:</p>
+<div class="fx">&mu;<sub>S</sub> = ln(1 + g<sub>S</sub>)          &mu;<sub>B</sub> = ln(1 + g<sub>B</sub>)
+
+z<sub>S</sub> ~ N(0,1)
+z<sub>B</sub> = &rho;·z<sub>S</sub> + &radic;(1 &minus; &rho;²)·z&prime;,   z&prime; ~ N(0,1)
+
+r<sub>S</sub> = exp(&mu;<sub>S</sub> + &sigma;<sub>S</sub>·z<sub>S</sub>) &minus; 1
+r<sub>B</sub> = exp(&mu;<sub>B</sub> + &sigma;<sub>B</sub>·z<sub>B</sub>) &minus; 1</div>
+
+<div class="note"><b>Caveat.</b> The conventional way to parameterise a lognormal is by its
+<em>arithmetic</em> mean, which requires &mu; = ln(1+m) &minus; &sigma;²/2. This engine deliberately
+does not, because the number is presented to the reader as &ldquo;the average stock return&rdquo;
+and a reader means the rate their money grows at. The consequence is that the <em>arithmetic</em>
+mean of the draws is higher than the label: with <var>g</var> = 7.5% and &sigma; = 17%, simulated
+returns average 9.08% and compound at 7.52%. Both figures are correct; they answer different
+questions.</div>
+
+<p>&sigma; is the standard deviation of the <em>log</em> return. The standard deviation of the simple
+return is larger, at (1+<var>g</var>)&radic;(e<sup>&sigma;²</sup>&minus;1), which for
+&sigma; = 17% and <var>g</var> = 7.5% is 18.0 points. Quoted spreads in the interface are the log
+figure.</p>
+
+<p>Inflation and cash are normal, not lognormal, and are floored:</p>
+<div class="fx">i  = max(&minus;3%, &mu;<sub>i</sub> + &sigma;<sub>i</sub>·z)
+r<sub>C</sub> = max(0, &mu;<sub>C</sub> + &sigma;<sub>C</sub>·z)</div>
+<p>The floors prevent the tail of a normal distribution producing hyperdeflation or negative
+nominal cash. They bias both series very slightly upward.</p>
+
+<h3>Parameters</h3>
+<table>
+  <tr><th>Symbol</th><th>Meaning</th><th class="n">Value</th></tr>
+  <tr><td>g<sub>S</sub></td><td>stock compound return</td><td class="n">5.5%, 7.5% or 9.2%</td></tr>
+  <tr><td>&sigma;<sub>S</sub></td><td>stock log volatility</td><td class="n">17%</td></tr>
+  <tr><td>g<sub>B</sub></td><td>bond compound return</td><td class="n">4.0%</td></tr>
+  <tr><td>&sigma;<sub>B</sub></td><td>bond log volatility</td><td class="n">6%</td></tr>
+  <tr><td>&rho;</td><td>stock/bond correlation</td><td class="n">0.10</td></tr>
+  <tr><td>&mu;<sub>C</sub>, &sigma;<sub>C</sub></td><td>cash</td><td class="n">3.0%, 1.0%</td></tr>
+  <tr><td>&sigma;<sub>i</sub></td><td>inflation spread</td><td class="n">1.2 points</td></tr>
+</table>
+
+<h3>The generator</h3>
+<p>Uniforms come from <code>mulberry32</code>, a 32-bit counter-based generator seeded with an
+integer the reader can see and change; normals come from the Box&ndash;Muller polar transform, which
+produces two at a time and caches the spare. The seed travels in the scenario code and the CSV, so
+any published result is reproducible exactly.</p>
+
+<h3>Historical data</h3>
+<p>One row per year, January to January: stock total return, bond return, CPI inflation.
+1871&ndash;2022 is built from Robert Shiller's dataset, where</p>
+<div class="fx">r<sub>S</sub> = (P<sub>Jan next</sub> + D<sub>year</sub>) / P<sub>Jan</sub> &minus; 1
+i    = CPI<sub>Jan next</sub> / CPI<sub>Jan</sub> &minus; 1</div>
+<p>with <var>P</var> the monthly-average S&amp;P composite price and <var>D</var> the year's
+dividends. Shiller's file stops in 2023, so 2023&ndash;2025 come from the S&amp;P 500 total return
+index (daily closes averaged per month, matching his convention), the Federal Reserve's GS10 series
+and CPI-U. Rebuilt over the 23 overlapping years, the second method reproduces the first exactly for
+bonds and inflation and to 0.23 points mean absolute for stocks.</p>
+<p>In historical mode cash is not a separate series; it is set to inflation plus half a point.</p>
+
+<h2 id="bond">3. The bond instrument</h2>
+<p>&ldquo;Bonds&rdquo; means a 10-year par Treasury bought each January at the prevailing yield
+<var>y</var><sub>0</sub> and sold a year later, when the prevailing yield is <var>y</var><sub>1</sub>
+and nine years remain:</p>
+<div class="fx">P = y<sub>0</sub>·(1 &minus; (1+y<sub>1</sub>)<sup>&minus;9</sup>) / y<sub>1</sub>  +  (1+y<sub>1</sub>)<sup>&minus;9</sup>
+
+r<sub>B</sub> = P &minus; 1 + y<sub>0</sub></div>
+<p>The first term prices the remaining coupon stream, the second the principal, and the coupon
+received during the year is added. This is used to build the historical series. In random mode bonds
+are simply drawn from the lognormal above &mdash; there is no yield state, so a random path cannot
+reproduce the mechanism by which a rise in rates hurts now and helps later.</p>
+
+<h2 id="tax">4. Tax</h2>
+
+<p>All thresholds are 2026 federal figures. Within a path they are multiplied by that path's
+<var>f</var>, which is how the law indexes them &mdash; with two deliberate exceptions noted below.
+Write <var>o</var> for ordinary income other than Social Security, <var>c</var> for long-term
+capital gains, <var>s</var> for Social Security benefits, <var>N</var><sub>65</sub> for the number of
+people aged 65 or over (0, 1 or 2).</p>
+
+<h3>4.1 How much Social Security is taxable</h3>
+<p>Provisional income is</p>
+<div class="fx">p = o + c + s/2</div>
+<p>and the taxable portion follows the two-tier rule:</p>
+<div class="fx">s<sub>t</sub> = 0                                                if p &le; T<sub>1</sub>
+s<sub>t</sub> = min(0.50·s, 0.50·(p &minus; T<sub>1</sub>))                       if T<sub>1</sub> &lt; p &le; T<sub>2</sub>
+s<sub>t</sub> = min(0.85·s, 0.85·(p &minus; T<sub>2</sub>) + min(0.50·s, 0.50·(T<sub>2</sub>&minus;T<sub>1</sub>)))   if p &gt; T<sub>2</sub></div>
+<p>with <var>T</var><sub>1</sub>, <var>T</var><sub>2</sub> = $32,000 and $44,000 filing jointly,
+$25,000 and $34,000 single.</p>
+<div class="note"><b>These thresholds are not indexed</b>, in the model or in the law. They have
+stood since 1984 and 1993. Over a thirty-year path with inflation, an ever-larger share of the
+benefit becomes taxable purely because prices rose. This is the single most consequential piece of
+non-indexation in the model, and it is faithful.</div>
+
+<h3>4.2 Deduction and taxable income</h3>
+<div class="fx">AGI = o + c + s<sub>t</sub>
+
+D = (D<sub>std</sub> + N<sub>65</sub>·D<sub>65</sub>)·f
+  + N<sub>65</sub>·max(0, 6000 &minus; 0.06·max(0, AGI &minus; D<sub>phase</sub>))   if year &le; 2028
+
+taxable = max(0, AGI &minus; D)</div>
+<p><var>D</var><sub>phase</sub> is $150,000 jointly, $75,000 single. The $6,000 senior deduction is
+written into law only through 2028, and the model drops it from 2029 exactly as the statute does. It
+is <strong>not</strong> multiplied by <var>f</var>, because the statute does not index it either.</p>
+
+<h3>4.3 The tax itself</h3>
+<p>Ordinary income fills the brackets from the bottom; long-term gains are then stacked on top and
+charged at the capital-gains schedule, which is evaluated as the difference between the schedule at
+the top and bottom of the gains slice:</p>
+<div class="fx">taxable<sub>ord</sub> = max(0, taxable &minus; c)
+taxable<sub>cg</sub>  = taxable &minus; taxable<sub>ord</sub>
+
+T = B(taxable<sub>ord</sub>, brackets, f)
+  + B(taxable<sub>ord</sub> + taxable<sub>cg</sub>, cgSchedule, f) &minus; B(taxable<sub>ord</sub>, cgSchedule, f)
+  + st · taxable</div>
+<p>where <var>B</var> integrates a marginal schedule whose thresholds have been scaled by
+<var>f</var>:</p>
+<div class="fx">B(x, brackets, f) = &Sigma;<sub>j</sub> rate<sub>j</sub> · (min(x, hi<sub>j</sub>·f) &minus; lo<sub>j</sub>·f)⁺</div>
+
+<div class="note warn"><b>Caveat: state tax.</b> <code>st</code> is a single flat rate applied to
+<em>federal</em> taxable income, including whatever part of Social Security is federally taxable.
+Real states differ enormously: some exempt Social Security entirely, some exempt pension income,
+some have their own brackets and deductions, and nine have no income tax at all. A flat rate is a
+deliberate simplification and will be wrong in the specifics for almost everybody.</div>
+
+<h3>4.4 Withdrawing enough to cover your own tax</h3>
+<p>A withdrawal is taxable, so covering a shortfall <var>gap</var> requires taking more than
+<var>gap</var>, which is itself taxed. The engine solves the fixed point</p>
+<div class="fx">G = gap + [ T(o + G<sub>trad</sub>, g·G<sub>brok</sub>, s) &minus; T<sub>base</sub> ] + pen·G<sub>trad</sub></div>
+<p>by direct iteration &mdash; at most 12 passes, stopping when successive estimates agree within
+fifty cents. Each pass re-runs the withdrawal ordering, because which pot the extra dollar comes from
+changes what it costs. <var>g</var> is the gain fraction of the brokerage account,</p>
+<div class="fx">g = max(0, 1 &minus; basis / brokerage)</div>
+<p>so a brokerage sale realises gains in proportion to how much of the account is gain, and the
+remainder is a tax-free return of basis. <var>T</var><sub>base</sub> is the tax that would have been
+due on income alone, before any withdrawal.</p>
+<p>The iteration is a contraction whenever the marginal rate is below 100%, so it converges quickly;
+twelve passes is a safety net, not a typical cost.</p>
+
+<h3>4.5 The early-withdrawal penalty</h3>
+<div class="fx">pen = 0     if retired and R &ge; 55       (Rule of 55)
+pen = 0.10  if a &lt; 59
+pen = 0.05  if a = 59
+pen = 0     otherwise</div>
+<div class="note warn"><b>Caveat, and it is generous.</b> The 5% at age 59 is a crude stand-in for
+the statutory rule, which turns on the half-birthday rather than the year. More importantly, the
+Rule of 55 waiver is applied to <em>all</em> pre-tax money. In law it applies only to the plan of the
+employer you separated from, never to an IRA. A reader retiring between 55 and 59½ whose savings are
+mostly in an IRA will see a rosier answer here than reality would give.</div>
+
+<h2 id="income">5. Guaranteed income</h2>
+<p>Three streams arrive whether or not they are wanted: Social Security, other income cards, and
+required distributions.</p>
+<div class="fx">s = ssAmt · f · (survivor share, if widowed)     when a &ge; ssAge
+
+other: for each card, amount·f if it rises with inflation, else the amount as written,
+       included when startAge &le; a &le; endAge, split into taxable and tax-free</div>
+<p>Their net contribution is the gross less the extra tax they cause:</p>
+<div class="fx">guarNet = s + rmd + other<sub>taxed</sub> + other<sub>free</sub> &minus; (T<sub>base</sub> &minus; T<sub>wage</sub>)</div>
+<p>where <var>T</var><sub>base</sub> is the tax on wage + rmd + taxable other, with Social Security,
+and <var>T</var><sub>wage</sub> is the tax on the wage alone. The difference isolates the tax caused
+by the retirement income rather than by employment.</p>
+<div class="note"><b>Before retirement</b> the model assumes a salary equal to the spending figure
+the reader entered, purely so that a withdrawal for a life event is taxed at a plausible marginal
+rate rather than from zero. No such salary is spent, saved or shown; it exists only as a tax base.</div>
+
+<h2 id="spend">6. What gets spent</h2>
+<p>The figure the reader enters is after-tax spending, and it is used as such. The planned amount in
+year <var>k</var> is</p>
+<div class="fx">planned = netSpend · f · (1 &minus; d)<sup>max(0, a &minus; 75)</sup> · (survivor share, if widowed)</div>
+<p>with <var>d</var> the optional decline after 75. Under the two target-based rules that is the
+amount; under the three portfolio-based rules it is discarded and replaced:</p>
+<table>
+  <tr><th>Rule</th><th>Amount spent</th></tr>
+  <tr><td>Steady</td><td><code>planned</code></td></tr>
+  <tr><td>Guardrails</td><td><code>planned · m</code>, with <var>m</var> adjusted as below</td></tr>
+  <tr><td>Percent of portfolio</td><td><code>P·rate + max(0, guarNet)</code></td></tr>
+  <tr><td>Divide by years left</td><td><code>P/(H&minus;a+1) + max(0, guarNet)</code></td></tr>
+  <tr><td>VPW</td><td><code>P·v(a) + max(0, guarNet)</code></td></tr>
+</table>
+<p><var>P</var> is the whole portfolio at the start of the year and <var>v</var>(<var>a</var>) is
+linearly interpolated from a table rising from 3.9% at 50 to 20.9% at 95. The percent rule is clamped
+to 2&ndash;8%. Note that under the portfolio rules the guaranteed income is <em>added to</em> the
+portfolio draw rather than subtracted from a target, so total spending rises with income rather than
+displacing withdrawals.</p>
+
+<h3>Guardrails</h3>
+<p>Each year the current withdrawal rate is compared with the rate in the first year of retirement:</p>
+<div class="fx">wr = max(0, planned·m &minus; guarNet) / P
+
+if wr &gt; 1.2·wr<sub>0</sub>:   m &larr; max(0.70, 0.9·m)
+if wr &lt; 0.8·wr<sub>0</sub>:   m &larr; min(1.50, 1.1·m)</div>
+<p>with <var>wr</var><sub>0</sub> captured in the first retired year. The multiplier moves by 10% at
+a time and is bounded at 70% and 150% of plan. The test uses the <em>previous</em> multiplier and the
+new one is applied afterwards, so a cut takes effect in the year it is triggered.</p>
+
+<h2 id="withdraw">7. Funding the year</h2>
+<p>The year's requirement is</p>
+<div class="fx">need = spending + lifeEventOutflow·f + irmaaSurcharge
+gap  = need &minus; guarNet</div>
+
+<p><strong>If the gap is negative</strong>, income exceeded the requirement. Any unspent required
+distribution goes to the brokerage account, counted entirely as basis since its tax has been paid;
+any remaining surplus goes to cash at Level 3 and above, or to the brokerage below it. Nothing is
+discarded.</p>
+
+<p><strong>If the gap is positive</strong>, it is funded by withdrawing <var>G</var> from the pots in
+one of three orders:</p>
+<table>
+  <tr><th>Order</th><th>Sequence</th></tr>
+  <tr><td>Conventional</td><td>cash &rarr; brokerage &rarr; pre-tax &rarr; Roth</td></tr>
+  <tr><td>Pre-tax first</td><td>cash &rarr; pre-tax &rarr; brokerage &rarr; Roth</td></tr>
+  <tr><td>Proportional</td><td>each pot supplies its own share of the total, with any shortfall in
+      one pot made up from the others in conventional order</td></tr>
+</table>
+<p>Each pot supplies whatever it has, up to what is still needed. If the pots together cannot supply
+<var>G</var>, and the shortfall exceeds one dollar, the path is marked as having run short: the age
+is recorded, all balances are set to zero, and that year's spending is recorded as zero.</p>
+<div class="note"><b>Caveat.</b> Failure is absolute and terminal. A path that falls a hundred
+dollars short in one year is treated identically to one that falls short by everything, and it never
+recovers even if Social Security would have arrived the following year. The headline percentage is
+therefore the share of paths that never once fell short, not a measure of how badly or how late they
+did.</div>
+
+<h2 id="l5">8. Level 5</h2>
+
+<h3>8.1 Required minimum distributions</h3>
+<p>From the statutory age &mdash; 73, or 75 for anyone born in 1960 or later &mdash; the year's
+distribution is the pre-tax balance divided by the IRS Uniform Lifetime Table factor:</p>
+<div class="fx">rmd = balance<sub>pre-tax</sub> / divisor(a)</div>
+<p>It is removed from the pre-tax account before anything else happens, taxed as ordinary income, and
+treated as income that covers spending first. Whatever is not needed is reinvested in the brokerage
+account as basis. The divisor falls from 26.5 at 73 to 2.0 at 120, which is roughly 3.8% of the
+balance at 73, 5% at 80 and 8% at 90.</p>
+
+<h3>8.2 Roth conversions</h3>
+<p>After the year's spending is settled, the headroom below the chosen bracket ceiling is</p>
+<div class="fx">room = bracketTop(rate, f) &minus; taxable(o + withdrawn, gains, s)</div>
+<p>and the conversion is <code>min(pre-tax balance, room)</code>. Its tax is the increase in the
+year's bill, and it must be payable from outside the retirement accounts:</p>
+<div class="fx">purse = max(0, cash + brokerage &minus; keep · spending)</div>
+<p>If the tax exceeds the purse, the conversion is scaled down by the ratio and retried, up to eight
+times. The tax is taken from cash first, then the brokerage, reducing its basis proportionally.
+Nothing is converted unless the tax can be paid, which is the point: a conversion funded from the
+converted money itself is a much weaker move and the model will not pretend otherwise.</p>
+
+<h3>8.3 Medicare surcharges</h3>
+<p>IRMAA is charged on income from two years earlier, so the model keeps a MAGI series and looks
+back:</p>
+<div class="fx">surcharge(k) = tier(MAGI[k&minus;2]) → annual amount · f · persons</div>
+<p>It is a step function, not a taper: one dollar over a threshold costs a full year of the higher
+premium, per person. The 2025 published brackets and amounts are used as the 2026 base and indexed
+by <var>f</var>. MAGI here is AGI including the taxable part of Social Security; no tax-exempt
+interest is modelled, so nothing else is added back. Only the surcharge is modelled &mdash; the
+standard premium everybody pays belongs in the spending figure.</p>
+
+<h3>8.4 Survivor years</h3>
+<p>From the chosen age, four things change at once: the filing status becomes single, so brackets
+narrow and the standard deduction roughly halves; the Social Security benefit falls to the chosen
+share; other income falls to its chosen share; and spending falls to its chosen share. The Social
+Security taxation thresholds fall from the joint pair to the single pair, which are
+<em>not</em> half of them &mdash; part of why a survivor often pays more tax on less income.</p>
+
+<h2 id="close">9. Closing the year</h2>
+<p>After every flow, growth is applied and the inflation index advances:</p>
+<div class="fx">r = w·r<sub>S</sub> + (1 &minus; w)·r<sub>B</sub>
+
+pre-tax, Roth, brokerage  ×= (1 + r)
+cash                      ×= (1 + r<sub>C</sub>)
+f                         ×= (1 + i)</div>
+<p>with <var>w</var> the stock share. Rebalancing to the target mix is therefore implicit and exact
+every year, at no cost and with no tax.</p>
+<div class="note"><b>Caveat: withdrawals precede growth.</b> The whole year's spending is taken
+before any return is applied, which is equivalent to withdrawing on 1 January. Real spending happens
+through the year. This is conservative &mdash; it removes money before it can earn &mdash; by roughly
+half a year's return on the amount withdrawn.</div>
+<div class="note"><b>Caveat: basis does not grow.</b> The brokerage balance compounds but its cost
+basis does not, so the gain fraction rises over time exactly as it should. What the model does not do
+is add reinvested dividends to basis, because it does not model dividends separately at all
+(&sect;11).</div>
+<div class="note warn"><b>Known wrinkle.</b> Contributions are added before the check for whether a
+path has already run short, so a path that fails <em>before</em> retirement will continue to receive
+contributions into a zeroed account for the remaining working years. It cannot affect the headline
+number, which only records whether a path ever failed, but it makes the balance chart for such a path
+misleading.</div>
+
+<h2 id="out">10. Turning paths into answers</h2>
+
+<h3>Success</h3>
+<p>A path succeeds if it never ran short. The headline figure is the share of paths with no recorded
+failure age &mdash; out of 2,000 futures in random mode, or out of the number of historical windows
+in backtest mode.</p>
+<div class="note"><b>Sampling error.</b> With 2,000 paths the standard error near 50% is
+&radic;(0.25/2000) &asymp; 1.1 points. Measured: 25 different seeds on the default plan spread from
+38.4% to 42.3%, standard deviation 0.97 points. Differences smaller than about two points are noise.</div>
+
+<h3>Percentile bands</h3>
+<p>For each year independently, the values across all paths are sorted and the 5th, 10th, 25th, 50th,
+75th, 90th and 95th percentiles taken, with linear interpolation between order statistics:</p>
+<div class="fx">pct(p) = x<sub>⌊t⌋</sub> + (x<sub>⌈t⌉</sub> &minus; x<sub>⌊t⌋</sub>)·(t &minus; ⌊t⌋),   t = (p/100)·(n&minus;1)</div>
+<div class="note warn"><b>Caveat, and it is the most misread thing in the whole tool.</b> A
+percentile band is <em>not a path</em>. The 10th-percentile line is the 10th-worst outcome in each
+year taken separately, and different paths occupy that position in different years. No single future
+traces the band. Charts that do follow one future &mdash; the one-future chart, the stress tests
+&mdash; are labelled as such.</div>
+
+<h3>Ranking a path</h3>
+<p>To pick a typical, lucky or unlucky future, paths are ordered by ending balance in today's
+dollars, with failures pushed below all survivors and earlier failures below later ones:</p>
+<div class="fx">score = endingBalance / f &minus; [failed] · 10⁹ · (200 &minus; failureAge)</div>
+
+<h3>Sustainable spending</h3>
+<p>The largest spending figure that still succeeds in at least 90% of futures, found by bisection:
+the upper bound doubles until it fails or reaches $5,000,000, then the interval halves for up to 18
+steps or until it is narrower than $1,000, and the result is rounded down to the nearest $1,000.
+Everything else about the plan is held fixed. It is not reported for the portfolio-based spending
+rules, where the question is meaningless because the rule itself decides spending and no amount can
+ever fail.</p>
+
+<h2 id="notmod">11. What is not modelled</h2>
+<ul>
+  <li><strong>Fees of any kind.</strong> No fund expenses, no advisory fee. Subtract them from the
+    return you choose: a 1% fee is roughly a point off the compound rate.</li>
+  <li><strong>Dividend and distribution tax inside the brokerage account.</strong> Real taxable
+    accounts owe tax annually on distributions even when nothing is sold, so brokerage balances here
+    grow slightly faster than they would in practice &mdash; a few tenths of a point a year for a
+    broad index fund.</li>
+  <li><strong>A glide path.</strong> The stock share is fixed and rebalanced to it every year.</li>
+  <li><strong>Healthcare inflation</strong> running ahead of general inflation, and long-term care.</li>
+  <li><strong>ACA premium subsidies</strong> before 65, which can be worth thousands and which
+    interact sharply with Roth conversions.</li>
+  <li><strong>State-specific rules</strong> beyond a flat rate; <strong>72(t)</strong> substantially
+    equal payments; <strong>NIIT</strong>, AMT, and the step-up in basis at death.</li>
+  <li><strong>Serial correlation of any kind</strong> in random mode. Years are independent draws.
+    Momentum, mean reversion and volatility clustering are all absent; the backtests contain whatever
+    of them history contained.</li>
+  <li><strong>Anything about your actual holdings.</strong> The model knows a stock share and a bond
+    share, not what you own.</li>
+</ul>
+
+<h2 id="check">12. What has been checked</h2>
+
+<h3>Against the Trinity study</h3>
+<p>Restricting the data to 1926&ndash;1995 gives 41 overlapping 30-year windows, exactly as many as
+theirs. At a 4% inflation-adjusted withdrawal with no tax either side:</p>
+<table>
+  <tr><th>Portfolio</th><th>This model</th><th>Trinity</th></tr>
+  <tr><td>100% stocks</td><td>38 of 41 (92.7%)</td><td>39 of 41 (95%)</td></tr>
+  <tr><td>75% stocks</td><td>39 of 41 (95.1%)</td><td>40 of 41 (98%)</td></tr>
+  <tr><td>50% stocks</td><td>38 of 41 (92.7%)</td><td>39 of 41 (95%)</td></tr>
+</table>
+<p>One window apart at every allocation. The systematic difference is the bond instrument: Trinity
+used long-term high-grade corporates, this uses 10-year Treasuries, which earn less. The gap is
+invisible where stocks dominate and widens as bonds take over, which is the observed pattern.</p>
+
+<h3>Against FI Calc</h3>
+<p>$1,000,000, 30 years, constant inflation-adjusted spending, 1871 data, no tax either side:
+100% / 96.8% / 91.3% / 77.8% at $35,000 / $40,000 / $45,000 / $50,000, against their 100% / 96.8% /
+91.2% / 79.2%. The remaining gap at $50,000 is their default 5% cash sleeve.</p>
+
+<h3>The distribution against 155 years of returns</h3>
+<table>
+  <tr><th>Statistic</th><th class="n">History</th><th class="n">Lognormal</th></tr>
+  <tr><td>Standard deviation of log returns</td><td class="n">0.166</td><td class="n">0.170</td></tr>
+  <tr><td>Skewness</td><td class="n">&minus;0.73</td><td class="n">0</td></tr>
+  <tr><td>Excess kurtosis</td><td class="n">+1.07</td><td class="n">0</td></tr>
+  <tr><td>Years beyond 2&sigma;</td><td class="n">7</td><td class="n">7.1</td></tr>
+  <tr><td>Years beyond 3&sigma;</td><td class="n">2</td><td class="n">0.42</td></tr>
+</table>
+<p>The body of the distribution is well calibrated and the far tail is not. 1931 (&minus;42.5%) is a
+&minus;3.66&sigma; event that 155 independent draws reproduce only 2% of the time, while the best
+year on record is only +2.18&sigma; &mdash; an asymmetry a symmetric-in-logs distribution cannot
+represent. Against expectation, losing years in the record do <em>not</em> cluster more than
+independent draws would produce: 6 runs of two consecutive losses against 7.8 expected, 1 run of
+three against 2.7. Volatility clustering is a daily and monthly phenomenon that washes out by annual
+aggregation.</p>
+
+<h3>Model against itself</h3>
+<p>Set the compound return to history's own 9.2% and the random projections return 64% where the
+backtest of the same plan says 67%. Feeding the model history reproduces history to within three
+points, and the residual runs in the direction the tail and skew findings predict.</p>
+
+<p class="foot">Retirement.diy &mdash; for planning and education, not financial advice.
+&copy; 2026 Brad Boyce. The engine is a single readable file; this document describes it as it
+stands, and where the two ever disagree, the code is what runs.</p>
+
+</main>
+</body>
+</html>
