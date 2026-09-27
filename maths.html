@@ -58,7 +58,7 @@
 or reproduce it from scratch. This describes what the engine actually does, including the places
 where it departs from what a textbook would say &mdash; those are marked.</p>
 <p class="lede">Companion to the <a href="index.html">calculator</a> and its &ldquo;How this
-works&rdquo; summary. Last revised 26 September 2026.</p>
+works&rdquo; summary. Last revised 27 September 2026.</p>
 
 <div class="toc"><ol>
   <li><a href="#conv">Conventions and timing</a></li>
@@ -490,6 +490,42 @@ would receive. The figure exists because the face value silently flatters any ch
 more money still untaxed, which is exactly the choice the conversion and withdrawal-order
 comparisons are asked to rank &mdash; and on this measure the option paying the least lifetime tax
 is frequently not the one that leaves the most.</div>
+
+<h3>Giving while alive</h3>
+<p>A gift is a cost the plan has to find, so it is added to the year's requirement alongside spending
+and any life event, and funded by the same withdrawals in the same order, carrying whatever income tax
+and early-withdrawal penalty those withdrawals actually trigger. It is deliberately <em>not</em>
+treated as consumption: it is excluded from the spending series, so that series still answers what the
+reader lives on, and it is outside the spending rule, because a guardrail cutting a promised gift is
+not what a guardrail is for.</p>
+<div class="fx">need = spending + gift + life events + Medicare surcharge</div>
+<p>Gift tax is not modelled. The 2026 annual exclusion is $19,000 per recipient and the lifetime
+exemption $15M a person, so few plans approach either.</p>
+<div class="note"><b>What this cannot see.</b> Giving away shares that have grown is not the same as
+giving away cash: the recipient takes over the giver's cost basis and owes the gain, where the same
+shares left until death would have had that gain erased by the step-up. The model funds a gift from the
+accounts in the usual order and does not track which asset went to which person, so it neither rewards
+nor penalises that choice. The help says so at the input. It is also why the arithmetic here can make
+gifting look cleaner than it is.</div>
+
+<h3>Qualified charitable distributions</h3>
+<p>Money moving straight from a traditional IRA to a charity, from age 70 &mdash; the law says 70&frac12;
+and this model counts whole years throughout. Capped at the 2026 ceiling of $111,000 a person, indexed,
+and at the balance available. Two things make it worth more than withdrawing the money and claiming a
+deduction, and both fall out of where it sits in the calculation rather than being special-cased.</p>
+<p>First, it never enters income. It is subtracted from the pre-tax balance before any of the tax
+machinery runs, so it does not raise taxable income, does not push Social Security across its
+provisional-income thresholds, and does not reach the MAGI series that sets a Medicare surcharge two
+years later. A deduction can do none of that, because by then the income has already counted.</p>
+<p>Second, it satisfies the required minimum distribution dollar for dollar. The requirement is worked
+out first, on the balance before the gift, and only the unsatisfied remainder becomes taxable
+income:</p>
+<div class="fx">taxable RMD = max(0, required &minus; QCD)</div>
+<p>On a $3M plan giving $40,000 a year this way, lifetime tax falls by about $327,000. A second, less
+obvious consequence: because the gift replaces a distribution that would otherwise have moved money
+<em>out</em> of the pre-tax account and into a taxable one, the estate left behind is more pre-tax-heavy
+than it would have been, and carries more income tax for beneficiaries. Both effects are real and the
+model shows both.</p>
 
 <h3>What beneficiaries receive</h3>
 <p>A different question from the one above, and not a rescaling of it, because three things change at
