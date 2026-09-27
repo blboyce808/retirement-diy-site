@@ -444,6 +444,27 @@ Everything else about the plan is held fixed. It is not reported for the portfol
 rules, where the question is meaningless because the rule itself decides spending and no amount can
 ever fail.</p>
 
+<h3>Ending wealth after tax</h3>
+<p>Every balance the page draws is a face value, and pre-tax money has never been taxed, so an
+ending total mixes dollars that are not worth the same. The after-tax figure prices the pre-tax
+balance at the rate one more dollar of ordinary income would cost that household in its final year,
+federal and state together, obtained numerically from the same tax function:</p>
+<div class="fx">m = [ tax(o+&delta;, g, s) &minus; tax(o, g, s) ] / &delta;,&nbsp;&nbsp;&delta; = 1000·f</div>
+<div class="fx">net = trad·(1 &minus; m) + roth + brokerage + cash</div>
+<p>where <code>o</code> is that year's ordinary income including any conversion, and <code>m</code>
+is clamped to [0, 1]. One figure is kept per path and the median is reported, in today's money,
+beside the face-value balance. A path that ran short contributes zero to both.</p>
+
+<div class="note warn"><b>Caveat: this is a rate, not a liquidation.</b> A marginal rate prices the
+balance as though it were drawn gradually. Emptying the account in a single year would push through
+higher brackets and cost more; spreading it across a longer retirement would cost less. It is also
+<em>your</em> rate: money left to someone is taxed at the heir's rate, which cannot be known in
+advance, so read this as what the balance is worth to the household rather than what a beneficiary
+would receive. The figure exists because the face value silently flatters any choice that leaves
+more money still untaxed, which is exactly the choice the conversion and withdrawal-order
+comparisons are asked to rank &mdash; and on this measure the option paying the least lifetime tax
+is frequently not the one that leaves the most.</div>
+
 <h2 id="notmod">11. What is not modelled</h2>
 <ul>
   <li><strong>Fees of any kind.</strong> No fund expenses, no advisory fee. Subtract them from the
