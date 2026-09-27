@@ -352,9 +352,26 @@ balance at 73, 5% at 80 and 8% at 90.</p>
 year's bill, and it must be payable from outside the retirement accounts:</p>
 <div class="fx">purse = max(0, cash + brokerage &minus; keep · spending)</div>
 <p>If the tax exceeds the purse, the conversion is scaled down by the ratio and retried, up to eight
-times. The tax is taken from cash first, then the brokerage, reducing its basis proportionally.
-Nothing is converted unless the tax can be paid, which is the point: a conversion funded from the
-converted money itself is a much weaker move and the model will not pretend otherwise.</p>
+times. Nothing is converted unless the tax can be paid, which is the point: a conversion funded from
+the converted money itself is a much weaker move and the model will not pretend otherwise.</p>
+
+<p>The tax is taken from cash first, then the brokerage. Selling in the brokerage realises gains,
+which are taxable in their own right, so the bill is circular &mdash; a larger sale owes more tax,
+which needs a larger sale. Writing <code>g</code> for the brokerage gain share and <code>c</code>
+for the conversion, the bill solves</p>
+<div class="fx">owed = tax(o + c, gains + max(0, owed &minus; cash) · g, s) &minus; tax(o, gains, s)</div>
+<p>by the same fixed-point iteration the withdrawal uses, to within fifty cents or eight passes. The
+realised gain stacks above ordinary income at long-term rates, so it does not consume the ordinary
+bracket room the conversion is filling, and it enters the MAGI series, which is why a conversion can
+raise a Medicare surcharge two years later by more than the conversion alone would suggest. The
+brokerage basis falls proportionally with the balance.</p>
+
+<div class="note warn"><b>Caveat: this was wrong until recently.</b> Until 27 September 2026 this sale was untaxed: the balance and basis
+fell but no capital-gains tax was charged, while the ordinary withdrawal path taxed the identical
+sale. Conversions therefore looked cheaper than they are. On a couple retiring at 62 with $3M and
+filling the 24% bracket, the correction added about $78,000 of lifetime tax and took roughly
+$319,000 off median wealth at 95. Any figure quoted from this tool before that date overstates the
+case for conversions by about that much.</div>
 
 <h3>8.3 Medicare surcharges</h3>
 <p>IRMAA is charged on income from two years earlier, so the model keeps a MAGI series and looks
