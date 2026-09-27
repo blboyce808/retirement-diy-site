@@ -567,6 +567,11 @@ footer{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:80ch}
       <p>The figures are the output of a model, not a prediction. They depend entirely on assumptions that may not hold: future returns, inflation, how long you live, and tax law that will change. Real markets do things no model anticipates. Two people with identical inputs can have very different outcomes.</p>
       <p>Some things are deliberately left out, and the help notes say which. Treat a result as one view among several, and check anything important with a qualified professional who knows your circumstances.</p>
 
+      <h3 class="tmh">Not estate planning, and not a lawyer</h3>
+      <p>Level 6 puts numbers on what might be left behind and what tax it would carry. That is arithmetic, and it is all it is. It is <b>not estate planning</b>, and nothing on this site is legal advice or a substitute for a lawyer.</p>
+      <p>Estate planning is the part this site does not do: wills, trusts, beneficiary designations, powers of attorney, probate, how property is titled, guardianship, and the rules of the state you live in. Those are legal documents with legal consequences, they differ by state, and getting them wrong is expensive in ways no calculator can show you. One example of how little the arithmetic settles: on most retirement accounts the beneficiary form controls who inherits, and it overrides whatever a will says. This site cannot see your beneficiary forms and does not ask about them.</p>
+      <p>If any of this matters to you, and it usually does, talk to an estate lawyer licensed in your state. Use the figures here as something to bring to that conversation, never as a replacement for it.</p>
+
       <h3 class="tmh">No warranty</h3>
       <p>This site is provided as is, without warranty of any kind, express or implied. That includes the implied warranties of merchantability, fitness for a particular purpose and non-infringement. It may contain errors. It may be unavailable. Calculations may be wrong.</p>
 
@@ -690,7 +695,7 @@ const N_PATHS = 2000;
    Built from Robert Shiller's monthly S&P composite, dividend, CPI and long-rate series (1871 to 2022). */
 const HIST = [[1871,0.1532,0.0504,0.0152],[1872,0.1094,0.0384,0.0229],[1873,-0.0262,0.0635,-0.044],[1874,0.0451,0.083,-0.0695],[1875,0.0515,0.0854,-0.0573],[1876,-0.1368,0.0561,0.0083],[1877,-0.0168,0.0526,-0.1563],[1878,0.1583,0.0522,-0.1029],[1879,0.4807,0.0571,0.2065],[1880,0.2568,0.0643,-0.0571],[1881,0.0036,0.0431,0.0807],[1882,0.0355,0.0354,-0.0187],[1883,-0.0524,0.0371,-0.0761],[1884,-0.1199,0.0438,-0.1029],[1885,0.2906,0.0467,-0.035],[1886,0.1171,0.0223,0.0],[1887,-0.006,0.0239,0.0476],[1888,0.0319,0.0535,-0.0454],[1889,0.0696,0.0368,-0.0476],[1890,-0.0595,0.0191,0.025],[1891,0.1839,0.0377,-0.0603],[1892,0.06,0.0247,0.0778],[1893,-0.1862,0.0413,-0.1329],[1894,0.0367,0.0553,-0.0409],[1895,0.0516,0.024,0.0137],[1896,0.0315,0.0513,-0.0285],[1897,0.1991,0.0378,0.0294],[1898,0.285,0.0529,0.015],[1899,0.0371,0.0271,0.1686],[1900,0.2014,0.0354,-0.0241],[1901,0.1925,0.0248,0.0246],[1902,0.0819,0.0226,0.0962],[1903,-0.1701,0.0254,-0.0439],[1904,0.3111,0.0279,0.0229],[1905,0.2089,0.0386,0.0],[1906,0.0059,0.0162,0.0449],[1907,-0.2394,0.0217,-0.0215],[1908,0.3837,0.047,0.0323],[1909,0.1591,0.0264,0.1074],[1910,-0.0351,0.0339,-0.0677],[1911,0.0345,0.0376,-0.0108],[1912,0.0719,0.008,0.0734],[1913,-0.0484,0.0659,0.0204],[1914,-0.0529,0.0357,0.01],[1915,0.3042,0.0565,0.0297],[1916,0.0794,0.0273,0.125],[1917,-0.1807,0.0177,0.1966],[1918,0.1755,0.0508,0.1786],[1919,0.1947,0.0115,0.1697],[1920,-0.136,0.0412,-0.0155],[1921,0.0946,0.1088,-0.1105],[1922,0.2859,0.0386,-0.0059],[1923,0.0507,0.0658,0.0298],[1924,0.2594,0.0556,0.0],[1925,0.2502,0.0522,0.0347],[1926,0.1106,0.0629,-0.0223],[1927,0.3629,0.0342,-0.0114],[1928,0.4645,0.0129,-0.0116],[1929,-0.0899,0.0598,0.0],[1930,-0.219,0.0291,-0.0702],[1931,-0.4247,0.0077,-0.1006],[1932,-0.0679,0.0652,-0.0979],[1933,0.5525,0.0478,0.0233],[1934,-0.0792,0.0571,0.0303],[1935,0.5344,0.039,0.0147],[1936,0.3201,0.0241,0.0217],[1937,-0.3125,0.0363,0.0071],[1938,0.1668,0.0416,-0.0141],[1939,0.0279,0.0357,-0.0071],[1940,-0.0894,0.0434,0.0144],[1941,-0.088,-0.0212,0.1135],[1942,0.2027,0.0238,0.0764],[1943,0.2335,0.0239,0.0296],[1944,0.1916,0.0336,0.023],[1945,0.3842,0.0383,0.0225],[1946,-0.1179,0.0171,0.1813],[1947,0.0254,0.0073,0.1023],[1948,0.0942,0.0349,0.0127],[1949,0.1659,0.0223,-0.0208],[1950,0.3315,0.0033,0.0809],[1951,0.2116,0.017,0.0433],[1952,0.1415,0.015,0.0038],[1953,0.0268,0.0562,0.0113],[1954,0.4562,0.0145,-0.0074],[1955,0.2848,0.0034,0.0037],[1956,0.0691,-0.0137,0.0299],[1957,-0.0564,0.0633,0.0362],[1958,0.3951,-0.0382,0.014],[1959,0.0756,-0.0102,0.0103],[1960,0.0625,0.1131,0.0171],[1961,0.1894,0.0206,0.0067],[1962,-0.0281,0.0595,0.0133],[1963,0.2088,0.0132,0.0164],[1964,0.1578,0.0402,0.0097],[1965,0.114,0.0115,0.0192],[1966,-0.0647,0.0483,0.0346],[1967,0.1598,-0.0202,0.0365],[1968,0.1048,0.0207,0.044],[1969,-0.0839,-0.0499,0.0618],[1970,0.0703,0.1822,0.0529],[1971,0.1381,0.0822,0.0327],[1972,0.176,0.0255,0.0365],[1973,-0.1609,0.0301,0.0939],[1974,-0.2085,0.0374,0.118],[1975,0.3857,0.0598,0.0672],[1976,0.111,0.1116,0.0522],[1977,-0.0884,0.0252,0.0684],[1978,0.1593,0.0115,0.0928],[1979,0.1661,-0.0039,0.1391],[1980,0.2529,0.0157,0.1183],[1981,-0.0698,0.0279,0.0839],[1982,0.2881,0.3795,0.0371],[1983,0.2014,0.0393,0.0419],[1984,0.0752,0.1325,0.0353],[1985,0.2585,0.2441,0.0389],[1986,0.3094,0.2289,0.0146],[1987,-0.0206,-0.0258,0.0405],[1988,0.1763,0.0616,0.0467],[1989,0.2277,0.1454,0.052],[1990,-0.0083,0.0896,0.0565],[1991,0.3157,0.1499,0.026],[1992,0.0757,0.0988,0.0326],[1993,0.1155,0.1244,0.0252],[1994,0.0108,-0.0705,0.028],[1995,0.3495,0.2249,0.0273],[1996,0.2705,-0.0052,0.0304],[1997,0.2771,0.138,0.0157],[1998,0.3128,0.1144,0.0167],[1999,0.1548,-0.081,0.0274],[2000,-0.0515,0.1725,0.0373],[2001,-0.1345,0.0601,0.0114],[2002,-0.2004,0.1238,0.026],[2003,0.2826,0.0331,0.0193],[2004,0.0596,0.0363,0.0297],[2005,0.1001,0.0276,0.0399],[2006,0.1322,0.0198,0.0208],[2007,-0.0134,0.1243,0.0428],[2008,-0.3515,0.1346,0.0003],[2009,0.3273,-0.0659,0.0263],[2010,0.1613,0.0633,0.0163],[2011,0.0331,0.15,0.0292],[2012,0.1603,0.0246,0.016],[2013,0.2535,-0.0554,0.0158],[2014,0.1335,0.109,-0.0009],[2015,-0.0334,0.0017,0.0137],[2016,0.2091,-0.0063,0.025],[2017,0.2471,0.0124,0.0207],[2018,-0.047,0.0155,0.0155],[2019,0.2788,0.1055,0.0249],[2020,0.1753,0.0756,0.014],[2021,0.2211,-0.0453,0.0748],[2022,-0.1201,-0.1169,0.0641],[2023,0.233,-0.004,0.0309],[2024,0.2618,-0.0006,0.03],[2025,0.1737,0.0772,0.0239]];
 const HIST_FIRST = HIST[0][0], HIST_LAST = HIST[HIST.length-1][0];
-const BUILD = '1479483';            // deploy.sh stamps the published copy with the source commit
+const BUILD = 'fb1bc45';            // deploy.sh stamps the published copy with the source commit
 let engine = 'mc';           // 'mc' Monte Carlo, 'hist' every historical start year
 let selYear = null;          // historical start year picked on the history chart
 const CUR_YEAR = new Date().getFullYear();
@@ -706,6 +711,7 @@ const SECTIONS = [
   {id:'income',   lvl:2, title:'Other income',           sub:'Level 2'},
   {id:'events',   lvl:4, title:'Life events',            sub:'Level 4'},
   {id:'tax5',     lvl:5, title:'Tax strategy',           sub:'Level 5'},
+  {id:'legacy6',  lvl:6, title:'Inheritance and legacy', sub:'Level 6'},
 ];
 const SEC_BY_ID = {}; SECTIONS.forEach(s=>SEC_BY_ID[s.id]=s);
 function firstSectionOf(lvl){ const s=SECTIONS.find(x=>x.lvl===lvl); return s ? s.id : null; }
@@ -715,10 +721,10 @@ const INPUTS = [
   {id:'retAge', lvl:1, label:'Retire at age', min:30,max:80,step:1,def:65,fmt:'age'},
   {id:'savings', lvl:1, only:[1,2], label:'Retirement savings today', min:0,max:9.5e6,step:5000,def:160000,fmt:'usd'},
   {id:'contrib', lvl:1, label:'Added each year until you retire', hint:"In today's dollars", min:0,max:150000,step:1000,def:10000,fmt:'usd'},
-  {id:'ssAmt', lvl:1, label:'Social Security', hint:"Per year, today's dollars", min:0,max:150000,step:500,def:42000,fmt:'usd', extra:'ssEst'},
+  {id:'filing', lvl:1, label:'Tax filing status', type:'select', def:'mfj', options:[['mfj','Married'],['single','Single']]},
+  {id:'ssAmt', lvl:1, label:'Social Security', hint:"Per year, today's dollars, both of you together", min:0,max:150000,step:500,def:42000,fmt:'usd', extra:'ssEst'},
   {id:'ssAge', lvl:1, label:'Social Security starts at age', min:62,max:70,step:1,def:67,fmt:'age'},
   {id:'stocks', lvl:1, label:'Stocks in your mix', hint:'The rest is bonds, rebalanced yearly', min:0,max:100,step:5,def:70,fmt:'pct0'},
-  {id:'filing', lvl:1, label:'Tax filing status', type:'select', def:'mfj', options:[['mfj','Married'],['single','Single']]},
   {id:'spend', lvl:1, label:'Yearly spending in retirement, after tax', hint:"What you actually spend, in today's dollars", extra:'budEst', min:10000,max:400000,step:500,def:62000,fmt:'usd'},
 
   {id:'planAge', lvl:2, sec:'uncert', label:'Plan to age', min:80,max:105,step:1,def:95,fmt:'age'},
@@ -758,6 +764,12 @@ const INPUTS = [
    type:'select', def:'on', options:[['on','Model them'],['off','Ignore them']]},
   {id:'rmd', lvl:5, label:'Required minimum distributions', hint:'The law empties Trad. 401k and IRA accounts whether you need the money or not',
    type:'select', def:'on', options:[['on','Model them'],['off','Ignore them']]},
+  {id:'heirRate', lvl:6, wide:true, sec:'legacy6', label:'Income tax bracket your heirs are in',
+   hint:'What they would pay on money coming out of a Trad. 401k or IRA', type:'select', def:'22',
+   options:[['0','They would pay no income tax'],['12','12%, a modest income'],['22','22%, a typical working household'],
+            ['24','24%'],['32','32%, a high earner'],['35','35%'],['37','37%, the top bracket']]},
+  {id:'charShare', lvl:6, sec:'legacy6', label:'Share of Trad. 401k and IRA left to charity',
+   hint:'A charity pays no income tax on it. Anything left to people does', min:0,max:100,step:5,def:0,fmt:'pct0'},
   {id:'legacy', lvl:3, label:'Leave behind at least', hint:"Today's dollars, at your plan age", min:0,max:3e6,step:10000,def:250000,fmt:'usd'},
 ];
 const DEF = {}; INPUTS.forEach(d=>DEF[d.id]=d.def);
@@ -787,7 +799,7 @@ function grossToSpend(o){
   const g = +((o.S||{}).spend) || 0;
   if(!g) return g;
   const L = TAXLAW[((o.S||{}).filing==='single') ? 'single' : 'mfj'];
-  const lvl = [1,2,3,4,5].includes(o.level) ? o.level : 1;
+  const lvl = [1,2,3,4,5,6].includes(o.level) ? o.level : 1;
   const st = (lvl>=2 ? (+o.S.stateTax || 4) : 4)/100;
   return Math.round(g - salaryTax(g, L, st));
 }
@@ -853,7 +865,7 @@ function applySnapshot(o){
     S.income.unshift(cleanIncome({name:'Pension', pen:true, amt:oldPen, startAge:Math.round(+o.S.penAge||62),
       endAge:0, cola:String(o.S.penCola||'none')==='full', taxable:true}));
   }
-  if([1,2,3,4,5].includes(o.level)) level = o.level;
+  if([1,2,3,4,5,6].includes(o.level)) level = o.level;
   if(typeof o.eventsSeeded==='boolean') eventsSeeded = o.eventsSeeded;
   if(['mc','hist'].includes(o.engine)) engine = o.engine;
   if(o.BUD && typeof o.BUD==='object'){ budInit(); Object.keys(BUD).forEach(k=>{ if(isFinite(+o.BUD[k])) BUD[k]=Math.max(0,+o.BUD[k]); }); }
@@ -1246,15 +1258,17 @@ function simulate(s, lvl, seedVal, mode){
          marginal rate, so it prices the balance as if drawn gradually - emptying the account in a
          single year would cost more, and spreading it over a longer retirement less. An heir would
          pay their own rate, which nobody can know. */
-      let mrEnd = 0;
+      let mrEnd = 0, mrGEnd = 0;
       if(!dry && k===nY-1){
         // the year's own income, from the copies kept for MAGI, since the tax block's locals have
         // gone out of scope by here
         const yrE = CUR_YEAR + k - 1, n65E = a >= 65 ? Ly.persons : 0;
         const ordEnd = wageY + rmdY + othY + divOY + tradY + convY, gainEnd = gainY + divQY, step = 1000*f;
-        mrEnd = Math.max(0, Math.min(1,
-          (incomeTax(ordEnd+step, gainEnd, ssY, Ly, f, n65E, yrE, st)
-         - incomeTax(ordEnd,      gainEnd, ssY, Ly, f, n65E, yrE, st)) / step));
+        const at = (o, g) => incomeTax(o, g, ssY, Ly, f, n65E, yrE, st);
+        const t0 = at(ordEnd, gainEnd);
+        mrEnd  = Math.max(0, Math.min(1, (at(ordEnd+step, gainEnd) - t0) / step));
+        // and the long-term rate on one more dollar of gain, for the brokerage's own embedded tax
+        mrGEnd = Math.max(0, Math.min(1, (at(ordEnd, gainEnd+step) - t0) / step));
       }
       trad*=1+r; roth*=1+r; brok*=1+r; cash*=1+rC; f*=1+infl;
       // Distributions were reinvested and have already been taxed, so they lift the basis and are
@@ -1263,7 +1277,12 @@ function simulate(s, lvl, seedVal, mode){
       if(!dry && brok>0) basis = Math.min(brok, basis + divQY + divOY);
       TRAD[k][i]=trad; ROTH[k][i]=roth; BROK[k][i]=brok; CASH[k][i]=cash;
       TAX[k][i]=tax; RET[k][i]=r; INF[k][i]=infl; CI[k][i]=f;
-      if(k===nY-1) ENDNET[i] = dry ? 0 : trad*(1-mrEnd) + roth + brok + cash;
+      // What the plan is worth to the household that built it: pre-tax money owes income tax, and
+      // the brokerage owes long-term gains tax on whatever it has grown. Roth and cash owe nothing.
+      // Note this is NOT what a beneficiary would get - see legacySplit, where the brokerage's basis
+      // steps up at death and the pre-tax rate becomes the heir's, not yours.
+      if(k===nY-1) ENDNET[i] = dry ? 0
+        : trad*(1-mrEnd) + roth + cash + brok - Math.max(0, brok-basis)*mrGEnd;
     }
   }
   const startYear = mode==='hist' ? Array.from({length:nP},(_,i)=>HIST[i][0]) : null;
@@ -1284,6 +1303,45 @@ function band(res, get, real){
 }
 /* The median after-tax ending total, in today's money, on the same footing as the balance stat
    beside it so the two can be read against each other. */
+/* Who ends up with the money, which is a different question from what it is worth to you, and the
+   answer is not a rescaling of it. Three things change at death:
+
+     - the brokerage's cost basis steps up to market value, so every dollar of growth in it escapes
+       capital-gains tax entirely. A beneficiary can therefore receive MORE than the account was
+       worth to the person who held it.
+     - pre-tax money is taxed at the heir's rate, not yours, and they are often mid-career while you
+       are not. Since 2020 most beneficiaries must also empty an inherited IRA within ten years,
+       which compresses that income and pushes it up their brackets. The single rate here stands in
+       for all of that; it cannot be known in advance and the help says so.
+     - a charity pays no income tax on pre-tax money at all, which is why the share left to one is
+       an input. It is the only lever in this level that is pure arithmetic.
+
+   Roth and cash pass through untouched. Returns medians in today's money. */
+function legacySplit(r){
+  const zero = {heirs:0, charity:0, tax:0, total:0};
+  if(!r) return zero;
+  const L = r.nY-1, share = Math.min(1, Math.max(0, (+S.charShare||0)/100));
+  const rate = level>=6 ? Math.min(1, Math.max(0, (+S.heirRate||0)/100)) : 0;
+  /* One future, decomposed, rather than three separate medians. Taking the median of each part
+     independently produces figures that do not add up - the path sitting at the middle of what
+     heirs receive is not the path sitting at the middle of what charity receives - and three
+     numbers presented as a split of one balance have to sum to it or the reader is right to think
+     something is broken. So the middle future by ending total is chosen and that one is split,
+     which is the same future the account charts already draw. */
+  const order = [];
+  for(let i=0;i<r.nP;i++) order.push([GET.total(r,L,i)/r.CI[L][i], i]);
+  order.sort((a,b)=>a[0]-b[0]);
+  const pick = order[Math.floor(order.length/2)];
+  if(!pick) return zero;
+  const i = pick[1], f = r.CI[L][i], trad = r.TRAD[L][i]||0;
+  const toChar = trad*share, toHeir = trad - toChar;
+  return {
+    heirs:   (toHeir*(1-rate) + (r.ROTH[L][i]||0) + (r.BROK[L][i]||0) + (r.CASH[L][i]||0))/f,
+    charity: toChar/f,
+    tax:     toHeir*rate/f,
+    total:   pick[0],
+  };
+}
 function endNetMed(r){
   if(!r || !r.ENDNET) return 0;
   const L = r.nY-1, a = [];
@@ -1427,7 +1485,10 @@ function syncDimmed(){
 
    The script face is whatever the machine already has. Embedding a handwriting font would be
    another 30KB on a 476KB page for one line of text. */
-const CUE_ORDER = ['age','retAge','savings','contrib','ssAmt','ssAge','pension','stocks','filing','spend'];
+/* The same order the fields appear in. Filing status moved above Social Security because it
+   decides whether that figure is one benefit or two, and being asked for a couple's combined
+   benefit before saying you are a couple is the wrong way round. */
+const CUE_ORDER = ['age','retAge','savings','contrib','filing','ssAmt','ssAge','pension','stocks','spend'];
 const CUE_TEXT = 'do this next:';
 // Nothing has been answered yet, so there is no "next" to point at: the first one invites
 // rather than continues. It comes back whenever the run restarts, after a Reset or an example.
@@ -2160,6 +2221,7 @@ const RAIL = [
   {k:4, n:'Level 4', t:'Life events', d:'Inheritances, a home, big costs'},
   {k:5, n:'Level 5', t:'Tax Strategy', d:'Choose when to pay the tax',
    info:'Withdrawal sequencing: compare which accounts to spend first, from the usual order to filling a low tax bracket each year, and see the effect on lifetime taxes and what you leave behind. A Roth conversion planner, required minimum distributions and Medicare premium surcharges. Your own state\'s tax rules, including its treatment of Social Security and retirement income. Survivor years: when one spouse dies, the other keeps the larger Social Security check, any pension drops to its survivor share, spending adjusts, and taxes switch to single filing. Head of household, married filing separately and dependents. Plus control over the market assumptions that are fixed in the free levels, and backtests against every start year since 1871 rather than the ten shown free.'},
+  {k:6, n:'Level 6', t:'Inheritance and legacy', d:'What would be left, and what tax it carries'},
   // A seventh tier, "Your Real Portfolio", was listed here and has been dropped. It wanted funds
   // by ticker with their real price history, which needs licensed market data: that cannot be
   // embedded in a self-contained page and cannot be fetched without a network call, so it
@@ -3010,7 +3072,7 @@ function cleanBase(b){
   const S2={}; INPUTS.forEach(d=>{ const v=b.S[d.id]; if(v===undefined) return;
     if(d.type==='select'){ if(d.options.some(o=>o[0]===String(v))) S2[d.id]=String(v); } else if(isFinite(+v)) S2[d.id]=+v; });
   S2.events = Array.isArray(b.S.events) ? b.S.events.slice(0,30).map(cleanEvent) : [];
-  return {S:S2, level:[1,2,3,4,5].includes(b.level)?b.level:1, mode:b.mode==='hist'?'hist':'mc', success:num(b.success), sust:num(b.sust), endMed:num(b.endMed),
+  return {S:S2, level:[1,2,3,4,5,6].includes(b.level)?b.level:1, mode:b.mode==='hist'?'hist':'mc', success:num(b.success), sust:num(b.sust), endMed:num(b.endMed),
     ages:arr(b.ages), medReal:arr(b.medReal), medNom:arr(b.medNom), H:num(b.H), tok:-1};
 }
 function setBaseline(){
@@ -3130,6 +3192,15 @@ function run(){
   if(level>=5 && !varRule){
     statsHtml += `<div class="stat"><div class="l">Worth after tax at ${res.H}${q('endNet')}</div><div class="v">${money(endNetMed(res))}</div></div>`;
   }
+  // Level 6 only. Below it there is no heir rate to apply, so the split would be arithmetic about
+  // an assumption the reader has not been asked for.
+  if(level>=6 && !varRule){
+    const sp = legacySplit(res);
+    statsHtml += `<div class="stat"><div class="l">Your heirs receive${q('endHeir')}</div><div class="v">${money(sp.heirs)}</div></div>`;
+    if(sp.charity > 0)
+      statsHtml += `<div class="stat"><div class="l">Charity receives${q('endChar')}</div><div class="v">${money(sp.charity)}</div></div>`;
+    statsHtml += `<div class="stat"><div class="l">Income tax on the inheritance${q('endHeirTax')}</div><div class="v">${money(sp.tax)}</div></div>`;
+  }
   if(level>=3){
     const nP=res.nP, endReal=new Float64Array(nP);
     let ok=0;
@@ -3170,7 +3241,7 @@ function run(){
   // donateLink is parked and returns nothing - see the note at its definition
   const _md = document.getElementById('methodDonate');
 if(_md) _md.innerHTML = donateLink('Here, if you would like to');
-document.getElementById('footer').innerHTML = 'For planning and education, not financial advice. © 2026 Brad Boyce. All rights reserved. Build ' + BUILD + '.' + '<button type="button" class="cmplink" id="openMethod">How this works</button>' + '<a class="cmplink" href="maths.html" target="_blank" rel="noopener">The arithmetic</a>' + '<button type="button" class="cmplink" id="openTerms">Terms of use</button>' + donateLink('Chip in');
+document.getElementById('footer').innerHTML = 'For planning and education. Not financial, tax or legal advice, not estate planning, and not a financial adviser. © 2026 Brad Boyce. All rights reserved. Build ' + BUILD + '.' + '<button type="button" class="cmplink" id="openMethod">How this works</button>' + '<a class="cmplink" href="maths.html" target="_blank" rel="noopener">The arithmetic</a>' + '<button type="button" class="cmplink" id="openTerms">Terms of use</button>' + donateLink('Chip in');
 }
 
 (()=>{ const d=document.getElementById('cmpdlg'), o=document.getElementById('openCmp');
@@ -3205,7 +3276,7 @@ const HELP = {
   // Level 2
   planAge:{t:'Plan to age', b:['How long the money needs to last. A future counts as a success only if spending is fully covered in every year through this age.','Level 1 uses 95. Planning past your expected lifespan protects against living longer than average.']},
   infl:{t:'Average inflation', b:['The average yearly rise in prices. Each simulated year draws its own rate around this average, with a spread of 1.2 points, so some futures see long stretches of high inflation.','Spending, contributions and income all grow with that future’s inflation. Level 1 uses 2.5%.','For scale: prices roughly tripled between 1966 and 1982. An average cannot show you what that felt like year by year, which is what the backtests are for.']},
-  ssAmt:{t:'Social Security', b:['Your household\'s yearly benefit in today\'s dollars, for the starting age you choose. It rises with inflation, matching Social Security\'s cost-of-living adjustment, and counts toward your retirement income.','Your statement at ssa.gov/myaccount has the most accurate figure. If you don\'t have it handy, the estimator below builds one from your pay. For a couple, add both benefits together.'], src:['SSA, retirement benefits','https://www.ssa.gov/benefits/retirement/planner/taxes.html']},
+  ssAmt:{t:'Social Security', b:['Your household\'s yearly benefit in today\'s dollars, for the starting age you choose. It rises with inflation, matching Social Security\'s cost-of-living adjustment, and counts toward your retirement income.','Your statement at ssa.gov/myaccount has the most accurate figure. If you don\'t have it handy, the estimator below builds one from your pay.','For a married couple this is both benefits added together, and one starting age is applied to both. Claiming at different ages is a real strategy and one this figure cannot express yet.'], src:['SSA, retirement benefits','https://www.ssa.gov/benefits/retirement/planner/taxes.html']},
   ssAge:{t:'Social Security starts at age', b:['The age you claim. Claiming at 62 cuts the benefit by about 30% versus full retirement age (67 for most people). Waiting to 70 raises it by about 24%.','Enter the benefit amount that matches the age you choose here. The model does not adjust it for you.']},
   stockRet:{t:'Average stock return', b:[
     ()=>`The rate your stocks compound at over decades, before inflation, once the good and bad years have cancelled out. Level 1 uses ${retPctS(MKT.sMean)}.`,
@@ -3287,8 +3358,31 @@ const HELP = {
     'The median total balance at your plan age. Half of the futures end higher and half end lower.',
     'Futures that ran out count as zero.',
     'Counted before any tax still owed on Trad. 401k and IRA money, which has never been taxed. A balance made up of pre-tax money is worth less than the same figure held in a Roth, so this is not what the money would buy. Level 5 works out the difference.']},
+  heirRate:{t:'Income tax bracket your heirs are in', b:[
+    'Money in a Trad. 401k or IRA has never been taxed. Whoever inherits it pays income tax at their own rate as they take it out, not at yours.',
+    'Nobody can know this figure in advance, which is the honest answer and the reason this is a short list of brackets rather than a dial. It depends on who inherits, what they earn at the time, where they live, and tax law decades from now. 22% is set as a middle. Move it and watch which way the answer leans rather than trusting any one figure.',
+    'One thing worth knowing about the timing: since 2020 most people who inherit a retirement account have to empty it within ten years. That squeezes the income into a short window, often while they are still working, which tends to push them into higher brackets than the one they normally sit in. This model applies a single rate and does not simulate those ten years, so it is on the gentle side.',
+    'Roth money and a taxable brokerage are not affected. Roth comes out tax-free, and a brokerage gets a fresh cost basis at death, so its growth is never taxed at all.'],
+   src:['IRS, retirement topics for beneficiaries','https://www.irs.gov/retirement-plans/required-minimum-distributions-for-ira-beneficiaries']},
+  charShare:{t:'Share of Trad. 401k and IRA left to charity', b:[
+    'A charity pays no income tax on money from a Trad. 401k or IRA. A person pays their full rate on it.',
+    'So the same gift is worth different amounts depending on which pot it comes out of. This setting moves a share of the pre-tax pot to charity and leaves the rest, along with all the Roth and brokerage money, to people. Set it to zero if nothing is going to charity.',
+    'This is arithmetic about tax, not a suggestion about your will. Who receives what is decided by your beneficiary forms and your will, not by this page, and the form usually overrides the will. That is a conversation for a lawyer in your state.']},
+  endHeir:{t:'Your heirs receive', b:[
+    'The median amount beneficiaries would actually get, in today\'s money, after the income tax on pre-tax balances: Roth and cash in full, the brokerage in full, and the pre-tax pot less the charitable share and less the rate you set.',
+    'It can be more than the "Worth after tax" figure above it, and that surprises people. The reason is the brokerage: its cost basis resets to market value at death, so all the growth inside it escapes capital-gains tax, where you would have owed tax to sell the same shares yourself.',
+    'It can also be a great deal less, if the heir bracket is above your own. Those two effects pull in opposite directions and which wins depends entirely on the mix of accounts you leave.',
+    'This is one future taken apart, not three separate medians: the middle future by ending balance, which is the same one the account charts draw. That way what heirs receive, what charity receives and the tax add up to the balance above them. Three numbers presented as the split of one figure ought to sum to it.',
+    'Futures where the money ran out leave nothing to anyone.']},
+  endChar:{t:'Charity receives', b:[
+    'The median amount going to charity, in today\'s money, taken from the pre-tax pot and taxed at nothing.',
+    'Only shown when the charitable share is above zero.']},
+  endHeirTax:{t:'Income tax on the inheritance', b:[
+    'What the tax authorities would take from the pre-tax pot on the way to your beneficiaries: the amount left to people, at the bracket you set.',
+    'Nothing here is estate tax. The federal exemption is $15 million a person in 2026, so it reaches very few households. Several states tax estates from a much lower threshold, and a handful tax the recipient instead, sometimes at a rate that depends on how closely related they are. None of that is modelled. Your state is the thing to check.']},
   endNet:{t:'Worth after tax', b:[
     'The same ending balance with the tax still owed on Trad. 401k and IRA money taken off, so it can be compared with money in a Roth, which owes nothing.',
+    'The brokerage is included at its value less the long-term gains tax on whatever it has grown, since you would owe that to sell it. A beneficiary would not: see Your heirs receive at Level 6, where the basis steps up at death.',
     'The rate is your own, not an assumption: it is what one more dollar of ordinary income would cost you in your final year, federal and state, worked out from the same tax code the rest of the page uses. It is a marginal rate, so it prices the balance as though drawn gradually. Emptying the account in one year would cost more; spreading it over a longer retirement, less.',
     'If the money is left to someone, they pay their own rate, which nobody can know in advance. Treat this as what the balance is worth to you, not what an heir would receive.',
     'This is the figure the conversion and withdrawal-order comparisons are ranked on, because the face-value balance flatters whichever choice leaves the most money still untaxed.']},
@@ -3372,7 +3466,7 @@ const HELP = {
     'The tax brackets rise with each future’s inflation, as the law requires. The Social Security thresholds do not: $25,000 and $32,000 have been sitting there since 1984 and 1993, untouched by four decades of prices. Every year a little more of your benefit becomes taxable, and nobody has to vote for it.',
     'Brokerage gains are taxed at the capital-gains rates, stacked on top of ordinary income. Before retirement, withdrawals are taxed as if added to a salary equal to your income target.',
     'Not modeled here: required minimum distributions, Medicare premium surcharges (IRMAA) and the 3.8% investment income tax. Level 5 adds the first two.'], src:['IRS, federal income tax rates and brackets','https://www.irs.gov/filing/federal-income-tax-rates-and-brackets']},
-  a_divtax:{t:'Yearly tax on brokerage dividends', b:['A taxable brokerage account owes tax each year on the dividends and capital-gains distributions its funds pay out, even when you sell nothing. The model does not deduct this, because it depends on what you hold: a broad stock index fund pays out much less than a dividend or bond fund.','As a result, brokerage balances grow slightly faster here than they would in practice. For a typical stock index fund the difference is often a few tenths of a percentage point a year. Neither Trad. 401k and IRA nor Roth accounts are affected.']},
+  a_divtax:{t:'Yearly tax on brokerage distributions', b:['A taxable brokerage account owes tax every year on what its funds pay out, even when you sell nothing. This is deducted. The stock share is assumed to pay dividends at 1.5% a year, taxed at long-term rates, and the bond share to pay interest at 4%, taxed as ordinary income. Both are treated as reinvested, so the balance is not reduced by the payout itself \u2014 only by the tax on it.','The bond side costs far more, both because it yields more and because interest is taxed as ordinary income rather than at long-term rates. On a 60/40 account roughly 0.9% of the balance arrives as dividends and 1.6% as interest. That difference is the whole argument for keeping bonds in a Trad. 401k, IRA or Roth rather than a brokerage.','Because the payout has been taxed once, it raises your cost basis, so the same money is not taxed again when the shares are sold. Trad. 401k, IRA and Roth accounts are not affected: nothing inside them is taxed yearly.','What is assumed, rather than known, is the yield. A broad index fund is close to these figures; a dividend-focused or high-yield bond fund pays out considerably more, and would cost more tax than this shows.']},
   surv:{t:'Model one spouse dying', b:[
     'A married plan quietly assumes both of you live to the plan age. Turning this on runs the years after one death, which is the single most under-modelled risk in retirement planning for couples.',
     'Four things change at once. The survivor files as single, so the tax brackets are narrower and the standard deduction is halved. One Social Security cheque stops. A pension may drop to a survivor share. Spending falls, but nowhere near by half.',
@@ -3472,7 +3566,14 @@ function assumptionRows(){
       ['a_seq','Withdrawal order', {std:'Cash, brokerage, Trad. 401k and IRA, Roth', tdf:'Trad. 401k and IRA first', prop:'Proportional'}[S.seq||'std']],
       ['a_conv','Roth conversions', S.rothConv==='off' ? 'None'
         : `Fill the ${S.rothConv}% tax bracket to age ${Math.round(S.convEnd)}, keeping ${+S.convKeep} yr liquid`]] : []),
-    ...(level>=3 ? [['a_divtax','Yearly tax on brokerage dividends','Not deducted']] : []),
+    ...(level>=3 ? [['a_divtax','Yearly tax on brokerage distributions',
+        `Dividends at ${(MKT.divS*100).toFixed(1)}% and bond interest at ${(MKT.bMean*100).toFixed(0)}%, taxed each year`]] : []),
+    ...(level>=6 ? [['a_heir','Tax your heirs would pay', S.heirRate==='0' ? 'None'
+        : `${S.heirRate}% on Trad. 401k and IRA money`],
+      ['a_stepup','Brokerage at death','Cost basis steps up, so its growth is never taxed'],
+      ['a_char','Left to charity', +S.charShare > 0
+        ? `${+S.charShare}% of Trad. 401k and IRA, untaxed` : 'None'],
+      ['a_estate','Estate and inheritance tax','Not modeled, federal or state']] : []),
     ['a_short','Running short','Any year not fully covered'],
     activeMode()==='hist' ? ['a_paths','Start years tested','All complete ones'] : ['a_paths','Futures simulated',N_PATHS.toLocaleString()],
   ];

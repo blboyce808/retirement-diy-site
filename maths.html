@@ -491,6 +491,36 @@ more money still untaxed, which is exactly the choice the conversion and withdra
 comparisons are asked to rank &mdash; and on this measure the option paying the least lifetime tax
 is frequently not the one that leaves the most.</div>
 
+<h3>What beneficiaries receive</h3>
+<p>A different question from the one above, and not a rescaling of it, because three things change at
+death. The brokerage's cost basis steps up to market value, so its growth is never taxed. Pre-tax
+money is taxed at the heir's rate rather than the owner's. And a charity pays nothing on pre-tax money
+at all. Writing <code>c</code> for the charitable share of the pre-tax pot and <code>h</code> for the
+heir's rate:</p>
+<div class="fx">to charity = trad · c</div>
+<div class="fx">tax = trad · (1 &minus; c) · h</div>
+<div class="fx">to heirs = trad · (1 &minus; c) · (1 &minus; h) + roth + brokerage + cash</div>
+<p>Those three sum to the ending balance by construction, and they are reported from a <em>single</em>
+path &mdash; the middle future by ending balance, the same one the account charts draw &mdash; rather
+than as three independent medians. Three medians would not add up, because the path sitting at the
+middle of what heirs receive is not the path sitting at the middle of what charity receives, and three
+figures presented as the split of one balance have to sum to it.</p>
+<p>Note that <code>to heirs</code> can exceed the owner's own after-tax figure, and frequently does.
+The brokerage is the reason: the owner owes long-term gains tax to sell those shares and a beneficiary
+does not. Whether that outweighs the heir's rate on the pre-tax pot depends entirely on the mix of
+accounts, which is the comparison the level exists to make.</p>
+
+<div class="note warn"><b>Caveat: <code>h</code> is unknowable, and this is not estate planning.</b>
+The heir's rate depends on who inherits, what they earn at the time, where they live and tax law
+decades hence. It is offered as a short list of brackets rather than a dial for that reason, and the
+right use of it is to move it and see which way the answer leans. The model also applies it as a flat
+rate: since 2020 most beneficiaries must empty an inherited retirement account within ten years, which
+compresses the income and pushes it up their brackets, so a single rate is the gentle version.
+Everything that actually governs who inherits &mdash; wills, trusts, beneficiary designations,
+titling, probate, state law &mdash; is legal machinery this page does not touch and does not model. On
+most retirement accounts the beneficiary form overrides the will, and this tool has never seen
+yours.</div>
+
 <h2 id="notmod">11. What is not modelled</h2>
 <ul>
   <li><strong>Fees of any kind.</strong> No fund expenses, no advisory fee. Subtract them from the
@@ -500,7 +530,13 @@ is frequently not the one that leaves the most.</div>
   <li><strong>ACA premium subsidies</strong> before 65, which can be worth thousands and which
     interact sharply with Roth conversions.</li>
   <li><strong>State-specific rules</strong> beyond a flat rate; <strong>72(t)</strong> substantially
-    equal payments; <strong>NIIT</strong>, AMT, and the step-up in basis at death.</li>
+    equal payments; <strong>NIIT</strong> and AMT.</li>
+  <li><strong>Estate and inheritance tax, federal or state.</strong> The federal exemption is $15M a
+    person in 2026 and reaches very few households, but several states tax estates from a far lower
+    threshold and a handful tax the recipient instead. None of that is here.</li>
+  <li><strong>The ten-year rule on inherited retirement accounts.</strong> Level 6 applies a single
+    rate to the pre-tax balance rather than simulating a beneficiary's own ten years of forced
+    withdrawals, which would push them up their own brackets. The single rate is the gentle version.</li>
   <li><strong>Serial correlation of any kind</strong> in random mode. Years are independent draws.
     Momentum, mean reversion and volatility clustering are all absent; the backtests contain whatever
     of them history contained.</li>
