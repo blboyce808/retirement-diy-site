@@ -529,7 +529,7 @@ footer{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:80ch}
       <p>The randomness is seeded, so the same inputs always give the same answer. The seed travels in your scenario code and your CSV export, which means a number you saw last week is still reproducible this week.</p>
 
       <h3 class="tmh">Three ways of asking the same question</h3>
-      <p><b>Statistical projections</b>, the default. Stock and bond returns are drawn from lognormal distributions with a correlation of 0.10, and inflation from a normal distribution around the average you set. Two thousand draws leaves a sampling error of about one point: rerunning the sampling 25 times on the default plan gave a spread of 38.4% to 42.3%, with a standard deviation of 0.97 points, which matches the 1.1 points the arithmetic predicts. Treat any difference smaller than a couple of points as noise.</p>
+      <p><b>Statistical projections</b>, the default. Stock and bond returns are drawn from lognormal distributions with a correlation of 0.10, and inflation from a normal distribution around the average you set. Two thousand draws leaves a sampling error of about one point: rerunning the sampling 25 times on the default plan gave a spread of 54.9% to 59.8%, with a standard deviation of 1.3 points, close to the 1.1 points the arithmetic predicts. Treat any difference smaller than a couple of points as noise.</p>
       <p><b>Historical backtests.</b> No randomness at all. Your plan is replayed against every real start year in the data, using that year&rsquo;s actual stock return, bond return and inflation. With 155 years of history and a 30-year retirement that is 126 separate rehearsals, each one a thing that genuinely happened to somebody.</p>
       <p><b>Stress tests.</b> Ordinary markets until the day you retire, then one of history&rsquo;s worst stretches beginning that very year: 1929, 1937, 1966, 1973, 2000, 2008, or a straight 30% fall. This isolates sequence-of-returns risk, which is the thing that actually ruins retirements.</p>
 
@@ -544,7 +544,7 @@ footer{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:80ch}
 
       <h3 class="tmh">Tax</h3>
       <p>Federal tax uses the 2026 brackets and standard deduction, indexed to each future&rsquo;s own inflation, with the extra deduction from 65 and the $6,000 senior deduction that expires after 2028. Social Security is taxed by the provisional-income formula, whose $25,000 and $32,000 thresholds are <i>not</i> indexed, because Congress never indexed them. Long-term capital gains are taxed at 0/15/20% stacked on top of ordinary income. State tax is one flat rate on federally taxable income.</p>
-      <p>Because a withdrawal has to cover its own tax, and that extra withdrawal is itself taxed, each year is solved by iteration rather than a single pass. Spending draws from cash, then the brokerage, then pre-tax accounts, then Roth, and Level 5 compares that against two other orders.</p>
+      <p>Because a withdrawal has to cover its own tax, and that extra withdrawal is itself taxed, each year is solved by iteration rather than a single pass. Spending draws from cash, then the brokerage, then pre-tax accounts, then Roth. Level 5 offers two other orders, and the buttons on the chart of who ends up with the money show what each does.</p>
 
       <h3 class="tmh">Spending is entered after tax</h3>
       <p>You tell the model what you want to spend, not what you want to earn. The earlier version asked for a before-tax income and converted it as though it were a salary, which is not how a retiree is taxed at all: somebody living on Roth money pays nothing like salary tax. Worse, the figure you typed never reached the simulation, which computed real tax on the actual withdrawals, so two different tax rules were in play at once. Now the number you enter is the number that gets spent, and the salary equivalent is shown underneath as a comparison.</p>
@@ -585,7 +585,7 @@ footer{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:80ch}
       </table></div>
 
       <h3 class="tmh">What it does not model</h3>
-      <p>Fees of any kind. The yearly tax on dividends inside a taxable brokerage account, which makes brokerage balances here grow slightly faster than they would in practice. Healthcare inflation running ahead of general inflation. Long-term care. A glide path that shifts towards bonds as you age; your mix is rebalanced to the same target every year. State-specific rules, exemptions and credits, which are coming at Level 5. Substantially equal payments under 72(t). ACA premium subsidies before 65. And anything at all about your actual investments: the model knows a stock share and a bond share, not what you hold.</p>
+      <p>Fees of any kind. Healthcare inflation running ahead of general inflation. Long-term care. A glide path that shifts towards bonds as you age; your mix is rebalanced to the same target every year. State-specific rules, exemptions and credits: one flat state rate applies at every level. Substantially equal payments under 72(t). ACA premium subsidies before 65. And anything at all about your actual investments: the model knows a stock share and a bond share, not what you hold.</p>
       <p>The market history ends in 2025, because a year is measured January to January and January 2027 has not happened yet.</p>
 
       <h3 class="tmh">Every formula, if you want them</h3>
@@ -689,18 +689,27 @@ const RMD_DIV = {73:26.5,74:25.5,75:24.6,76:23.7,77:22.9,78:22.0,79:21.1,80:20.2
 /* Medicare income-related surcharges. Charged on top of the standard Part B and Part D premiums
    when income two years earlier was above a threshold, per person, and they step rather than taper,
    so a dollar over a line costs a year of surcharge. Only the surcharge is modelled: the standard
-   premium belongs in the spending figure. Thresholds and amounts are the 2025 published figures,
-   used as the 2026 base and indexed with inflation; check them each November. */
+   premium belongs in the spending figure. 2026 figures (CMS fact sheet and SSA POMS HI 01101.020):
+   the Part B adjustment over the $202.90 standard premium plus the Part D adjustment, times twelve.
+   The lower thresholds rise with inflation each year; the top one ($500,000 / $750,000) is fixed in
+   law until 2028 and indexed after. Check them each November. */
 const IRMAA = {
-  mfj:   [212000,266000,334000,400000,750000],
-  single:[106000,133000,167000,200000,500000],
-  add:   [1052,2644,4235,5826,6356]      // per person per year, Part B and Part D together
+  mfj:   [218000,274000,342000,410000,750000],
+  single:[109000,137000,171000,205000,500000],
+  add:   [1148,2885,4620,6355,6936],     // per person per year, Part B and Part D together
+  topFixedThrough: 2027
 };
-function irmaaFor(magi, L, f){
+/* The thresholds are chosen by the filing status on the return being looked back at (L), and the
+   surcharge is paid by each person on Medicare now (persons), which differ in the two years after a
+   death: the look-back return was joint, but only the survivor pays. */
+function irmaaFor(magi, L, f, yr, persons){
   const cuts=(L.persons>1 ? IRMAA.mfj : IRMAA.single);
   let tier=-1;
-  for(let i=0;i<cuts.length;i++) if(magi > cuts[i]*f) tier=i;
-  return tier<0 ? 0 : IRMAA.add[tier]*f*L.persons;
+  for(let i=0;i<cuts.length;i++){
+    const idx = (i===cuts.length-1 && yr <= IRMAA.topFixedThrough) ? 1 : f;
+    if(i<cuts.length-1 ? magi > cuts[i]*idx : magi >= cuts[i]*idx) tier=i;
+  }
+  return tier<0 ? 0 : IRMAA.add[tier]*f*(persons ?? L.persons);
 }
 /* Income as Medicare counts it: adjusted gross income, which includes the taxable part of Social
    Security. No tax-exempt interest is modelled, so this is the whole of it. */
@@ -741,7 +750,7 @@ const N_PATHS = 2000;
    Built from Robert Shiller's monthly S&P composite, dividend, CPI and long-rate series (1871 to 2022). */
 const HIST = [[1871,0.1532,0.0504,0.0152],[1872,0.1094,0.0384,0.0229],[1873,-0.0262,0.0635,-0.044],[1874,0.0451,0.083,-0.0695],[1875,0.0515,0.0854,-0.0573],[1876,-0.1368,0.0561,0.0083],[1877,-0.0168,0.0526,-0.1563],[1878,0.1583,0.0522,-0.1029],[1879,0.4807,0.0571,0.2065],[1880,0.2568,0.0643,-0.0571],[1881,0.0036,0.0431,0.0807],[1882,0.0355,0.0354,-0.0187],[1883,-0.0524,0.0371,-0.0761],[1884,-0.1199,0.0438,-0.1029],[1885,0.2906,0.0467,-0.035],[1886,0.1171,0.0223,0.0],[1887,-0.006,0.0239,0.0476],[1888,0.0319,0.0535,-0.0454],[1889,0.0696,0.0368,-0.0476],[1890,-0.0595,0.0191,0.025],[1891,0.1839,0.0377,-0.0603],[1892,0.06,0.0247,0.0778],[1893,-0.1862,0.0413,-0.1329],[1894,0.0367,0.0553,-0.0409],[1895,0.0516,0.024,0.0137],[1896,0.0315,0.0513,-0.0285],[1897,0.1991,0.0378,0.0294],[1898,0.285,0.0529,0.015],[1899,0.0371,0.0271,0.1686],[1900,0.2014,0.0354,-0.0241],[1901,0.1925,0.0248,0.0246],[1902,0.0819,0.0226,0.0962],[1903,-0.1701,0.0254,-0.0439],[1904,0.3111,0.0279,0.0229],[1905,0.2089,0.0386,0.0],[1906,0.0059,0.0162,0.0449],[1907,-0.2394,0.0217,-0.0215],[1908,0.3837,0.047,0.0323],[1909,0.1591,0.0264,0.1074],[1910,-0.0351,0.0339,-0.0677],[1911,0.0345,0.0376,-0.0108],[1912,0.0719,0.008,0.0734],[1913,-0.0484,0.0659,0.0204],[1914,-0.0529,0.0357,0.01],[1915,0.3042,0.0565,0.0297],[1916,0.0794,0.0273,0.125],[1917,-0.1807,0.0177,0.1966],[1918,0.1755,0.0508,0.1786],[1919,0.1947,0.0115,0.1697],[1920,-0.136,0.0412,-0.0155],[1921,0.0946,0.1088,-0.1105],[1922,0.2859,0.0386,-0.0059],[1923,0.0507,0.0658,0.0298],[1924,0.2594,0.0556,0.0],[1925,0.2502,0.0522,0.0347],[1926,0.1106,0.0629,-0.0223],[1927,0.3629,0.0342,-0.0114],[1928,0.4645,0.0129,-0.0116],[1929,-0.0899,0.0598,0.0],[1930,-0.219,0.0291,-0.0702],[1931,-0.4247,0.0077,-0.1006],[1932,-0.0679,0.0652,-0.0979],[1933,0.5525,0.0478,0.0233],[1934,-0.0792,0.0571,0.0303],[1935,0.5344,0.039,0.0147],[1936,0.3201,0.0241,0.0217],[1937,-0.3125,0.0363,0.0071],[1938,0.1668,0.0416,-0.0141],[1939,0.0279,0.0357,-0.0071],[1940,-0.0894,0.0434,0.0144],[1941,-0.088,-0.0212,0.1135],[1942,0.2027,0.0238,0.0764],[1943,0.2335,0.0239,0.0296],[1944,0.1916,0.0336,0.023],[1945,0.3842,0.0383,0.0225],[1946,-0.1179,0.0171,0.1813],[1947,0.0254,0.0073,0.1023],[1948,0.0942,0.0349,0.0127],[1949,0.1659,0.0223,-0.0208],[1950,0.3315,0.0033,0.0809],[1951,0.2116,0.017,0.0433],[1952,0.1415,0.015,0.0038],[1953,0.0268,0.0562,0.0113],[1954,0.4562,0.0145,-0.0074],[1955,0.2848,0.0034,0.0037],[1956,0.0691,-0.0137,0.0299],[1957,-0.0564,0.0633,0.0362],[1958,0.3951,-0.0382,0.014],[1959,0.0756,-0.0102,0.0103],[1960,0.0625,0.1131,0.0171],[1961,0.1894,0.0206,0.0067],[1962,-0.0281,0.0595,0.0133],[1963,0.2088,0.0132,0.0164],[1964,0.1578,0.0402,0.0097],[1965,0.114,0.0115,0.0192],[1966,-0.0647,0.0483,0.0346],[1967,0.1598,-0.0202,0.0365],[1968,0.1048,0.0207,0.044],[1969,-0.0839,-0.0499,0.0618],[1970,0.0703,0.1822,0.0529],[1971,0.1381,0.0822,0.0327],[1972,0.176,0.0255,0.0365],[1973,-0.1609,0.0301,0.0939],[1974,-0.2085,0.0374,0.118],[1975,0.3857,0.0598,0.0672],[1976,0.111,0.1116,0.0522],[1977,-0.0884,0.0252,0.0684],[1978,0.1593,0.0115,0.0928],[1979,0.1661,-0.0039,0.1391],[1980,0.2529,0.0157,0.1183],[1981,-0.0698,0.0279,0.0839],[1982,0.2881,0.3795,0.0371],[1983,0.2014,0.0393,0.0419],[1984,0.0752,0.1325,0.0353],[1985,0.2585,0.2441,0.0389],[1986,0.3094,0.2289,0.0146],[1987,-0.0206,-0.0258,0.0405],[1988,0.1763,0.0616,0.0467],[1989,0.2277,0.1454,0.052],[1990,-0.0083,0.0896,0.0565],[1991,0.3157,0.1499,0.026],[1992,0.0757,0.0988,0.0326],[1993,0.1155,0.1244,0.0252],[1994,0.0108,-0.0705,0.028],[1995,0.3495,0.2249,0.0273],[1996,0.2705,-0.0052,0.0304],[1997,0.2771,0.138,0.0157],[1998,0.3128,0.1144,0.0167],[1999,0.1548,-0.081,0.0274],[2000,-0.0515,0.1725,0.0373],[2001,-0.1345,0.0601,0.0114],[2002,-0.2004,0.1238,0.026],[2003,0.2826,0.0331,0.0193],[2004,0.0596,0.0363,0.0297],[2005,0.1001,0.0276,0.0399],[2006,0.1322,0.0198,0.0208],[2007,-0.0134,0.1243,0.0428],[2008,-0.3515,0.1346,0.0003],[2009,0.3273,-0.0659,0.0263],[2010,0.1613,0.0633,0.0163],[2011,0.0331,0.15,0.0292],[2012,0.1603,0.0246,0.016],[2013,0.2535,-0.0554,0.0158],[2014,0.1335,0.109,-0.0009],[2015,-0.0334,0.0017,0.0137],[2016,0.2091,-0.0063,0.025],[2017,0.2471,0.0124,0.0207],[2018,-0.047,0.0155,0.0155],[2019,0.2788,0.1055,0.0249],[2020,0.1753,0.0756,0.014],[2021,0.2211,-0.0453,0.0748],[2022,-0.1201,-0.1169,0.0641],[2023,0.233,-0.004,0.0309],[2024,0.2618,-0.0006,0.03],[2025,0.1737,0.0772,0.0239]];
 const HIST_FIRST = HIST[0][0], HIST_LAST = HIST[HIST.length-1][0];
-const BUILD = 'd6d943a';            // deploy.sh stamps the published copy with the source commit
+const BUILD = '4854996';            // deploy.sh stamps the published copy with the source commit
 let engine = 'mc';           // 'mc' Monte Carlo, 'hist' every historical start year
 let selYear = null;          // historical start year picked on the history chart
 const CUR_YEAR = new Date().getFullYear();
@@ -1012,7 +1021,12 @@ function incomeTax(ord, gains, ss, L, f, n65, yr, st){
   const taxable = Math.max(0, agi - ded);
   const ordT = Math.max(0, taxable - gains), gT = taxable - ordT;
   let t = bracketTax(ordT, L.brk, f);
-  if(gT > 0) t += bracketTax(ordT+gT, L.cg, f) - bracketTax(ordT, L.cg, f);
+  if(gT > 0){
+    t += bracketTax(ordT+gT, L.cg, f) - bracketTax(ordT, L.cg, f);
+    // the IRS worksheet's last line: never more than ordinary rates on everything would have cost,
+    // which bites in a narrow band where the 20% gains rate sits above the ordinary bracket it lands in
+    t = Math.min(t, bracketTax(taxable, L.brk, f));
+  }
   return t + st*taxable;
 }
 /* Tax on a salary of the same size: turns the before-tax income target into after-tax spending. */
@@ -1141,10 +1155,14 @@ function simulate(s, lvl, seedVal, mode){
       let tax = 0;
       let wageY=0, rmdY=0, othY=0, tradY=0, convY=0, gainY=0, ssY=0, needY=0;   // this year's income, for MAGI
       let divOY=0, divQY=0;   // brokerage distributions: coupon interest, and qualified dividends
-      // from the year of the death the survivor files single: narrower brackets, half the standard
-      // deduction, and Social Security thresholds that are not halved to match
+      // From the year of the death the income and spending shares change. The filing status changes a
+      // year later: the law allows a joint return for the year a spouse dies, and from the next year
+      // the survivor files single - narrower brackets, half the standard deduction, and Social Security
+      // thresholds that are not halved to match. (Qualifying surviving spouse status needs a dependent
+      // child, which this model does not have.)
       const widowed = survOn && a >= survAgeV;
-      const Ly = widowed ? TAXLAW.single : L;
+      const singleAt = age => survOn && age > survAgeV;
+      const Ly = singleAt(a) ? TAXLAW.single : L;
 
       // Nothing is added to a path that has already run short. The contribution used to sit outside
       // the check below, so a plan that failed before retirement went on paying into a zeroed
@@ -1241,7 +1259,9 @@ function simulate(s, lvl, seedVal, mode){
              Guaranteed income counts towards the total on top of it, already net of its own tax. */
           const P = trad+roth+brok+cash;
           const share = rule==='pct' ? pctRate
-                      : rule==='oneN' ? 1/Math.max(1, H - a + 1)
+                      // the years left are a to H-1: the plan age is reached, not lived through, so the
+                      // last year takes everything (it divided by one year too many until 28 Sept 2026)
+                      : rule==='oneN' ? 1/Math.max(1, H - a)
                       : vpwPct(a);
           const W = Math.max(0, P*share);
           life = Math.max(0, W - (W > 0 ? extraOf(plan(W)) : 0)) + Math.max(0, guarNet);
@@ -1258,9 +1278,19 @@ function simulate(s, lvl, seedVal, mode){
           if(gm < MINM[i]) MINM[i] = gm;
         }
         life *= gm;
-        // the surcharge this year is set by income two years ago, which is why a conversion or a
-        // large withdrawal shows up as a cost later rather than at the time
-        const surcharge = (irmaaOn && a>=65 && k>=2) ? irmaaFor(MAGI[k-2][i], Ly, f) : 0;
+        /* The surcharge this year is set by income two years ago, which is why a conversion or a large
+           withdrawal shows up as a cost later rather than at the time. The two years before the plan
+           starts have no income on record - index 0 holds opening balances, not a year - so year 1's
+           income stands in for them. It is not known until year 1 is over, so year 1's own surcharge is
+           charged a year late, in year 2, beside year 2's. Until 28 Sept 2026 both years went uncharged.
+           The thresholds follow the filing status of the year looked back at; the surcharge is paid by
+           the people alive now. */
+        let surcharge = 0;
+        if(irmaaOn && k>=2){
+          const lb = Math.max(1, k-2), lbL = singleAt(A + lb - 1) ? TAXLAW.single : L;
+          if(a >= 65) surcharge += irmaaFor(MAGI[lb][i], lbL, f, yr, Ly.persons);
+          if(k === 2 && a-1 >= 65) surcharge += irmaaFor(MAGI[1][i], lbL, f, yr, Ly.persons);
+        }
         /* Money given away is a cost the plan has to find, funded through the same withdrawals as
            anything else and taxed accordingly, but it is not consumption: it stays out of SPEND so the
            spending chart still answers what the reader lives on, and out of the spending rule, because
@@ -1310,11 +1340,24 @@ function simulate(s, lvl, seedVal, mode){
              ordinary taxable income only. Gains and qualified dividends are stacked on top of it at their
              own rates and never occupy it; counting them in used to make "fill the 22%" stop short by the
              whole of the year's gains. Any knock-on tax on those gains, pushed from the 0% band into the
-             15% by the conversion, is still charged, because taxOf below prices the whole return. */
-          const ordTaxable = Math.max(0, taxableIncome(ordNow, gainsNow, ssNow, Ly, f, n65, yr) - gainsNow);
-          const room = bracketTop(Ly, convRate, f) - ordTaxable;
-          if(room > 0){
-            let conv = Math.min(trad, room);
+             15% by the conversion, is still charged, because taxOf below prices the whole return.
+             The room is found by searching, not by subtracting: a converted dollar is not always one
+             dollar of taxable income. While the standard deduction is unused the first dollars are
+             taxed at nothing; once Social Security is partly taxable, each dollar can make up to 85
+             cents more of the benefit taxable; the senior deduction phases out. Subtracting undershot
+             in the first case and overshot into the next bracket in the others. Ordinary taxable income
+             only ever rises with the conversion, so a bisection finds the largest one that fits. */
+          const top = bracketTop(Ly, convRate, f);
+          const ordTaxOf = c => Math.max(0, taxableIncome(ordNow + c, gainsNow, ssNow, Ly, f, n65, yr) - gainsNow);
+          let fill = 0;
+          if(ordTaxOf(0) < top){
+            if(ordTaxOf(trad) <= top) fill = trad;
+            else { let lo = 0, hi = trad;
+              for(let it=0; it<40 && hi-lo > .5; it++){ const m = (lo+hi)/2; if(ordTaxOf(m) <= top) lo = m; else hi = m; }
+              fill = lo; }
+          }
+          if(fill > 1){
+            let conv = fill;
             // Cash pays the bill first; anything beyond it comes out of the brokerage, and selling
             // there realises gains that are taxable in their own right. That makes the bill
             // circular - a larger sale owes more tax, which needs a larger sale - so it is solved
@@ -1422,20 +1465,24 @@ function band(res, get, real){
    The context is memoised because the chart asks for a rate once per path per year, and only the pot
    changes between those calls. */
 let heirMemo = null;
+/* The reader's own state rate stands in for the heirs'. Nobody can know where they will live, but
+   leaving state tax out made the heirs' figure look better than "Worth after tax", which does charge
+   it, for a reason that has nothing to do with inheritance (timing audit X12, 28 Sept 2026). */
 function heirCtx(){
-  const key = [S.heirs, S.heirInc, S.heirFiling].join('|');
+  const st = stateRateOf(S, level);
+  const key = [S.heirs, S.heirInc, S.heirFiling, st].join('|');
   if(!heirMemo || heirMemo.key !== key){
     const law = TAXLAW[S.heirFiling==='single' ? 'single' : 'mfj'];
     const inc = Math.max(0, +S.heirInc||0);
-    heirMemo = {key, law, inc, n: Math.max(1, Math.round(+S.heirs||1)),
-                base: incomeTax(inc, 0, 0, law, 1, 0, TAXLAW.year, 0)};
+    heirMemo = {key, law, inc, st, n: Math.max(1, Math.round(+S.heirs||1)),
+                base: incomeTax(inc, 0, 0, law, 1, 0, TAXLAW.year, st)};
   }
   return heirMemo;
 }
 function heirEffRate(pot){
   if(!(pot > 0) || level < 6) return 0;
   const c = heirCtx(), perYear = pot / c.n / 10;
-  const extra = incomeTax(c.inc + perYear, 0, 0, c.law, 1, 0, TAXLAW.year, 0) - c.base;
+  const extra = incomeTax(c.inc + perYear, 0, 0, c.law, 1, 0, TAXLAW.year, c.st) - c.base;
   return Math.min(1, Math.max(0, extra * 10 * c.n / pot));
 }
 /* Who ends up with the money, which is a different question from what it is worth to you, and the
@@ -2060,7 +2107,7 @@ function buildEvents(sc, first){
           <span class="num evamt"><span>$</span><input aria-label="Amount" inputmode="decimal" value="${Math.round(ev.amt).toLocaleString('en-US')}"></span>${q('ev_amt')}</div>
         <div class="evrow evwhen"><label>Year <input class="evyear" inputmode="numeric" aria-label="Year" value="${ev.year}"></label>${q('ev_year')}
           <label>for <input class="evyears" inputmode="numeric" aria-label="Number of years" value="${ev.years}"> yr</label>${q('ev_years')}
-          <span class="evage">${age<Math.round(S.age)?'Already past':'Age '+age}</span></div>`;
+          <span class="evage">${age<Math.round(S.age)?'Already past':age>=planEndAge()?'At or after your plan age, not counted':'Age '+age}</span></div>`;
       const upd=()=>{ changed(); };
       card.querySelector('.evname').addEventListener('change',e=>{ ev.name=e.target.value.slice(0,40); upd(); });
       card.querySelectorAll('.evtype button').forEach(b=>b.addEventListener('click',()=>{ ev.type=b.dataset.t; draw(); upd(); }));
@@ -2243,8 +2290,9 @@ function buildCSV(){
   rows.push(['Dollars', real ? "Today's dollars" : 'Future dollars']);
   rows.push(['Futures or start years', res.nP]);
   rows.push(['How to read the columns', (real ? "Dollar columns are in today's dollars." : 'Dollar columns are in future dollars, as a statement would show them.')
-    + ' Balances are at the end of each year of age and at face value: Trad. 401k and IRA money still owes income tax.'
-    + ' Taxes incurred sit on the row for the age that year starts, and include the early-withdrawal penalty, Roth conversion tax and the yearly tax on brokerage dividends and interest, but not the Medicare surcharge.'
+    + ' Balances are the savings on reaching each age (1 January of that calendar year), at face value: Trad. 401k and IRA money still owes income tax. The first row is today\'s balance.'
+    + ' Taxes incurred are for the year starting at that age (that calendar year), and include the early-withdrawal penalty, Roth conversion tax and the yearly tax on brokerage dividends and interest, but not the Medicare surcharge.'
+    + ' Market return and inflation are for the year ending at that age, the year before.'
     + " Sustainable spending is in today's dollars."]);
   if(mode==='mc') rows.push(['Random seed', seed], ['Random number generator', 'mulberry32; normal draws by the polar method; yearly lognormal returns']);
   rows.push(['Scenario code (paste into the app to reproduce these exact results)', encodeScenario()]);
@@ -2265,7 +2313,7 @@ function buildCSV(){
   const cols=[];
   const add=(name,vals)=>cols.push({name,vals});
   add('Age', res.ages);
-  add(mode==='hist'?'Years from now':'Calendar year', res.ages.map(a=> mode==='hist' ? a-A : CUR_YEAR+a-A));
+  add(mode==='hist'?'Years from now':'Calendar year starting at this age', res.ages.map(a=> mode==='hist' ? a-A : CUR_YEAR+a-A));
   const tb=band(res, GET.total, real);
   PCTS.forEach(pc=>add(`Total savings p${pc}`, tb[pc].map(r0)));
   // a year's tax sits on the row for the age that year starts, like the spending chart; the last row is empty
@@ -2520,7 +2568,7 @@ function setLevel(k){
 
 /* ===================== PANELS ===================== */
 const PANELS = [
-  {id:'total', lvl:1, title:'Total savings', color:'--pine', wide:true, desc:'All accounts combined, at the end of each year of age.'},
+  {id:'total', lvl:1, title:'Total savings', color:'--pine', wide:true, desc:'All accounts combined, on reaching each age.'},
   {id:'flow', lvl:2, title:'Annual spending', color:'--steel', wide:true, desc:'Each year of the median future: what arrives by itself, what you take from savings, and what is left once tax and any early-withdrawal penalty are paid.'},
   {id:'assets', lvl:1, title:'Assets by class, median outcome', color:'--steel', wide:true, desc:'Each account in the median future, stacked. Hatched areas show guaranteed income as the savings it would take to replace it.'},
   {id:'history', lvl:2, title:'Backtest your scenario against history', color:'--pine', wide:true, paid:true, desc:'Your plan replayed through ten real stretches of US markets since 1871, from the worst outcome to the best. Tap a line or a year to follow it in the charts below.'},
@@ -2603,7 +2651,7 @@ const BEQ_CTRL = `<div class="mctl"><span class="mlab" id="beqSeqLab">Withdrawal
   <div class="mctl"><span class="mlab" id="beqConvLab">Do you convert 401k/IRA to Roths?</span><div class="seg" role="group" aria-labelledby="beqConvLab">
   <button data-bconv="off">No conversions</button><button data-bconv="12">Fill 12%</button><button data-bconv="22">Fill 22%</button><button data-bconv="24">Fill 24%</button></div>
   <span data-q="beq_conv"></span></div>
-  <p class="expnote">Both are settings from the panel on the left, put here because this is the chart they change. Pressing a button changes the setting there too.</p>
+  <p class="expnote">The withdrawal sequence and the Roth conversions settings can also be set in the settings panel. Pressing a button changes the setting there too.</p>
   <div class="mctl yctl"><label class="ytog"><input type="checkbox" id="beqAuto"> Auto scale</label><span data-q="beq_scale"></span></div>`;
 /* The bequest chart's y axis. With auto-scale on, Chart.js fits it to whatever is drawn, which is
    right in general and wrong here: pressing a withdrawal-order or conversion button rescales the axis,
@@ -2743,14 +2791,19 @@ function syncHover(e, chart){
 }
 function drawReturns(res, real, tb){
   const i=pickPath(res);
+  /* The same convention as every other balance chart: at each age, the savings on reaching it, and
+     beneath it the return in the year that starts there. It used to plot each year-end balance at the
+     age the year began, so the same dollar figure sat one age apart here and on the other charts. The
+     plan age has a balance and no year after it, so its bar is empty. */
   const labels=[], vals=[], bal=[], lo=[], hi=[], med=[];
-  for(let k=1;k<res.nY;k++){
-    labels.push(res.A+k-1);
-    const r=res.RET[k][i], inf=res.INF[k][i];
-    vals.push(100*(real ? (1+r)/(1+inf)-1 : r));
+  for(let k=0;k<res.nY;k++){
+    labels.push(res.A+k);
+    if(k+1<res.nY){ const r=res.RET[k+1][i], inf=res.INF[k+1][i]; vals.push(100*(real ? (1+r)/(1+inf)-1 : r)); }
+    else vals.push(null);
     bal.push(GET.total(res,k,i)/(real ? res.CI[k][i] : 1));
     lo.push(tb[25][k]); hi.push(tb[75][k]); med.push(tb[50][k]);
   }
+  const yrs = vals.slice(0,-1);   // the years, without the plan age's empty bar
   const pos=cssVar('--pine'), neg=cssVar('--risk'), muted=cssVar('--muted'), line=cssVar('--line'), surface=cssVar('--surface'), ink=cssVar('--ink'), band=cssVar('--slate');
   const colors=vals.map(v=>v>=0?pos:neg);
   const retIdx=res.R-res.A;
@@ -2760,24 +2813,27 @@ function drawReturns(res, real, tb){
   const y0 = res.mode==='hist' ? res.startYear[i] : null;
   const pickName = res.mode==='hist' && retPick==='year' ? `The ${res.startYear[i]} start` : ({bad:'The unlucky future',typ:'The typical future',good:'The lucky future',rand:'This future'})[retPick] || 'This future';
   // summary line
-  const n=vals.length, g=vals.reduce((m,v)=>m*(1+v/100),1), avg=(Math.pow(g,1/n)-1)*100;
-  let wi=0; vals.forEach((v,j)=>{ if(v<vals[wi]) wi=j; });
-  const neg3 = vals.slice(retIdx, retIdx+5).filter(v=>v<0).length;
+  const n=yrs.length, g=yrs.reduce((m,v)=>m*(1+v/100),1), avg=(Math.pow(g,1/n)-1)*100;
+  let wi=0; yrs.forEach((v,j)=>{ if(v<yrs[wi]) wi=j; });
+  const neg3 = yrs.slice(retIdx, retIdx+5).filter(v=>v<0).length;
   const dry = res.dryAge[i];
   const sgn=v=>(v>=0?'+':'−')+Math.abs(v).toFixed(1)+'%';
   const sum=document.getElementById('retSum');
-  if(sum) sum.textContent = (res.mode==='hist' ? `Retiring into the markets of ${res.startYear[i]}. ` : '') + `This future averaged ${sgn(avg)} a year${real?' after inflation':''}. Worst year: ${sgn(vals[wi])} at age ${labels[wi]}. `
+  // A backtest starts at the reader's current age in its start year, and retires R-A years later; only
+  // when those coincide is it "retiring into" the start year's markets.
+  const hy = res.mode==='hist' ? res.startYear[i] : null;
+  if(sum) sum.textContent = (hy==null ? '' : res.R>res.A ? `Starting in ${hy} at age ${res.A}, retiring into the markets of ${hy+res.R-res.A}. ` : `Retiring into the markets of ${hy}. `) + `This future averaged ${sgn(avg)} a year${real?' after inflation':''}. Worst year: ${sgn(vals[wi])} at age ${labels[wi]}. `
     + `${neg3} losing year${neg3===1?'':'s'} in the first five of retirement. `
     + (isNaN(dry) ? 'Money lasted to the end.' : `Money ran short at age ${dry}.`);
   const lg=document.getElementById('lg_market');
   if(lg) lg.innerHTML = `<span><i style="background:${ink};height:3px"></i>${pickName}</span><span><i style="background:${rgba(band,.22)}"></i>Middle half of all futures</span>`;
 
   const fmt=v=>(v>0?'+':'')+Math.round(v)+'%';
-  const ttTitle=it=>{ const j=it[0].dataIndex; return 'Year starting at age '+labels[j]+(y0!=null ? ` (${y0+j})` : ''); };
+  const ttTitle=it=>{ const j=it[0].dataIndex; return 'Age '+labels[j]+(y0!=null ? ` (${y0+j})` : ''); };
   const ttBody=it=>{ const j=it.dataIndex; return [
-      (real?'Return after inflation: ':'Return: ')+(vals[j]>=0?'+':'')+vals[j].toFixed(1)+'%',
-      'Savings at year end: '+money(bal[j]),
-      'Typical future: '+money(med[j])]; };
+      'Savings on reaching this age: '+money(bal[j]),
+      'Typical future: '+money(med[j])]
+      .concat(vals[j]==null ? [] : [(real?'Return in the year that follows, after inflation: ':'Return in the year that follows: ')+(vals[j]>=0?'+':'')+vals[j].toFixed(1)+'%']); };
   const tooltip={backgroundColor:surface,titleColor:ink,bodyColor:ink,borderColor:line,borderWidth:1,padding:10,displayColors:false,
     filter:it=>it.datasetIndex===0,
     callbacks:{title:ttTitle,label:ttBody}};
@@ -2868,13 +2924,22 @@ function eventMarks(res){
    The name is the reader's text, so it goes through esc(). Amounts are today's dollars whichever way
    the chart is showing, because under future dollars one figure would be wrong in most of the 2,000
    futures - the heading says so. */
+/* The plan age as the engine uses it: the age the plan is run until, never at or before retirement or
+   today. Kept beside simulate()'s own rule so the event cards and the key agree with it. */
+function planEndAge(){
+  const A=Math.round(S.age), R=Math.max(Math.round(S.retAge), A);
+  return Math.max(level>=2 ? Math.round(S.planAge) : 95, R+1, A+1);
+}
 function renderEventKey(res){
   const el=document.getElementById('evKey'); if(!el) return;
   const A=res.A, H=res.H;
   const rows = (level>=4 ? (S.events||[]) : []).filter(e=>+e.amt>0).map(e=>{
     const start = A + (Math.round(+e.year||CUR_YEAR) - CUR_YEAR), n=Math.max(1,Math.round(+e.years||1));
-    return {start, end:start+n-1, n, e};
-  }).filter(r=>r.end>=A && r.start<=H).sort((a,b)=>a.start-b.start);
+    // only the years the engine applies: from today's age to the year before the plan age, which is
+    // reached rather than lived through; a span running past it is cut there (timing audit T13)
+    const s0 = Math.max(start, A), e0 = Math.min(start+n-1, H-1);
+    return {start:s0, end:e0, n:e0-s0+1, e};
+  }).filter(r=>r.end>=r.start).sort((a,b)=>a.start-b.start);
   if(!rows.length){ el.hidden=true; el.innerHTML=''; return; }
   el.hidden=false;
   el.innerHTML = `<div class="evkh">Life events, in today's dollars${q('evkey')}</div>` + rows.map(({start,end,n,e})=>{
@@ -2902,8 +2967,9 @@ const SWR = .04;
    band - and it was very nearly the total savings chart drawn again: measured across the default
    plan it sat between 0.80 and 0.96 of that curve at every age, so the shape carried nothing the
    reader had not already seen one panel earlier. What it was hiding is the interesting part. The tax
-   wedge runs from about a fifth of the estate down to a twentieth by the plan age, because the mix
-   of accounts shifts as the pre-tax pot is drawn down, and a wedge is invisible when you plot a
+   wedge on the default plan runs from about a tenth of the estate up to a sixth around 65 to 70 and
+   down to almost nothing by the plan age, because the mix of accounts shifts as the pre-tax pot fills
+   and is then drawn down, and a wedge is invisible when you plot a
    level. So this stacks the three destinations instead, which is a quantity no other chart shows.
 
    One future, the middle one by ending balance, matching the figures above the charts and the
@@ -3056,7 +3122,7 @@ function taxCauses(res, real){
     add(Math.round(S.convEnd)+1, -1, 2, 'rule', ()=>`Roth conversions stop after ${Math.round(S.convEnd)}, and the tax paid on them stops with them.`);
   }
   if(level>=5 && S.surv==='on' && S.filing!=='single')
-    add(Math.round(S.survAge), 1, 2, 'rule', ()=>`From ${Math.round(S.survAge)} the plan assumes one spouse has died. The survivor files single: narrower brackets and half the standard deduction on much the same income.`);
+    add(Math.round(S.survAge)+1, 1, 2, 'rule', ()=>`The plan assumes one spouse dies at ${Math.round(S.survAge)}. From the next year the survivor files single: narrower brackets and half the standard deduction on much the same income.`);
   if(R<59 && R<55) add(60, -1, 3, 'rule', ()=>`The 10% penalty on Trad. 401k and IRA withdrawals before 59 and a half stops, and the tax total drops with it.`);
   if(level>=6 && +S.giftAmt>0) add(Math.round(S.giftAge), 1, 2, 'rule', ()=>`Giving ${money(+S.giftAmt)} a year from ${Math.round(S.giftAge)} is paid for with larger withdrawals, and withdrawals from Trad. 401k and IRA are taxed as income.`);
   if(level>=6 && +S.qcd>0 && A<70) add(70, -1, 2, 'rule', ()=>`Gifts to charity straight from the IRA start at 70. They satisfy the required withdrawal without ever counting as income.`);
@@ -3080,7 +3146,9 @@ function taxCauses(res, real){
         ro=medSeries(res,(k,i)=>res.ROTH[k][i],real);
   let peakBC=0, peakT=0;
   for(let k=0;k<res.nY;k++){
-    if(peakBC>25000 && bc[k]<2000 && tr[k]>20000){
+    // only once retired: before that the salary pays the living costs and nothing is drawn for them,
+    // so an empty brokerage says nothing about where spending comes from (timing audit T12)
+    if(peakBC>25000 && bc[k]<2000 && tr[k]>20000 && res.ages[k] >= R){
       const a=res.ages[k]; add(a, 1, 1, 'bcOut', ()=>`Around ${a} the cash and brokerage run out in the typical future, so spending starts coming from Trad. 401k and IRA money, which is taxed as income.`); peakBC=0; }
     if(peakT>50000 && tr[k]<2000 && ro[k]>10000){
       const a=res.ages[k]; add(a, -1, 1, 'lasting', ()=>`Around ${a} the Trad. 401k and IRA money runs out in the typical future, and spending comes from the Roth, which is not taxed.`); peakT=0; }
@@ -3116,7 +3184,7 @@ function chartNotes(id, res, series){
     // a cost that uses up the last of the cash and brokerage: one note, both reasons
     const cost = near(a1, 1).find(c=>c.kind==='eventOut'), gone = near(a1, 1).find(c=>c.kind==='bcOut');
     let why;
-    if(ep.dir>0 && cost && gone){
+    if(ep.dir>0 && ep.lasting && cost && gone){
       why = `${cost.tag} is paid for with a larger withdrawal, and it uses up what is left of the cash and brokerage, so from then on spending comes from Trad. 401k and IRA money, which is taxed as income.`;
     } else {
       if(!hit || used.has(hit)) return;
@@ -3176,7 +3244,10 @@ function drawAssets(res, real){
   let i=idx[Math.round(.5*(res.nP-1))];
   const followYear = res.mode==='hist' && retPick==='year' && selYear!==null && selYear-res.startYear[0]>=0 && selYear-res.startYear[0]<res.nP;
   if(followYear) i=selYear-res.startYear[0];
-  const ttl=document.getElementById('ttl_assets'); if(ttl) ttl.textContent = followYear ? `Assets by class, retiring into ${selYear}` : 'Assets by class, median outcome';
+  // the start year is when the plan begins at today's age, not the year of retirement unless the two coincide
+  const ttl=document.getElementById('ttl_assets'); if(ttl) ttl.textContent = followYear
+    ? (res.R>res.A ? `Assets by class, the ${selYear} start (retiring in ${selYear+res.R-res.A})` : `Assets by class, retiring into ${selYear}`)
+    : 'Assets by class, median outcome';
   const labels=res.ages, nY=res.nY, A=res.A;
   const scale=k=> real ? 1/res.CI[k][i] : 1;
   const series=[];
@@ -3663,6 +3734,10 @@ function run(){
   document.getElementById('verdict').textContent = varRule
     ? (res.rule==='pct'
         ? `Taking a share of what is left means it is never exhausted, but you live on what it pays: typically ${money(spendStats.med)} a year${inToday}, and as little as ${money(spendStats.worst)} in a bad year.`
+        // VPW takes a share set by age alone, never by the plan age, so it makes no promise about what is
+        // left at the plan age; only 1/N does (timing audit T18)
+        : res.rule==='vpw'
+        ? `This takes a share that rises with age, so the balance shrinks late in life. You live on what it pays: typically ${money(spendStats.med)} a year${inToday}, and as little as ${money(spendStats.worst)} in a bad year.`
         : `This spends your savings down to almost nothing by ${res.H}, on purpose. You live on what it pays along the way: typically ${money(spendStats.med)} a year${inToday}, and as little as ${money(spendStats.worst)} in a bad year.`)
     : mode==='hist'
     ? `In ${Math.round(success*res.nP)} of ${res.nP} historical start years, your money lasts to age ${res.H}.`
@@ -3798,7 +3873,7 @@ const HELP = {
     'Many people need 70 to 85% of their pre-retirement pay, because saving for retirement and payroll taxes stop.']},
   stocks:{t:'Stocks in your mix', b:['The share of your investments held in stocks. The rest is bonds.','The mix is rebalanced back to this split every year. More stocks raise the average return and widen the range between good and bad futures.']},
   // Level 2
-  planAge:{t:'Plan to age', b:['How long the money needs to last. A future counts as a success only if spending is fully covered in every year through this age.','Level 1 uses 95. Planning past your expected lifespan protects against living longer than average.']},
+  planAge:{t:'Plan to age', b:['How long the money needs to last. A future counts as a success only if spending is fully covered in every year until you reach this age: the plan runs up to that birthday.','Level 1 uses 95. Planning past your expected lifespan protects against living longer than average.']},
   infl:{t:'Average inflation', b:['The average yearly rise in prices. Each simulated year draws its own rate around this average, with a spread of 1.2 points, so some futures see long stretches of high inflation.','Spending, contributions and income all grow with that future’s inflation. Level 1 uses 2.5%.','For scale: prices roughly tripled between 1966 and 1982. An average cannot show you what that felt like year by year, which is what the backtests are for.']},
   ssAmt:{t:'Social Security', b:['Your household\'s yearly benefit in today\'s dollars, for the starting age you choose. It rises with inflation, matching Social Security\'s cost-of-living adjustment, and counts toward your retirement income.','Your statement at ssa.gov/myaccount has the most accurate figure. If you don\'t have it handy, the estimator below builds one from your pay.','For a married couple this is both benefits added together, and one starting age is applied to both. Claiming at different ages is a real strategy and one this figure cannot express yet.'], src:['SSA, retirement benefits','https://www.ssa.gov/benefits/retirement/planner/taxes.html']},
   ssAge:{t:'Social Security starts at age', b:['The age you claim. Claiming at 62 cuts the benefit by about 30% versus full retirement age (67 for most people). Waiting to 70 raises it by about 24%.','Enter the benefit amount that matches the age you choose here. The model does not adjust it for you.']},
@@ -3807,7 +3882,7 @@ const HELP = {
     ()=>`<b style="display:inline;font:inherit;font-weight:600">Cautious, ${retPctS(STOCK_RET.cautious)}</b> Vanguard projects 4 to 6% for the next ten years, though that would be a slow decade compared with history.`,
     ()=>`<b style="display:inline;font:inherit;font-weight:600">Balanced, ${retPctS(STOCK_RET.balanced)}</b> still worse than about three quarters of historical thirty-year stretches.`,
     ()=>`<b style="display:inline;font:inherit;font-weight:600">Historical, ${retPctS(STOCK_RET.historical)}</b> expect the typical market, based on 150 years of it.`,
-    'A forecast for the next decade and an assumption for a thirty-year plan are different things. Ten-year stretches have run anywhere from losing money to compounding at 19%; thirty-year stretches have never come in below 5%. The shorter the window, the wilder the range.',
+    'A forecast for the next decade and an assumption for a thirty-year plan are different things. Ten-year stretches have run anywhere from losing money to compounding at 19%; thirty-year stretches have never compounded at much less than 5%. The shorter the window, the wilder the range.',
     ()=>`All three keep the same ${pctS(MKT.sVol)} year-to-year spread, so only the average moves and the three stay comparable. Bond, cash and inflation assumptions do not change either.`,
     'No one knows which is right. Try each and see how much your answer depends on the choice: if the verdict holds across all three, it does not rest on this assumption.']},
   // Level 3
@@ -3844,8 +3919,8 @@ const HELP = {
     'A fixed annuity pays the same number of dollars for life, so its buying power falls every year. Choose "Fixed amount" for those and enter the amount of the cheque.']},
   ev_name:{t:'Event name', b:['A label for your own reference, such as "Kitchen remodel" or "Aunt\'s estate". It does not affect the math.']},
   ev_type:{t:'Money in or money out', b:['Money in adds to your savings: an inheritance, the sale of a home or business, a bonus, a legal settlement.','Money out is a cost paid from savings: a home down payment, college, a wedding, a new car, a gift to family.']},
-  ev_amt:{t:'Amount', b:['Enter it in today\'s dollars. The model grows it with each future\'s inflation up to the year it happens, so a $50,000 cost in 15 years stays a $50,000-sized cost in real terms.','Enter the after-tax amount. Money in is invested in your brokerage account, with all of it counted as cost basis. Money out is paid from cash, then brokerage, then Trad. 401k and IRA, then Roth, with tax on those withdrawals added automatically.','Before 59½, money out that comes from a Trad. 401k or IRA also carries the 10% early-withdrawal penalty, and that is included (unless you retire at 55 or later, when the Rule of 55 waives it).']},
-  ev_year:{t:'Year', b:['The calendar year the event happens. The model converts it to your age, shown at the right.','Events in past years, or after your plan age, are ignored.']},
+  ev_amt:{t:'Amount', b:['Enter it in today\'s dollars. The model grows it with each future\'s inflation up to the year it happens, so a $50,000 cost in 15 years stays a $50,000-sized cost in real terms.','Enter the after-tax amount. Money in is invested in your brokerage account, with all of it counted as cost basis. Money out is paid from cash, then brokerage, then Trad. 401k and IRA, then Roth, with tax on those withdrawals added automatically.','Before 59½, money out that comes from a Trad. 401k or IRA also carries the 10% early-withdrawal penalty, and that is included, unless you have already retired, at 55 or later, when the Rule of 55 waives it. In the year you turn 59 the model charges half.']},
+  ev_year:{t:'Year', b:['The calendar year the event happens. The model converts it to your age, shown at the right.','Events in past years, or in or after the year you reach your plan age, are ignored: the plan runs until that birthday, not through the year that follows it.']},
   ev_years:{t:'Number of years', b:['How many years in a row the amount repeats, starting in the year above. Use it for college tuition, support for a parent, or a rental income stream.','The amount is per year, in today\'s dollars, so it keeps pace with inflation.']},
   ev_marks:{t:'Event markers', b:['Triangles along the top of the Total savings chart mark years with life events. Up is net money in, down is net money out.']},
   a_events:{t:'Life events', b:['One-time or repeating sums you entered in Level 4. They occur in the same year in every simulated future. What differs is the market around them, which matters most for large costs early in retirement.']},
@@ -3868,7 +3943,7 @@ const HELP = {
   se_earn:{t:'Your yearly pay now', b:[()=>`Wages or net self-employment income. Social Security only counts pay up to $${SSP.cap.toLocaleString('en-US')} a year (the 2026 limit), so anything above that is ignored.`,'The estimate assumes this pay continues, rising with average wages, until the age you stop working.'], src:['SSA, contribution and benefit base','https://www.ssa.gov/oact/cola/cbb.html']},
   se_start:{t:'Age you started full-time work', b:['Your first year of steady, full-time pay. Social Security averages your highest 35 years, so a later start can leave zero years in that average.']},
   se_shape:{t:'Earlier pay, compared with now', b:['How your earlier pay compares with today\'s, after adjusting for wage growth over time. Most careers rise, so "somewhat lower" suits many people.','Somewhat lower starts your career at 75% of today\'s level and rises steadily. Much lower starts at 50%.']},
-  se_stop:{t:'Stop working at age', b:['Your last year of earnings. Years after this count as zero. Stopping before 62 does not reduce a benefit directly, but it can leave fewer high-earning years in the 35-year average.']},
+  se_stop:{t:'Stop working at age', b:['The age you stop working: pay counts up to the year before this age, and nothing from this age on. Stopping before 62 does not reduce a benefit directly, but it can leave fewer high-earning years in the 35-year average.']},
   se_claim:{t:'Start benefits at age', b:[()=>`Full retirement age is ${SSP.fra} for anyone born in 1960 or later. Starting at 62 cuts the benefit by 30% for life. Waiting past ${SSP.fra} adds 8% a year, up to 24% more at 70.`,'Waiting also raises what a surviving spouse would receive.'], src:['SSA, early or late retirement','https://www.ssa.gov/benefits/retirement/planner/agereduction.html']},
   se_spouse:{t:'Spousal benefit', b:[()=>`A spouse with little work history can receive up to half of your full-retirement-age benefit. It is reduced if started before ${SSP.fra} and does not grow by waiting past ${SSP.fra}. This estimate assumes your spouse starts at the same age you do.`,'If your spouse has their own work history, estimate their benefit separately and add the two.']},
   se_cut:{t:'Benefit cut', b:['Social Security\'s trustees project that the retirement trust fund runs short in the early 2030s. If Congress does not act, incoming taxes would cover roughly 80% of scheduled benefits.','Checking this box plans for that reduction. Many planners use it as a cautious case.']},
@@ -3876,8 +3951,8 @@ const HELP = {
   se_pia:{t:'Full-retirement-age benefit', b:[()=>`The monthly benefit at full retirement age. The 2026 formula replaces 90% of the first $${SSP.b1.toLocaleString('en-US')} of monthly average earnings, 32% up to $${SSP.b2.toLocaleString('en-US')}, and 15% above that. Lower earners get a larger share of their pay replaced.`], src:['SSA, benefit formula bend points','https://www.ssa.gov/oact/cola/bendpoints.html']},
 
   // results
-  verdict:{t:'How often your money lasts', b:[()=>`The model runs ${N_PATHS.toLocaleString()} futures. Each one draws its own year-by-year sequence of stock, bond, cash and inflation outcomes.`,'This number is the share of futures in which every year\'s spending is fully covered through your plan age. It measures how often the plan works across a wide range of plausible markets. It is not a guarantee.','The label beneath uses common rules of thumb: 85% or more is on solid footing, 70 to 84% is worth a closer look, and below 70% is at real risk. Many planners accept 75 to 90%, because a plan can be adjusted along the way.']},
-  state:{t:'Status label', b:['85% or more: on solid footing. 70 to 84%: worth a closer look. Below 70%: at real risk of running short.','These cut-offs are common planning rules of thumb, not standards. Many planners are comfortable in the 75 to 90% range, because a plan can be adjusted along the way.']},
+  verdict:{t:'How often your money lasts', b:[()=>`The model runs ${N_PATHS.toLocaleString()} futures. Each one draws its own year-by-year sequence of stock, bond, cash and inflation outcomes.`,'This number is the share of futures in which every year\'s spending is fully covered until you reach your plan age. It measures how often the plan works across a wide range of plausible markets. It is not a guarantee.','The label beneath uses common rules of thumb: 85% or more reads Holds up in most futures, 70 to 84% Worth a closer look, and below 70% At real risk of running short. Many planners accept 75 to 90%, because a plan can be adjusted along the way.']},
+  state:{t:'Status label', b:['85% or more: holds up in most futures. 70 to 84%: worth a closer look. Below 70%: at real risk of running short.','These cut-offs are common planning rules of thumb, not standards. Many planners are comfortable in the 75 to 90% range, because a plan can be adjusted along the way.']},
   endMed:{t:'Typical balance', b:[
     'The median total balance at your plan age. Half of the futures end higher and half end lower.',
     'Futures that ran out count as zero.',
@@ -3885,12 +3960,12 @@ const HELP = {
   heirs:{t:'People sharing it', b:[
     'How many people the Trad. 401k and IRA money is divided between. It changes the tax, and not by a little.',
     'The reason is the ten-year rule. Since 2020 most people who inherit a retirement account have to empty it within ten years, so the money lands on them as a decade of extra income on top of whatever they already earn. Split between four people it is four smaller slugs, each of which may stay inside the bracket they were already in. Left to one person it is one large slug, and the top of it can be taxed several brackets higher.',
-    'On a $1.5M pre-tax pot left to people earning $120,000, going from one heir to four moves the effective rate from about 21.5% to 18.5%. On a $6M pot it moves from 28% to 21.5%. But if the pot is small relative to what they earn, dividing it changes nothing at all, because the whole slug fits inside one bracket either way.',
+    'On a $1.5M pre-tax pot left to people earning $120,000, going from one heir to four moves the federal part of the effective rate from about 21.5% to 18.5%. On a $6M pot it moves from 28% to 21.5%. Your state rate is added on top, as a stand-in for theirs. But if the pot is small relative to what they earn, dividing it changes nothing at all, because the whole slug fits inside one bracket either way.',
     'It has no effect on Roth money, a brokerage, or anything left to charity.']},
   heirInc:{t:'What each of them earns', b:[
     'The household income of the people inheriting, today, before tax. The inherited money stacks on top of this, which is what decides the rate it is taxed at.',
     'You are guessing, and that is expected. It is the same guess as naming their tax bracket would be, only in a form the tax code can actually use, so the model does the bracket arithmetic instead of asking you to. If they are at very different income levels, use something near the middle.',
-    'Everything is worked out on this year\'s brackets and in today\'s money. Projecting a specific person\'s tax return decades from now would be inventing precision on top of a guess.']},
+    'Everything is worked out on this year\'s brackets and in today\'s money, with your own state rate standing in for theirs, since where they will live is anyone\'s guess. Projecting a specific person\'s tax return decades from now would be inventing precision on top of a guess.']},
   heirFiling:{t:'How they file', b:[
     'Married or single, for the people inheriting. It matters because a married couple\'s brackets are roughly twice as wide, so the same inherited amount is taxed less heavily.',
     'This is about them, not about you. Your own filing status is at Level 1.']},
@@ -3900,7 +3975,7 @@ const HELP = {
     'Why it can be worth doing, in tax terms alone: money still in a Trad. 401k or IRA at your death is taxed at your heirs\' rate, and money you withdraw now is taxed at yours. If theirs is higher, moving it earlier is cheaper. Change the heir questions above and watch which way it leans.',
     'And a trap worth knowing, which this model does not capture: if you give away shares that have grown rather than cash, the person receiving them takes over your cost basis, so they owe the gain you never paid. Left until death, that gain disappears instead. The model funds gifts from your accounts in the normal order and does not track which asset went to whom, so it neither rewards nor punishes that choice. Giving cash, or something you have not gained much on, sidesteps it.',
     'Gift tax is not modelled. In 2026 the annual exclusion is $19,000 per recipient and the lifetime exemption $15M a person, so most plans never approach either, but very large giving programmes should be checked with someone who knows your situation.']},
-  giftAge:{t:'Start giving to people at age', b:['Giving to people runs from this age to your plan age. It does not affect the charitable gifts above, which the law allows from 70 and a half.','Set it before you retire if you like; the withdrawal is then taxed on top of your working income, which the model accounts for.']},
+  giftAge:{t:'Start giving to people at age', b:['Giving to people runs from this age until you reach your plan age. It does not affect the charitable gifts above, which the law allows from 70 and a half.','Set it before you retire if you like; the withdrawal is then taxed on top of your working income, which the model accounts for.']},
   qcd:{t:'Gifts to charity, from your IRA', b:[
     'A qualified charitable distribution: money going straight from a Trad. IRA to a charity, without passing through your hands. Enter a yearly amount in today\'s dollars; it rises with each future\'s inflation, as the ceiling does.',
     'This is the best-value move in the whole level, and the reason is that it never becomes income. It is not added to your taxable income, so it does not push more of your Social Security into being taxable, and it does not reach the income figure Medicare looks back at two years later to set your surcharge. A deduction cannot do any of that, because a deduction comes after the income has already counted.',
@@ -3918,7 +3993,7 @@ const HELP = {
     'So the same gift is worth different amounts depending on which pot it comes out of. This setting moves a share of the pre-tax pot to charity and leaves the rest, along with all the Roth and brokerage money, to people. Set it to zero if nothing is going to charity.',
     'This is arithmetic about tax, not a suggestion about your will. Who receives what is decided by your beneficiary forms and your will, not by this page, and the form usually overrides the will. That is a conversation for a lawyer in your state.']},
   endHeir:{t:'Your heirs receive, after taxes', b:[
-    'What beneficiaries would actually get, in whichever dollars the page is showing, once the income tax on pre-tax money is paid: Roth and cash in full, the brokerage in full, and the Trad. 401k and IRA money less any share left to charity and less the income tax your heirs would pay on the rest. That tax is worked out from how many people share it and what they earn.',
+    'What beneficiaries would actually get, in whichever dollars the page is showing, once the income tax on pre-tax money is paid: Roth and cash in full, the brokerage in full, and the Trad. 401k and IRA money less any share left to charity and less the income tax your heirs would pay on the rest. That tax is worked out from how many people share it and what they earn, federal plus your own state rate as a stand-in for theirs.',
     'It can be more than the "Worth after tax" figure above it, and that surprises people. The reason is the brokerage: its cost basis resets to market value at death, so all the growth inside it escapes capital-gains tax, where you would have owed tax to sell the same shares yourself.',
     'It can also be a great deal less, if the heir bracket is above your own. Those two effects pull in opposite directions and which wins depends entirely on the mix of accounts you leave.',
     'The tax itself is not shown as a separate figure. It is the red band on the chart of who ends up with it, where you can see how big a slice it is and how it changes with the age you die, and with the two buttons above that chart.',
@@ -3960,7 +4035,7 @@ const HELP = {
     'Each event you entered at Level 4, by the age it happens, with its amount. The arrows on the chart mark the same years: up for money coming in, down for money going out.',
     'The amount under an arrow is the net for that year, so a year with money both coming in and going out shows the difference. An event that repeats is labelled in its first year only; here it shows its yearly amount and the ages it runs.',
     'Amounts are in today\'s dollars even when the chart shows future dollars, because a single future-dollar figure would only be right in one of the many futures behind the chart.']},
-  panel_total:{t:'Total savings', b:['The sum of all your account balances at the end of each year of age, after that year\'s contributions or withdrawals and investment returns.','A future that runs out drops to zero and stays there, which pulls the lower band down late in life.']},
+  panel_total:{t:'Total savings', b:['The sum of all your account balances on reaching each age: after the year before it, with that year\'s contributions or withdrawals and investment returns. The first point is today\'s balance.','A future that runs out drops to zero and stays there, which pulls the lower band down late in life.']},
   panel_assets:{t:'Assets by class, median outcome', b:['This follows one future, the one whose ending wealth is the median of all simulated futures, and stacks each of its accounts year by year. It shows how money moves between account types as you save, retire and draw down.','Unlike the shaded bands elsewhere, these are values from a single future, so they add up.']},
   assets_hatch:{t:'Hatched areas', b:['Social Security and a pension are assets too, even though you cannot withdraw them as a lump sum. The hatched areas show what they are worth as savings, using the 4% rule: a $20,000 yearly pension matches roughly $500,000 in savings.','Social Security appears from the age you start collecting it. A fixed pension shrinks in today\'s dollars once payments begin, because inflation erodes each check. These areas have no value to heirs: they stop when you do. Hover the chart to see the total in your accounts, before any tax still owed on Trad. 401k and IRA money.']},
   engine:{t:'Two ways to test your plan', b:[`<b style="display:inline;font:inherit;font-weight:600">Monte Carlo Statistical Projections</b> runs your plan through ${N_PATHS.toLocaleString()} imagined futures. Each year\'s stock, bond and inflation numbers are drawn at random from the averages and spreads in the assumptions list. This explores a wide range of possibilities, including futures worse or better than anything seen before, but it is only as good as those assumptions.`,`<b style="display:inline;font:inherit;font-weight:600">Historical Backtests</b> runs your plan through what actually happened. It pretends you start today at your current age in ${HIST_FIRST}, then in ${HIST_FIRST+1}, and so on, replaying real US markets year by year in order. It answers: would this plan have survived the Great Depression, the 1970s, and every other stretch on record?`,'History is a limited record: about 150 years, only a handful of truly separate bad stretches, and only for the US, one of the best-performing markets of the period. The two methods check each other. When they disagree, the Monte Carlo assumptions are usually the more cautious of the two.']},
@@ -3968,7 +4043,7 @@ const HELP = {
   panel_history:{t:'Backtest your scenario against history', b:['Your plan, with the same taxes, income, accounts and life events, replayed through real US stock, bond and inflation history. Each line is one start year: the year you would be your current age.','Of every complete start year since 1871, the chart shows ten, spread evenly from the worst ending to the best. Red lines ran short. The rest shade from gold to green as the ending rises.','Tap a line or a year to switch to Historical Backtests and follow that start year in the market returns and assets charts. Neighbouring start years share most of their markets, so bad outcomes cluster around a few hard stretches, such as the 1900s, the late 1920s and the mid-1960s.']},
   a_hist:{t:'Historical market data', b:[`Annual US returns from January ${HIST_FIRST} to January ${HIST_LAST+1}. Everything to 2022 comes from Robert Shiller\'s public dataset; his file stops there, so the last three years are built from the S&P 500 total return index, the 10-year Treasury and the consumer price index instead. Stocks are the S&P composite index with dividends reinvested. Bonds are a 10-year US Treasury bought each January at the prevailing yield and sold a year later. Inflation is the consumer price index.`,'Shiller\'s data uses monthly average prices, which smooths some returns slightly compared with exact year-end prices.'], src:['Robert Shiller, online data','http://www.econ.yale.edu/~shiller/data.htm']},
   a_histcash:{t:'Cash in historical mode', b:['The dataset has no short-term interest rate going back to 1871, so cash is assumed to earn inflation plus half a percentage point each year.']},
-  panel_market:{t:'One future, year by year', b:['Each simulated future is a sequence of yearly returns for your stock and bond mix. This chart shows the sequence for one future, year by year. Green bars are gains and red bars are losses.','The top chart is your total savings in that same future. The shaded band behind it is the middle half of all futures, and the dashed line is the typical one. The ages line up, so a drop in savings sits directly above the red bars that caused it.','The dashed line marks retirement. Losses in the first years after it do the most damage, because you are selling investments while prices are down. This is called sequence-of-returns risk.','In today\'s dollars mode, returns are shown after that year\'s inflation.']},
+  panel_market:{t:'One future, year by year', b:['Each simulated future is a sequence of yearly returns for your stock and bond mix. This chart shows the sequence for one future, year by year. Green bars are gains and red bars are losses.','The top chart is your total savings in that same future. The shaded band behind it is the middle half of all futures, and the dashed line is the typical one. The ages line up: at each age the top chart shows the savings on reaching it, as every other savings chart does, and the bar beneath is the return in the year that follows. So a red bar is followed by a drop in savings on the way to the next age.','The dashed line marks retirement. Losses in the first years after it do the most damage, because you are selling investments while prices are down. This is called sequence-of-returns risk.','In today\'s dollars mode, returns are shown after that year\'s inflation.']},
   pick:{t:'Which future', b:['The futures are ranked by what they leave at your plan age, with the ones that ran out ranked lowest.','Unlucky is the future at the 10th percentile, typical is the median and lucky is the 90th percentile. Another shows a random future each time you press it.','Two futures with the same average return can end very differently if the bad years come early.']},
   panel_flow:{t:'Annual spending', b:[
     'One year at a time, for the middle future, this is the whole cash flow: Social Security, then any pension or other income, then whatever had to be sold from your savings to cover the rest. The three stack up to the gross total arriving that year.',
@@ -3992,7 +4067,7 @@ const HELP = {
   panel_cash:{t:'Excess savings held as cash', b:['Your cash beyond everyday needs, over time. It is spent first in retirement, so it usually empties within a year or two unless income exceeds spending.','Reaching zero here does not mean an empty checking account. The everyday cushion you keep is outside the model and stays untouched.']},
 
   // assumptions
-  a_stocks:{t:'Stock returns', b:[()=>`Each year\'s stock return is drawn at random so that the money compounds at ${retPctS(stockMeanOf(S,level))} a year over the long run, before inflation. The spread is ${pctS(MKT.sVol)}, measured on the logarithm of the return, which works out at about 18.6% on the returns themselves.${level>=2?' You choose the average in the panel on the left.':` Level 2 lets you choose between ${retPctS(STOCK_RET.cautious)}, ${retPctS(STOCK_RET.balanced)} and ${retPctS(STOCK_RET.historical)}.`}`,'Returns follow a lognormal shape, so a year can lose at most 100% but gains are unlimited. Years are independent: the model does not assume a crash is followed by a rebound.','The spread is the same whichever average you pick. To see markets that are genuinely wilder, rather than merely noisier, use Historical Backtests or the stress tests: there the bad years arrive in the order they really did.']},
+  a_stocks:{t:'Stock returns', b:[()=>`Each year\'s stock return is drawn at random so that the money compounds at ${retPctS(stockMeanOf(S,level))} a year over the long run, before inflation. The spread is ${pctS(MKT.sVol)}, measured on the logarithm of the return, which works out at about 18.6% on the returns themselves.${level>=2?' You choose the average in the settings panel.':` Level 2 lets you choose between ${retPctS(STOCK_RET.cautious)}, ${retPctS(STOCK_RET.balanced)} and ${retPctS(STOCK_RET.historical)}.`}`,'Returns follow a lognormal shape, so a year can lose at most 100% but gains are unlimited. Years are independent: the model does not assume a crash is followed by a rebound.','The spread is the same whichever average you pick. To see markets that are genuinely wilder, rather than merely noisier, use Historical Backtests or the stress tests: there the bad years arrive in the order they really did.']},
   a_bonds:{t:'Bond returns', b:[()=>`Bonds compound at ${pctS(MKT.bMean)} a year before inflation, with a spread of ${pctS(MKT.bVol)}. This resembles a broad intermediate-term bond fund.`,'That is below the 4.4% US bonds have compounded at since 1871, and well above the 0.9% of the last ten years. Bond returns swing by era more than the figure suggests: 6.5% a year through the long fall in rates from 1982, 2.9% since 2006, and after inflation the last decade lost money.','The figure is deliberately a long-run one rather than a reading of today. A starting yield predicts the next decade well and a thirty-year plan poorly, and a plan that long will live through several rate regimes.']},
   a_rho:{t:'Stock and bond correlation', b:[()=>`How much stocks and bonds move together. At ${MKT.rho.toFixed(2)}, they are nearly independent, so bonds soften bad stock years in most futures but not all.`,'In some periods, such as 2022, both fell together. The model knows a share of stocks and a share of bonds, not the particular funds you hold.']},
   a_cash:{t:'Cash returns', b:[()=>`Cash earns an average of ${pctS(MKT.cMean)} a year with a spread of ${pctS(MKT.cVol)}, and never goes below zero.`]},
@@ -4000,10 +4075,10 @@ const HELP = {
   a_inflL1:{t:'Average inflation', b:['Level 1 assumes prices rise 2.5% a year on average, close to the long-run US figure. Level 2 lets you set it.']},
   a_rebal:{t:'Rebalancing', b:['Every account is reset to your stock and bond mix once a year. The mix stays the same for your whole life. Glide paths that shift toward bonds with age are planned for a paid level.']},
   a_timing:{t:'Yearly steps', b:['The model works in whole years. Contributions and withdrawals happen at the start of each year, and returns apply to what remains.']},
-  a_seq:{t:'Withdrawal order', b:['Which pot pays for spending first. Level 5 lets you change it and compares the three orders side by side.']},
+  a_seq:{t:'Withdrawal order', b:['Which pot pays for spending first. Level 5 lets you change it, and the buttons on the chart of who ends up with the money show what each order does.']},
   a_order:{t:'Withdrawal order', b:['Spending comes from cash first, then brokerage, then Trad. 401k and IRA accounts, then Roth. This common order keeps tax-free money growing longest.','Levels 1 and 2 use a single pre-tax pot, so order does not apply there. Income left over after spending is reinvested and not taxed again.']},
   filing:{t:'Tax filing status', b:['Sets which federal tax brackets, standard deduction and Social Security thresholds apply.','Married assumes both of you are the same age, so both get the extra deductions from 65. If one spouse dies, the survivor files as single in later years and usually pays more tax. The free levels do not switch statuses; Level 5 models survivor years.']},
-  stateTax:{t:'State income tax rate', b:['One flat rate charged on your federally taxable income, including the taxed part of Social Security.','Nine states have no income tax. Several others exempt Social Security or part of retirement income, so a lower number may fit you. Level 1 uses 4%. Level 5 applies your own state\'s actual rules.']},
+  stateTax:{t:'State income tax rate', b:['One flat rate charged on your federally taxable income, including the taxed part of Social Security.','Nine states have no income tax. Most states with an income tax do not tax Social Security, and many exempt part of pension or IRA income; since this rate is also charged on the taxed part of Social Security, a lower number may fit you. Level 1 uses 4%.','Every level uses this one flat rate. State-specific rules are not modelled.']},
   spendTypical:{t:'Typical spending', b:[
     'The average year in the middle future, after tax, in today’s money. Half of the futures spend more than this on average and half spend less.',
     'It replaces the sustainable income figure, which only means something when you set the spending and the question is whether the money keeps up. Here the portfolio sets the spending, so the useful questions are how much it usually pays and how little it pays in a bad run.']},
@@ -4020,13 +4095,13 @@ const HELP = {
   panel_stress:{t:'Stress tests', b:['Each test gives you ordinary, average markets until the year you retire, then replays one of history\'s worst stretches starting that very year. That isolates the sequence-of-returns risk: bad years right after you stop working do the most damage.','Where the historical record runs out (it ends in '+HIST_LAST+'), the remaining years use average returns again.','The dashed line is your typical Monte Carlo future, for comparison. Stress tests use the same taxes, income, accounts and events as the rest of your plan.','History supplies the bad starts free of charge: 1929, 1937, 1966, 1973, 2000, 2008. Nobody who retired into one of them knew at the time which one they had drawn.']},
   a_pen:{t:'Early-withdrawal penalty', b:['Trad. 401k and IRA withdrawals before 59½ usually owe an extra 10% tax. The model charges it, including on withdrawals for life events before you retire.','It is waived after you retire if you leave your job at 55 or later (the Rule of 55), assuming the money is in that employer\'s 401(k). Roth withdrawals are treated as coming from your contributions, which are penalty-free. Substantially equal payments under 72(t) are not modeled. The rule is named after the paragraph it happens to sit in, which tells you most of what you need to know about how tax law gets its names.'], src:['IRS Tax Topic 558, early distributions','https://www.irs.gov/taxtopics/tc558']},
   a_tax:{t:'Federal income tax', b:[()=>taxTableHtml(),
-    'The tax brackets rise with each future’s inflation, as the law requires. The Social Security thresholds do not: $25,000 and $32,000 have been sitting there since 1984 and 1993, untouched by four decades of prices. Every year a little more of your benefit becomes taxable, and nobody has to vote for it.',
+    'The tax brackets rise with each future’s inflation. The law actually uses chained CPI, which has run about a quarter of a point a year below ordinary inflation, so tax decades out is slightly understated here. The Social Security thresholds do not: $25,000 and $32,000 have not moved since 1984, nor the upper $34,000 and $44,000 since 1994, untouched by four decades of prices. Every year a little more of your benefit becomes taxable, and nobody has to vote for it.',
     'Brokerage gains are taxed at the capital-gains rates, stacked on top of ordinary income. Before retirement, withdrawals are taxed as if added to a salary equal to your yearly spending.',
     'Not modeled here: required minimum distributions, Medicare premium surcharges (IRMAA) and the 3.8% investment income tax. Level 5 adds the first two.'], src:['IRS, federal income tax rates and brackets','https://www.irs.gov/filing/federal-income-tax-rates-and-brackets']},
   a_divtax:{t:'Yearly tax on brokerage distributions', b:['A taxable brokerage account owes tax every year on what its funds pay out, even when you sell nothing. This is deducted. The stock share is assumed to pay dividends at 1.5% a year, taxed at long-term rates, and the bond share to pay interest at 4%, taxed as ordinary income. Both are treated as reinvested, so the balance is not reduced by the payout itself \u2014 only by the tax on it.','The bond side costs far more, both because it yields more and because interest is taxed as ordinary income rather than at long-term rates. On a 60/40 account roughly 0.9% of the balance arrives as dividends and 1.6% as interest. That difference is the whole argument for keeping bonds in a Trad. 401k, IRA or Roth rather than a brokerage.','Because the payout has been taxed once, it raises your cost basis, so the same money is not taxed again when the shares are sold. Trad. 401k, IRA and Roth accounts are not affected: nothing inside them is taxed yearly.','What is assumed, rather than known, is the yield. A broad index fund is close to these figures; a dividend-focused or high-yield bond fund pays out considerably more, and would cost more tax than this shows.']},
   surv:{t:'Model one spouse dying', b:[
     'A married plan quietly assumes both of you live to the plan age. Turning this on runs the years after one death, which is the single most under-modelled risk in retirement planning for couples.',
-    'Four things change at once. The survivor files as single, so the tax brackets are narrower and the standard deduction is halved. One Social Security cheque stops. A pension may drop to a survivor share. Spending falls, but nowhere near by half.',
+    'Four things change. One Social Security cheque stops. From the year after the death the survivor files as single, so the tax brackets are narrower and the standard deduction is halved; the year of the death itself is still a joint return, as the law allows. A pension may drop to a survivor share. Spending falls, but nowhere near by half.',
     'The result is often a higher tax bill on a lower income, sometimes called the widow tax. On a typical household, a couple paying tax on $70,000 of withdrawals plus $50,000 of Social Security owes around $11,800; the survivor, on the same withdrawals and a single cheque, owes closer to $14,800.',
     'It does nothing on a single-filer plan, where there is no second person to lose.']},
   survAge:{t:'One spouse dies at age', b:[
@@ -4043,13 +4118,15 @@ const HELP = {
     'One person does not live on half. Housing, insurance, property tax, utilities and the car barely change; food, travel and clothing do. Studies of surviving spouses tend to land around 70 to 80% of the couple.',
     'Health costs often move the other way, since the care one spouse provided may have to be bought.']},
   a_surv:{t:'Survivor years', b:[
-    'From the chosen age the plan is run for one person: single filing, a reduced Social Security cheque, a survivor share of other income and reduced spending.',
-    'Not modelled: a step-up in basis on inherited assets, the year-of-death joint return, inherited IRA rules, or any life insurance that might pay out.']},
+    'From the chosen age the plan is run for one person: a reduced Social Security cheque, a survivor share of other income and reduced spending, and single filing from the following year, since the year of the death is still a joint return.',
+    'Medicare surcharges in the first two years after a death are judged on the joint return they look back at, against the joint thresholds, but only the survivor pays them.',
+    'Not modelled: a step-up in basis on inherited assets, inherited IRA rules, qualifying surviving spouse status (which needs a dependent child), or any life insurance that might pay out.']},
   irmaa:{t:'Medicare surcharges (IRMAA)', b:[
     'From 65, Medicare charges more for Part B and Part D when your income was above a threshold two years earlier. The surcharge is per person, so a couple pays it twice.',
     'It steps rather than tapers. One dollar over a line costs a full year of the higher premium, which is why a large withdrawal or a Roth conversion can be expensive in a way that shows up two years later. Medicare is reading a tax return you filed while thinking about something else entirely.',
     'Only the surcharge is modelled here. The standard premium everyone pays belongs in your income needs, and the budget planner has a line for it.',
-    'Thresholds and amounts are the published 2025 figures used as the 2026 base and rising with inflation. They are set each autumn, so check them before relying on a close call.'], src:['Medicare.gov, Medicare costs','https://www.medicare.gov/basics/costs/medicare-costs']},
+    'Thresholds and amounts are the published 2026 figures: no surcharge up to $109,000 of income for a single filer or $218,000 for a couple, then five steps. The lower thresholds rise with inflation; the top one is fixed in law until 2028. They are set each autumn, so check them before relying on a close call.',
+    'The two years before the plan starts are not on record, so the first year\'s income stands in for them, and the first year\'s surcharge is charged a year late, in the second year, once that income is known.'], src:['CMS, 2026 Medicare Parts A and B premiums and deductibles','https://www.cms.gov/newsroom/fact-sheets/2026-medicare-parts-b-premiums-deductibles']},
   a_irmaa:{t:'Medicare surcharges', b:[
     'Charged from 65 on the income you had two years earlier, per person, in steps. Modelled as a cost rather than a tax, because that is what it is: a higher premium.',
     'Not modelled: the appeal after a life-changing event such as retiring, which can get the surcharge waived on income you no longer have.'], src:['Medicare.gov, Medicare costs','https://www.medicare.gov/basics/costs/medicare-costs']},
@@ -4058,7 +4135,7 @@ const HELP = {
     '<b style="display:inline;font:inherit;font-weight:600">Conventional</b> spends cash, then the brokerage, then Trad. 401k and IRA accounts, leaving tax-free Roth money growing longest. It is the usual advice and the order the free levels use.',
     '<b style="display:inline;font:inherit;font-weight:600">Trad. 401k and IRA first</b> pays income tax earlier but leaves a smaller Trad. 401k and IRA balance, so the required distributions that start in your seventies are smaller too.',
     '<b style="display:inline;font:inherit;font-weight:600">Proportional</b> takes a slice of everything, keeping the mix steady and spreading taxable income evenly across the years rather than bunching it.',
-    'The panel runs your plan under all three, so you can see the difference for your own numbers rather than taking a rule of thumb on trust. Which wins depends on the size of your Trad. 401k and IRA balance, your other income and how long the money has to last.']},
+    'The buttons on the chart of who ends up with the money switch between all three, so you can see the difference for your own numbers rather than taking a rule of thumb on trust. Which wins depends on the size of your Trad. 401k and IRA balance, your other income and how long the money has to last.']},
   beq_scale:{t:'Auto scale', b:[
     'Off, the height of this chart stays put while you press the buttons above it, so a change in the bands is a change in the money rather than a change of scale. If a setting needs more room the top rises to fit, and it stays there, so switching back and forth always lands on the same view.',
     'Change anything else about the plan and the chart is fitted afresh, because that is a new picture rather than a comparison.',
@@ -4074,7 +4151,7 @@ const HELP = {
   panel_bequest:{t:'Who ends up with it, by the age you die', b:[
     'Your plan runs to one age. This drops that assumption and asks, for every age you might die at, how the money would divide: what the people you leave it to receive, what goes to charity if you have set a share, and what income tax takes on the way.',
     'Nothing extra is simulated to draw it. Each year\'s balance already has every year of spending up to that point taken out of it, so dying at 75 simply means the age-75 balance, divided the way an inheritance is divided.',
-    'The red band is the part worth watching, and it is why this chart shows a split rather than a total. It is the income tax still owed on Trad. 401k and IRA money, and it narrows as that pot is drawn down: on a typical plan it starts near a fifth of the estate and falls to a twentieth by the plan age. Anything that moves money out of the pre-tax pot early, a Roth conversion above all, shrinks that band.',
+    'The red band is the part worth watching, and it is why this chart shows a split rather than a total. It is the income tax still owed on Trad. 401k and IRA money, and it narrows as that pot is drawn down: on the default plan it starts near a tenth of the estate, grows to about a sixth around 65 to 70 as the pre-tax pot fills, and shrinks to almost nothing by the plan age. Anything that moves money out of the pre-tax pot early, a Roth conversion above all, shrinks that band.',
     'An earlier version of this panel drew what heirs would receive as a single line. It turned out to be the total savings chart over again, between 0.80 and 0.96 of it at every age, so the shape said nothing new. The split is the part that is genuinely not shown anywhere else.',
     'One future, the middle one by ending balance, so this agrees with the figures above the charts and with the accounts chart. The retirement age is marked as on the other charts.',
     'What this is not: a view on how long you will live, or a suggestion about when to give anything away. It is the same plan, read at a different ending.']},
@@ -4083,13 +4160,14 @@ const HELP = {
     'The gap between retiring and the start of Social Security and required distributions is usually the lowest-income stretch of your life. Filling a low tax bracket then can cost less tax than leaving the money to come out later at a higher rate, and Roth money is never subject to required distributions.',
     'The tax is paid from your cash and brokerage, not from the money being moved, which is what makes the move worth doing. If those cannot cover it, the conversion shrinks to what they can.',
     'Watch both numbers, not one: converting usually lowers lifetime tax, but paying that tax early takes money out of the pot during the years a plan is most fragile, so the share of futures that last can fall even as the ending balance rises.',
-    'Not modelled: the five-year rule on each conversion, Medicare surcharges two years later, and any state that taxes conversions differently from other income.'], src:['IRS, Roth IRAs','https://www.irs.gov/retirement-plans/roth-iras']},
+    'Medicare surcharges are included: a conversion counts toward the income Medicare reads two years later, so a large one can raise a surcharge then.',
+    'Not modelled: the five-year rule on each conversion, and any state that taxes conversions differently from other income.'], src:['IRS, Roth IRAs','https://www.irs.gov/retirement-plans/roth-iras']},
   convKeep:{t:'Keep liquid when converting', b:[
     'A conversion is paid for out of cash and brokerage, so a determined one can empty them. This holds back a reserve: the tax may only use what sits above this many years of spending.',
     'At zero, conversions will spend everything liquid to fill the tax bracket, which maximises the amount moved and leaves nothing to absorb a bad year. Two years is a common cushion.',
     'The reserve is measured against the spending planned for that year, so it rises with inflation along with everything else.']},
   convEnd:{t:'Convert until age', b:[
-    'Conversions run from the year you retire until this age. The usual choice is the year before required minimum distributions begin, because from then on those distributions fill the low tax brackets by themselves.',
+    ()=>`Conversions run from the year you retire until this age. The usual choice is the year before required minimum distributions begin, which for you is ${rmdStartAge(CUR_YEAR-Math.round(S.age))-1}, because from then on those distributions fill the low tax brackets by themselves.`,
     'Setting it earlier is the cautious choice if you expect to need the money, or if a surcharge or subsidy cliff sits just above your income.']},
   a_conv:{t:'Roth conversions', b:['Converted amounts are taxed as ordinary income in the year they move, at the federal tax brackets and your state rate, with the tax paid from cash and brokerage.']},
   rmd:{t:'Required minimum distributions', b:[
@@ -4098,9 +4176,13 @@ const HELP = {
     'This is what makes Roth conversions worth considering: money moved to a Roth in your low-income years is never subject to these distributions.',
     'Set this to "Ignore them" to see the difference they make. That is not a choice you have in real life; it is here so the effect is visible. The effect is not always bad: taking money out earlier can mean paying tax in lower tax brackets, and what is reinvested comes back with the tax already paid.'], src:['IRS Publication 590-B','https://www.irs.gov/publications/p590b']},
   a_rmd:{t:'Required minimum distributions', b:[
-    ()=>`SECURE 2.0 starts them at 73, or 75 for anyone born in ${RMD_START_LATE} or later. On your current age that is ${rmdStartAge(CUR_YEAR-Math.round(S.age))}.`,
+    ()=>`SECURE 2.0 starts them at 73, or 75 for anyone born in ${RMD_START_LATE} or later. On your current age that is ${rmdStartAge(CUR_YEAR-Math.round(S.age))}.`
+      // the model infers a birth year from an age, which is ambiguous at exactly this age: someone who is
+      // 66 now may have been born late in 1959, when the law says 73
+      + (CUR_YEAR-Math.round(S.age) === RMD_START_LATE ? ` The model works out your birth year from your age as ${RMD_START_LATE}; if you were born in ${RMD_START_LATE-1}, they start at 73, two years earlier than shown here.` : ''),
     'The amount is the Trad. 401k and IRA balance divided by a factor from the IRS Uniform Lifetime Table. Roth accounts have no such requirement during your lifetime.',
-    'Not modeled: the separate rules for inherited accounts, still-working exceptions for a plan at your current employer, or qualified charitable distributions.'], src:['IRS Publication 590-B','https://www.irs.gov/publications/p590b']},
+    'Qualified charitable distributions are modelled at Level 6: from 70 they count toward the requirement dollar for dollar.',
+    'Not modeled: the separate rules for inherited accounts, or still-working exceptions for a plan at your current employer.'], src:['IRS Publication 590-B','https://www.irs.gov/publications/p590b']},
   a_fees:{t:'Fees', b:['Returns are before fund expenses and advisory fees. If you pay 1% a year in fees, your real average return is roughly 1 point lower than shown.','Nothing here deducts them for you. If you pay an adviser, subtract their fee from the return you pick in the panel, and do the same for fund expenses.']},
   a_short:{t:'Running short', b:['A future runs short in the first year that all accounts together cannot cover that year\'s spending after income and tax. From then on its balances stay at zero.']},
   a_paths:{t:'Number of futures', b:[()=>`Each run simulates ${N_PATHS.toLocaleString()} futures from a fixed random seed, so moving a slider changes only your inputs, not the luck. "Rerun the statistical sampling" draws a fresh set. Results usually shift by a point or two, which shows the sampling noise.`]},

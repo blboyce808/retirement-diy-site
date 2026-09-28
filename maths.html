@@ -190,7 +190,10 @@ reproduce the mechanism by which a rise in rates hurts now and helps later.</p>
 <h2 id="tax">4. Tax</h2>
 
 <p>All thresholds are 2026 federal figures. Within a path they are multiplied by that path's
-<var>f</var>, which is how the law indexes them &mdash; with two deliberate exceptions noted below.
+<var>f</var> &mdash; with two deliberate exceptions noted below. The law indexes them by chained CPI-U,
+which has run about a quarter of a point a year below CPI-U; the model uses the path's own inflation
+for simplicity, so brackets decades out are slightly too wide and tax there slightly understated
+(timing audit X2, 28 September 2026).
 Write <var>o</var> for ordinary income other than Social Security, <var>c</var> for long-term
 capital gains, <var>s</var> for Social Security benefits, <var>N</var><sub>65</sub> for the number of
 people aged 65 or over (0, 1 or 2).</p>
@@ -227,9 +230,14 @@ the top and bottom of the gains slice:</p>
 <div class="fx">taxable<sub>ord</sub> = max(0, taxable &minus; c)
 taxable<sub>cg</sub>  = taxable &minus; taxable<sub>ord</sub>
 
-T = B(taxable<sub>ord</sub>, brackets, f)
-  + B(taxable<sub>ord</sub> + taxable<sub>cg</sub>, cgSchedule, f) &minus; B(taxable<sub>ord</sub>, cgSchedule, f)
+T = min( B(taxable<sub>ord</sub>, brackets, f)
+         + B(taxable<sub>ord</sub> + taxable<sub>cg</sub>, cgSchedule, f) &minus; B(taxable<sub>ord</sub>, cgSchedule, f),
+         B(taxable, brackets, f) )
   + st · taxable</div>
+<p>The <code>min</code> is the last line of the IRS Qualified Dividends and Capital Gain Tax
+Worksheet: the result is never more than ordinary rates on everything would have cost. It matters only
+in a narrow band where the 20% gains rate sits above the ordinary bracket the gains land in, and is
+worth at most about $57 a year; it was added on 28 September 2026.</p>
 <p>where <var>B</var> integrates a marginal schedule whose thresholds have been scaled by
 <var>f</var>:</p>
 <div class="fx">B(x, brackets, f) = &Sigma;<sub>j</sub> rate<sub>j</sub> · (min(x, hi<sub>j</sub>·f) &minus; lo<sub>j</sub>·f)⁺</div>
@@ -293,7 +301,7 @@ amount; under the three portfolio-based rules it is discarded and replaced:</p>
   <tr><td>Steady</td><td><code>planned</code></td></tr>
   <tr><td>Guardrails</td><td><code>planned · m</code>, with <var>m</var> adjusted as below</td></tr>
   <tr><td>Percent of portfolio</td><td><code>W &minus; extra(W) + max(0, guarNet)</code>, <code>W = P·rate</code></td></tr>
-  <tr><td>Divide by years left</td><td><code>W &minus; extra(W) + max(0, guarNet)</code>, <code>W = P/(H&minus;a+1)</code></td></tr>
+  <tr><td>Divide by years left</td><td><code>W &minus; extra(W) + max(0, guarNet)</code>, <code>W = P/(H&minus;a)</code></td></tr>
   <tr><td>VPW</td><td><code>W &minus; extra(W) + max(0, guarNet)</code>, <code>W = P·v(a)</code></td></tr>
 </table>
 <p>For the three portfolio rules <var>W</var> is a withdrawal before tax, as the 4% rule and VPW define
@@ -359,14 +367,19 @@ account as basis. The divisor falls from 26.5 at 73 to 2.0 at 120, which is roug
 balance at 73, 5% at 80 and 8% at 90.</p>
 
 <h3>8.2 Roth conversions</h3>
-<p>After the year's spending is settled, the headroom below the chosen bracket ceiling is</p>
-<div class="fx">room = bracketTop(rate, f) &minus; max(0, taxable(o + withdrawn, gains, s) &minus; gains)</div>
-<p>The bracket is an ordinary-income bracket, so only ordinary taxable income occupies it: gains and
-qualified dividends stack on top at their own rates. Counting them in, as the model did until 28
-September 2026, made a conversion stop short of the bracket by the whole of the year's gains. Where
-the conversion pushes those gains out of the 0% band, the extra tax is part of the bill below.</p>
-<p>and the conversion is <code>min(pre-tax balance, room)</code>. Its tax is the increase in the
-year's bill, and it must be payable from outside the retirement accounts:</p>
+<p>After the year's spending is settled, the conversion <code>c</code> is the largest amount, up to
+the pre-tax balance, that keeps ordinary taxable income inside the chosen bracket:</p>
+<div class="fx">max(0, taxable(o + withdrawn + c, gains, s) &minus; gains) &le; bracketTop(rate, f)</div>
+<p>found by bisection, since the left side only ever rises with <code>c</code>. The bracket is an
+ordinary-income bracket, so only ordinary taxable income occupies it: gains and qualified dividends
+stack on top at their own rates. It is a search rather than a subtraction because a converted dollar
+is not always one dollar of taxable income: while the standard deduction is unused the first dollars
+are taxed at nothing, once Social Security is partly taxable each dollar can make up to 85 cents more
+of it taxable, and the senior deduction phases out. Subtracting, as the model did until 28 September
+2026, undershot in the first case and spilled into the next bracket in the others. Where the
+conversion pushes gains out of the 0% band, the extra tax is part of the bill below.</p>
+<p>Its tax is the increase in the year's bill, and it must be payable from outside the retirement
+accounts:</p>
 <div class="fx">purse = max(0, cash + brokerage &minus; keep · spending)</div>
 <p>If the tax exceeds the purse, the conversion is scaled down by the ratio and retried, up to eight
 times. Nothing is converted unless the tax can be paid, which is the point: a conversion funded from
@@ -393,17 +406,26 @@ case for conversions by about that much.</div>
 <h3>8.3 Medicare surcharges</h3>
 <p>IRMAA is charged on income from two years earlier, so the model keeps a MAGI series and looks
 back:</p>
-<div class="fx">surcharge(k) = tier(MAGI[k&minus;2]) → annual amount · f · persons</div>
+<div class="fx">surcharge(k) = tier(MAGI[max(1, k&minus;2)], thresholds of that year's filing status) → annual amount · f · persons now</div>
+<p>The two years before the plan starts have no income on record, so year 1's MAGI stands in for them.
+It is not known until year 1 ends, so year 1's own surcharge is charged a year late, in year 2, beside
+year 2's; until 28 September 2026 neither year was charged at all. The thresholds follow the filing
+status of the return being looked back at, so in the first two years after a death a joint return is
+judged against the joint thresholds, while only the survivor pays.</p>
 <p>It is a step function, not a taper: one dollar over a threshold costs a full year of the higher
-premium, per person. The 2025 published brackets and amounts are used as the 2026 base and indexed
-by <var>f</var>. MAGI here is AGI including the taxable part of Social Security; no tax-exempt
+premium, per person. The 2026 figures are used (CMS; SSA POMS HI 01101.020): the Part B adjustment
+over the $202.90 standard premium plus the Part D adjustment, $1,148 to $6,936 a person a year, from
+$109,000 single or $218,000 joint. The lower thresholds are indexed by <var>f</var>; the top one,
+$500,000 or $750,000, is fixed in law through 2027 and indexed after. MAGI here is AGI including the taxable part of Social Security; no tax-exempt
 interest is modelled, so nothing else is added back. Only the surcharge is modelled &mdash; the
 standard premium everybody pays belongs in the spending figure.</p>
 
 <h3>8.4 Survivor years</h3>
-<p>From the chosen age, four things change at once: the filing status becomes single, so brackets
-narrow and the standard deduction roughly halves; the Social Security benefit falls to the chosen
-share; other income falls to its chosen share; and spending falls to its chosen share. The Social
+<p>From the chosen age the Social Security benefit falls to the chosen share, other income falls to
+its chosen share, and spending falls to its chosen share. From the <em>following</em> year the filing
+status becomes single, so brackets narrow and the standard deduction roughly halves: the law allows a
+joint return for the year a spouse dies, and qualifying surviving spouse status needs a dependent
+child, which the model does not have. The Social
 Security taxation thresholds fall from the joint pair to the single pair, which are
 <em>not</em> half of them &mdash; part of why a survivor often pays more tax on less income.</p>
 
@@ -436,8 +458,9 @@ its contribution, which arrived before the shortfall.</div>
 failure age &mdash; out of 2,000 futures in random mode, or out of the number of historical windows
 in backtest mode.</p>
 <div class="note"><b>Sampling error.</b> With 2,000 paths the standard error near 50% is
-&radic;(0.25/2000) &asymp; 1.1 points. Measured: 25 different seeds on the default plan spread from
-38.4% to 42.3%, standard deviation 0.97 points. Differences smaller than about two points are noise.</div>
+&radic;(0.25/2000) &asymp; 1.1 points. Measured: 25 different seeds (1 to 25) on the default plan at
+Level 1 spread from 54.9% to 59.8%, standard deviation 1.3 points. Differences smaller than about two
+points are noise.</div>
 
 <h3>Percentile bands</h3>
 <p>For each year independently, the values across all paths are sorted and the 5th, 10th, 25th, 50th,
@@ -564,15 +587,17 @@ inherited retirement account within ten years, so what they inherit arrives as a
 ordinary income stacked on whatever they already earn. For <code>n</code> people sharing a pot
 <code>P</code>, each taking <code>P/n</code> across ten years on their own income <code>y</code>:</p>
 <div class="fx">h = 10 · n · [ tax(y + P / n / 10) &minus; tax(y) ] / P</div>
-<p>with <code>P</code> in today's dollars and <code>tax</code> on this year's brackets, whatever the
+<p>with <code>tax</code> including the reader's flat state rate as a stand-in for the beneficiaries',
+<code>P</code> in today's dollars and <code>tax</code> on this year's brackets, whatever the
 page is showing: projecting an heir's tax return decades out would be false precision on top of a
 guess, and pricing a future-dollar pot on today's brackets would push it into brackets it would never
 reach.</p>
 <p>which is why the number of heirs changes the answer at all: the same pot divided four ways is four
 smaller slugs, each of which may stay inside the bracket that person was already in. On a $1.5M pot
-left to people earning $120,000 the rate falls from 21.5% to 18.5% going from one heir to four; on a
-$6M pot, from 28.0% to 21.5%. It is equally why the effect sometimes vanishes: on that $1.5M pot left
-to someone earning $250,000 it is 24.0% however it is divided, because every slug lands inside one
+left to people earning $120,000 the federal part of the rate falls from 21.5% to 18.5% going from one
+heir to four; on a $6M pot, from 28.0% to 21.5%. The state rate adds the same few points to every one of
+these, since the inherited income sits above the heirs' deduction. It is equally why the effect sometimes vanishes: on that $1.5M pot left
+to someone earning $250,000 the federal part is 24.0% however it is divided, because every slug lands inside one
 bracket. Note also that <code>h</code> is evaluated on the amount actually inherited, so giving part
 of the pot to charity lowers the rate on what is left.</p>
 <p>Those three sum to the ending balance by construction, and they are reported from a <em>single</em>
@@ -590,8 +615,10 @@ planning.</b> Computing the rate removes the arithmetic from the reader but not 
 inherits, what they earn at the time, where they live and what the brackets look like decades hence are
 all unknown, and asking for an income rather than a bracket only puts the same guess in a form the tax
 code can use. The right use of it is to move the inputs and see which way the answer leans, not to
-trust any single figure. What it does not model: a beneficiary's own deductions, other investment
-income or state tax, the year they actually inherit, or the fact that a spouse, a minor child, a
+trust any single figure. The reader's own state rate stands in for the beneficiaries' (added
+28 September 2026, so the heirs' figure is not flattered against "Worth after tax", which charges it).
+What it does not model: a beneficiary's own deductions, other investment income or their own state's
+rules, the year they actually inherit, or the fact that a spouse, a minor child, a
 disabled beneficiary or anyone within ten years of the account holder's age may stretch withdrawals
 across a lifetime instead of ten years.
 Everything that actually governs who inherits &mdash; wills, trusts, beneficiary designations,
@@ -614,7 +641,8 @@ yours.</div>
     threshold and a handful tax the recipient instead. None of that is here.</li>
   <li><strong>A beneficiary's tax position beyond an income and a filing status.</strong> The
     ten-year rule <em>is</em> modelled, but through a single income figure: their own deductions, other
-    investment income, state tax and the year they actually inherit are not. Nor is a beneficiary who
+    investment income, their own state (the reader's rate stands in) and the year they actually inherit
+    are not. Nor is a beneficiary who
     may still stretch withdrawals over a lifetime rather than ten years &mdash; a spouse, a minor
     child, a disabled or chronically ill person, or anyone within ten years of the account holder's
     age.</li>
