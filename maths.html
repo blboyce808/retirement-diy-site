@@ -275,8 +275,11 @@ mostly in an IRA will see a rosier answer here than reality would give.</div>
 
 <h2 id="income">5. Guaranteed income</h2>
 <p>Three streams arrive whether or not they are wanted: Social Security, other income cards, and
-required distributions.</p>
-<div class="fx">s = ssAmt · f · (survivor share, if widowed)     when a &ge; ssAge
+required distributions. Social Security is two benefits for a married plan, each from its own
+claiming age on the reader's age timeline (the model treats both spouses as the same age), and one for
+a single filer. Plans and codes from before 28 September 2026 held one household figure claimed at one
+age; they load with that figure whole and the spouse's at zero, so their results do not change.</p>
+<div class="fx">s = ( ssAmt·[a &ge; ssAge] + ssAmt<sub>2</sub>·[a &ge; ssAge<sub>2</sub>] ) · f · (survivor share, if widowed)
 
 other: for each card, amount·f if it rises with inflation, else the amount as written,
        included when startAge &le; a &le; endAge, split into taxable and tax-free</div>
