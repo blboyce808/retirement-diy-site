@@ -58,7 +58,7 @@
 or reproduce it from scratch. This describes what the engine actually does, including the places
 where it departs from what a textbook would say &mdash; those are marked.</p>
 <p class="lede">Companion to the <a href="index.html">calculator</a> and its &ldquo;How this
-works&rdquo; summary. Last revised 27 September 2026.</p>
+works&rdquo; summary. Last revised 28 September 2026.</p>
 
 <div class="toc"><ol>
   <li><a href="#conv">Conventions and timing</a></li>
@@ -93,7 +93,12 @@ flow against an age therefore read it one index later than the balance for the s
 multiplied at the close of every year. So the first simulated year uses <var>f</var> = 1: today's
 dollars and that year's dollars are the same thing. All internal arithmetic is in nominal dollars of
 the year concerned, and &ldquo;today's dollars&rdquo; anywhere in the interface means a nominal
-figure divided by that path's <var>f</var>.</p>
+figure divided by that path's <var>f</var>. Which <var>f</var> matters: a balance quoted at the end
+of year <var>k</var> is divided by the index after that year's inflation, <var>f</var><sub>k</sub>,
+but a flow &mdash; income, spending, withdrawals, tax &mdash; was priced during the year at the index
+in force when it began, <var>f</var><sub>k&minus;1</sub>, and is divided by that. The spending and tax
+charts, the lifetime tax total and the spreadsheet's tax columns all plot a year's flows at the age
+that year starts.</p>
 
 <p>Three modes fill the return series, and nothing else about the engine changes between them:</p>
 <table>
@@ -269,7 +274,8 @@ other: for each card, amount·f if it rises with inflation, else the amount as w
        included when startAge &le; a &le; endAge, split into taxable and tax-free</div>
 <p>Their net contribution is the gross less the extra tax they cause:</p>
 <div class="fx">guarNet = s + rmd + other<sub>taxed</sub> + other<sub>free</sub> &minus; (T<sub>base</sub> &minus; T<sub>wage</sub>)</div>
-<p>where <var>T</var><sub>base</sub> is the tax on wage + rmd + taxable other, with Social Security,
+<p>where <var>T</var><sub>base</sub> is the tax on wage + rmd + taxable other + the brokerage's coupon
+interest, with its qualified dividends as long-term gains and with Social Security (&sect;10),
 and <var>T</var><sub>wage</sub> is the tax on the wage alone. The difference isolates the tax caused
 by the retirement income rather than by employment.</p>
 <div class="note"><b>Before retirement</b> the model assumes a salary equal to the spending figure
@@ -286,10 +292,15 @@ amount; under the three portfolio-based rules it is discarded and replaced:</p>
   <tr><th>Rule</th><th>Amount spent</th></tr>
   <tr><td>Steady</td><td><code>planned</code></td></tr>
   <tr><td>Guardrails</td><td><code>planned · m</code>, with <var>m</var> adjusted as below</td></tr>
-  <tr><td>Percent of portfolio</td><td><code>P·rate + max(0, guarNet)</code></td></tr>
-  <tr><td>Divide by years left</td><td><code>P/(H&minus;a+1) + max(0, guarNet)</code></td></tr>
-  <tr><td>VPW</td><td><code>P·v(a) + max(0, guarNet)</code></td></tr>
+  <tr><td>Percent of portfolio</td><td><code>W &minus; extra(W) + max(0, guarNet)</code>, <code>W = P·rate</code></td></tr>
+  <tr><td>Divide by years left</td><td><code>W &minus; extra(W) + max(0, guarNet)</code>, <code>W = P/(H&minus;a+1)</code></td></tr>
+  <tr><td>VPW</td><td><code>W &minus; extra(W) + max(0, guarNet)</code>, <code>W = P·v(a)</code></td></tr>
 </table>
+<p>For the three portfolio rules <var>W</var> is a withdrawal before tax, as the 4% rule and VPW define
+it, and <code>extra(W)</code> is the income tax and early-withdrawal penalty that drawing <var>W</var>
+in the usual order adds to the year's bill (section 7). The reader lives on what is left. Until 28
+September 2026 the share was spent after tax with the tax drawn on top, which withdrew about 10% more
+than the rate shown.</p>
 <p><var>P</var> is the whole portfolio at the start of the year and <var>v</var>(<var>a</var>) is
 linearly interpolated from a table rising from 3.9% at 50 to 20.9% at 95. The percent rule is clamped
 to 2&ndash;8%. Note that under the portfolio rules the guaranteed income is <em>added to</em> the
@@ -308,8 +319,10 @@ new one is applied afterwards, so a cut takes effect in the year it is triggered
 
 <h2 id="withdraw">7. Funding the year</h2>
 <p>The year's requirement is</p>
-<div class="fx">need = spending + lifeEventOutflow·f + irmaaSurcharge
+<div class="fx">need = spending + gift·f + lifeEventOutflow·f + irmaaSurcharge
 gap  = need &minus; guarNet</div>
+<p>where the gift is the yearly amount given to people while alive, from the age chosen (Level 6;
+&sect;10).</p>
 
 <p><strong>If the gap is negative</strong>, income exceeded the requirement. Any unspent required
 distribution goes to the brokerage account, counted entirely as basis since its tax has been paid;
@@ -347,7 +360,11 @@ balance at 73, 5% at 80 and 8% at 90.</p>
 
 <h3>8.2 Roth conversions</h3>
 <p>After the year's spending is settled, the headroom below the chosen bracket ceiling is</p>
-<div class="fx">room = bracketTop(rate, f) &minus; taxable(o + withdrawn, gains, s)</div>
+<div class="fx">room = bracketTop(rate, f) &minus; max(0, taxable(o + withdrawn, gains, s) &minus; gains)</div>
+<p>The bracket is an ordinary-income bracket, so only ordinary taxable income occupies it: gains and
+qualified dividends stack on top at their own rates. Counting them in, as the model did until 28
+September 2026, made a conversion stop short of the bracket by the whole of the year's gains. Where
+the conversion pushes those gains out of the 0% band, the extra tax is part of the bill below.</p>
 <p>and the conversion is <code>min(pre-tax balance, room)</code>. Its tax is the increase in the
 year's bill, and it must be payable from outside the retirement accounts:</p>
 <div class="fx">purse = max(0, cash + brokerage &minus; keep · spending)</div>
@@ -403,10 +420,11 @@ every year, at no cost and with no tax.</p>
 before any return is applied, which is equivalent to withdrawing on 1 January. Real spending happens
 through the year. This is conservative &mdash; it removes money before it can earn &mdash; by roughly
 half a year's return on the amount withdrawn.</div>
-<div class="note"><b>Caveat: basis does not grow.</b> The brokerage balance compounds but its cost
-basis does not, so the gain fraction rises over time exactly as it should. What the model does not do
-is add reinvested dividends to basis, because it does not model dividends separately at all
-(&sect;11).</div>
+<div class="note"><b>Basis grows only with money already taxed.</b> The brokerage balance compounds
+and its cost basis does not, so the gain fraction rises over time exactly as it should. What does raise
+the basis is money that has already been taxed: contributions, money coming in from life events,
+surplus income put back, and the yearly dividends and interest, which are taxed as they are paid and
+treated as reinvested (&sect;10). The basis is capped at the balance.</div>
 <div class="note"><b>Nothing survives a failure.</b> A path that has run short receives no further
 contributions, so its balances stay at zero for the rest of the plan. The failure year itself keeps
 its contribution, which arrived before the shortfall.</div>
@@ -476,10 +494,14 @@ ending total mixes dollars that are not worth the same. The after-tax figure pri
 balance at the rate one more dollar of ordinary income would cost that household in its final year,
 federal and state together, obtained numerically from the same tax function:</p>
 <div class="fx">m = [ tax(o+&delta;, g, s) &minus; tax(o, g, s) ] / &delta;,&nbsp;&nbsp;&delta; = 1000·f</div>
-<div class="fx">net = trad·(1 &minus; m) + roth + brokerage + cash</div>
-<p>where <code>o</code> is that year's ordinary income including any conversion, and <code>m</code>
-is clamped to [0, 1]. One figure is kept per path and the median is reported, in today's money,
-beside the face-value balance. A path that ran short contributes zero to both.</p>
+<div class="fx">m<sub>g</sub> = [ tax(o, g+&delta;, s) &minus; tax(o, g, s) ] / &delta;</div>
+<div class="fx">net = trad·(1 &minus; m) + roth + cash + brokerage &minus; max(0, brokerage &minus; basis)·m<sub>g</sub></div>
+<p>where <code>o</code> is that year's ordinary income including any conversion, <code>g</code> its
+gains and qualified dividends, <code>m</code> the marginal ordinary rate and <code>m<sub>g</sub></code>
+the marginal long-term rate, both clamped to [0, 1]. The brokerage is charged the long-term tax on its
+unrealised gain because the household would owe it to sell; that rate is genuinely zero for a
+low-income household, since the 0% band is real. One figure is kept per path and the median is
+reported beside the face-value balance, in whichever dollars the page is showing. A path that ran short contributes zero to both.</p>
 
 <div class="note warn"><b>Caveat: this is a rate, not a liquidation.</b> A marginal rate prices the
 balance as though it were drawn gradually. Emptying the account in a single year would push through
@@ -510,8 +532,9 @@ gifting look cleaner than it is.</div>
 
 <h3>Qualified charitable distributions</h3>
 <p>Money moving straight from a traditional IRA to a charity, from age 70 &mdash; the law says 70&frac12;
-and this model counts whole years throughout. Capped at the 2026 ceiling of $111,000 a person, indexed,
-and at the balance available. Two things make it worth more than withdrawing the money and claiming a
+and this model counts whole years throughout. Capped at the 2026 ceiling of $111,000 a person, indexed, which the
+model applies once per household rather than once for each spouse (the cautious reading), and at the
+balance available. Two things make it worth more than withdrawing the money and claiming a
 deduction, and both fall out of where it sits in the calculation rather than being special-cased.</p>
 <p>First, it never enters income. It is subtracted from the pre-tax balance before any of the tax
 machinery runs, so it does not raise taxable income, does not push Social Security across its
@@ -541,10 +564,14 @@ inherited retirement account within ten years, so what they inherit arrives as a
 ordinary income stacked on whatever they already earn. For <code>n</code> people sharing a pot
 <code>P</code>, each taking <code>P/n</code> across ten years on their own income <code>y</code>:</p>
 <div class="fx">h = 10 · n · [ tax(y + P / n / 10) &minus; tax(y) ] / P</div>
+<p>with <code>P</code> in today's dollars and <code>tax</code> on this year's brackets, whatever the
+page is showing: projecting an heir's tax return decades out would be false precision on top of a
+guess, and pricing a future-dollar pot on today's brackets would push it into brackets it would never
+reach.</p>
 <p>which is why the number of heirs changes the answer at all: the same pot divided four ways is four
 smaller slugs, each of which may stay inside the bracket that person was already in. On a $1.5M pot
 left to people earning $120,000 the rate falls from 21.5% to 18.5% going from one heir to four; on a
-$6M pot, from 31.2% to 24.0%. It is equally why the effect sometimes vanishes: on that $1.5M pot left
+$6M pot, from 28.0% to 21.5%. It is equally why the effect sometimes vanishes: on that $1.5M pot left
 to someone earning $250,000 it is 24.0% however it is divided, because every slug lands inside one
 bracket. Note also that <code>h</code> is evaluated on the amount actually inherited, so giving part
 of the pot to charity lowers the rate on what is left.</p>
