@@ -542,7 +542,7 @@ footer{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:80ch}
       <p>The randomness is seeded, so the same inputs always give the same answer. The seed travels in your scenario code and your CSV export, which means a number you saw last week is still reproducible this week.</p>
 
       <h3 class="tmh">Three ways of asking the same question</h3>
-      <p><b>Statistical projections</b>, the default. Stock and bond returns are drawn from lognormal distributions with a correlation of 0.10, and inflation from a normal distribution around the average you set. Two thousand draws leaves a sampling error of about one point: rerunning the sampling 25 times on the default plan gave a spread of 54.9% to 59.8%, with a standard deviation of 1.3 points, close to the 1.1 points the arithmetic predicts. Treat any difference smaller than a couple of points as noise.</p>
+      <p><b>Statistical projections</b>, the default. Stock and bond returns are drawn from lognormal distributions with a correlation of 0.10, and inflation from a normal distribution around the average you set. Two thousand draws leaves a sampling error of about one point: rerunning the sampling 25 times on the default plan gave a spread of 55.1% to 59.8%, with a standard deviation of 1.2 points, close to the 1.1 points the arithmetic predicts. Treat any difference smaller than a couple of points as noise.</p>
       <p><b>Historical backtests.</b> No randomness at all. Your plan is replayed against every real start year in the data, using that year&rsquo;s actual stock return, bond return and inflation. With 155 years of history and a 30-year retirement that is 126 separate rehearsals, each one a thing that genuinely happened to somebody.</p>
       <p><b>Stress tests.</b> Ordinary markets until the day you retire, then one of history&rsquo;s worst stretches beginning that very year: 1929, 1937, 1966, 1973, 2000, 2008, or a straight 30% fall. This isolates sequence-of-returns risk, which is the thing that actually ruins retirements.</p>
 
@@ -605,7 +605,6 @@ footer{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:80ch}
       <p>This page is the summary. There is a companion page that writes out every calculation the engine performs &mdash; the return draws, the bond pricing, the tax arithmetic including the fixed point that solves for withdrawing enough to cover its own tax, the withdrawal orders, conversions, surcharges, and how paths become percentages &mdash; in enough detail to check it or rebuild it. It marks the places the implementation departs from the textbook, and there are several. <a class="cmplink" href="maths.html" target="_blank" rel="noopener">The arithmetic, in full</a></p>
       <h3 class="tmh">What it costs</h3>
       <p>Nothing, and there is nothing to buy. Every level is open, there is no account to make, no email to hand over, and nothing on this page is tracking you or being sold to anybody. It is a side project rather than a business, and the honest reason everything is free is that charging for it would mean building a payment system instead of improving the model.</p>
-      <p hidden><span id="methodDonate"></span></p>
       <h3 class="tmh">Sources</h3>
       <p class="cmpnote">Robert Shiller, online data, Yale University, for everything to 2022. The Federal Reserve Bank of St Louis (FRED) series GS10 and CPIAUCNS, and the S&amp;P 500 total return index, for 2023 onwards. IRS Revenue Procedure 2025-32 and Publication 590-B. Social Security Administration, retirement benefits and the provisional-income rules. Medicare.gov, Medicare costs. Cooley, Hubbard and Walz, &ldquo;Retirement Savings: Choosing a Withdrawal Rate That Is Sustainable&rdquo;, AAII Journal, 1998. FI Calc, ficalc.app, consulted September 2026. Named rather than linked, so that reading the method does not mean leaving the page.</p>
     </div>
@@ -657,6 +656,8 @@ footer{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:80ch}
 
 <script>
 /* ============ MARKET ASSUMPTIONS (fixed, except the Level 2 stock-return preset and yearly fees) ============ */
+// the inflation the return presets are stated at; returns move with inflation away from it
+const INFL_REF = .025;
 const MKT = {sMean:.075, sVol:.17, bMean:.040, bVol:.06, rho:.10, inflVol:.012, cMean:.030, cVol:.010,
   /* What a taxable account hands out each year whether or not anything is sold. divS is the stock
      dividend yield: the S&P 500 pays 1.05% in September 2026 against a 1.61% long-run average, and a
@@ -737,33 +738,13 @@ function magiOf(ord, gains, ss, L){
 }
 function rmdStartAge(birthYear){ return birthYear >= RMD_START_LATE ? 75 : 73; }
 function rmdDivisor(age){ return RMD_DIV[Math.min(Math.max(age,73),120)] || 0; }
-// Where a reader can chip in, if they want to. Paste a page here - Ko-fi, GitHub Sponsors,
-// Buy Me a Coffee, a Stripe payment link - and the two places that use it start showing it.
-// Empty means no link appears anywhere, so nothing half-finished can ship by accident.
-// It has to stay a plain link the reader clicks, never an embedded widget: a widget loads
-// somebody else's script and their tracking, which would break both the no-outside-requests
-// rule and the promise about not being followed around. rel=noreferrer so the service is not
-// even told which page sent them, and target=_blank so the reader does not lose their plan.
-// PARKED, 27 Sept 2026, to be considered later. Donations were chosen over a paywall in
-// September, then set aside in favour of chasing traffic first, so this is switched off at the
-// source rather than left looking like a feature waiting for a URL. Nothing renders either way:
-// DONATE was already empty. The stub below keeps the two call sites honest.
-//
-// To bring it back: delete the stub, uncomment the three lines under it, and put a GitHub
-// Sponsors, Ko-fi or Stripe payment-link URL in DONATE. A link appears in the footer and in the
-// methodology dialog. Read the note above first - it must stay a plain anchor.
-const donateLink = () => '';
-// const DONATE = '';
-// const donateLink = text => DONATE
-//   ? `<a class="cmplink" href="${DONATE}" target="_blank" rel="noopener noreferrer">${text}</a>`
-//   : '';
 const retPctS = v => (v*100).toFixed(2).replace(/0$/,'') + '%';   // 8.0%, 8.75%, 9.5%: exact, where pctS rounds to one decimal
 const N_PATHS = 2000;
 /* Annual US history, Jan to Jan: [year, stock total return, 10-year Treasury return, CPI inflation].
    Built from Robert Shiller's monthly S&P composite, dividend, CPI and long-rate series (1871 to 2022). */
 const HIST = [[1871,0.1532,0.0504,0.0152],[1872,0.1094,0.0384,0.0229],[1873,-0.0262,0.0635,-0.044],[1874,0.0451,0.083,-0.0695],[1875,0.0515,0.0854,-0.0573],[1876,-0.1368,0.0561,0.0083],[1877,-0.0168,0.0526,-0.1563],[1878,0.1583,0.0522,-0.1029],[1879,0.4807,0.0571,0.2065],[1880,0.2568,0.0643,-0.0571],[1881,0.0036,0.0431,0.0807],[1882,0.0355,0.0354,-0.0187],[1883,-0.0524,0.0371,-0.0761],[1884,-0.1199,0.0438,-0.1029],[1885,0.2906,0.0467,-0.035],[1886,0.1171,0.0223,0.0],[1887,-0.006,0.0239,0.0476],[1888,0.0319,0.0535,-0.0454],[1889,0.0696,0.0368,-0.0476],[1890,-0.0595,0.0191,0.025],[1891,0.1839,0.0377,-0.0603],[1892,0.06,0.0247,0.0778],[1893,-0.1862,0.0413,-0.1329],[1894,0.0367,0.0553,-0.0409],[1895,0.0516,0.024,0.0137],[1896,0.0315,0.0513,-0.0285],[1897,0.1991,0.0378,0.0294],[1898,0.285,0.0529,0.015],[1899,0.0371,0.0271,0.1686],[1900,0.2014,0.0354,-0.0241],[1901,0.1925,0.0248,0.0246],[1902,0.0819,0.0226,0.0962],[1903,-0.1701,0.0254,-0.0439],[1904,0.3111,0.0279,0.0229],[1905,0.2089,0.0386,0.0],[1906,0.0059,0.0162,0.0449],[1907,-0.2394,0.0217,-0.0215],[1908,0.3837,0.047,0.0323],[1909,0.1591,0.0264,0.1074],[1910,-0.0351,0.0339,-0.0677],[1911,0.0345,0.0376,-0.0108],[1912,0.0719,0.008,0.0734],[1913,-0.0484,0.0659,0.0204],[1914,-0.0529,0.0357,0.01],[1915,0.3042,0.0565,0.0297],[1916,0.0794,0.0273,0.125],[1917,-0.1807,0.0177,0.1966],[1918,0.1755,0.0508,0.1786],[1919,0.1947,0.0115,0.1697],[1920,-0.136,0.0412,-0.0155],[1921,0.0946,0.1088,-0.1105],[1922,0.2859,0.0386,-0.0059],[1923,0.0507,0.0658,0.0298],[1924,0.2594,0.0556,0.0],[1925,0.2502,0.0522,0.0347],[1926,0.1106,0.0629,-0.0223],[1927,0.3629,0.0342,-0.0114],[1928,0.4645,0.0129,-0.0116],[1929,-0.0899,0.0598,0.0],[1930,-0.219,0.0291,-0.0702],[1931,-0.4247,0.0077,-0.1006],[1932,-0.0679,0.0652,-0.0979],[1933,0.5525,0.0478,0.0233],[1934,-0.0792,0.0571,0.0303],[1935,0.5344,0.039,0.0147],[1936,0.3201,0.0241,0.0217],[1937,-0.3125,0.0363,0.0071],[1938,0.1668,0.0416,-0.0141],[1939,0.0279,0.0357,-0.0071],[1940,-0.0894,0.0434,0.0144],[1941,-0.088,-0.0212,0.1135],[1942,0.2027,0.0238,0.0764],[1943,0.2335,0.0239,0.0296],[1944,0.1916,0.0336,0.023],[1945,0.3842,0.0383,0.0225],[1946,-0.1179,0.0171,0.1813],[1947,0.0254,0.0073,0.1023],[1948,0.0942,0.0349,0.0127],[1949,0.1659,0.0223,-0.0208],[1950,0.3315,0.0033,0.0809],[1951,0.2116,0.017,0.0433],[1952,0.1415,0.015,0.0038],[1953,0.0268,0.0562,0.0113],[1954,0.4562,0.0145,-0.0074],[1955,0.2848,0.0034,0.0037],[1956,0.0691,-0.0137,0.0299],[1957,-0.0564,0.0633,0.0362],[1958,0.3951,-0.0382,0.014],[1959,0.0756,-0.0102,0.0103],[1960,0.0625,0.1131,0.0171],[1961,0.1894,0.0206,0.0067],[1962,-0.0281,0.0595,0.0133],[1963,0.2088,0.0132,0.0164],[1964,0.1578,0.0402,0.0097],[1965,0.114,0.0115,0.0192],[1966,-0.0647,0.0483,0.0346],[1967,0.1598,-0.0202,0.0365],[1968,0.1048,0.0207,0.044],[1969,-0.0839,-0.0499,0.0618],[1970,0.0703,0.1822,0.0529],[1971,0.1381,0.0822,0.0327],[1972,0.176,0.0255,0.0365],[1973,-0.1609,0.0301,0.0939],[1974,-0.2085,0.0374,0.118],[1975,0.3857,0.0598,0.0672],[1976,0.111,0.1116,0.0522],[1977,-0.0884,0.0252,0.0684],[1978,0.1593,0.0115,0.0928],[1979,0.1661,-0.0039,0.1391],[1980,0.2529,0.0157,0.1183],[1981,-0.0698,0.0279,0.0839],[1982,0.2881,0.3795,0.0371],[1983,0.2014,0.0393,0.0419],[1984,0.0752,0.1325,0.0353],[1985,0.2585,0.2441,0.0389],[1986,0.3094,0.2289,0.0146],[1987,-0.0206,-0.0258,0.0405],[1988,0.1763,0.0616,0.0467],[1989,0.2277,0.1454,0.052],[1990,-0.0083,0.0896,0.0565],[1991,0.3157,0.1499,0.026],[1992,0.0757,0.0988,0.0326],[1993,0.1155,0.1244,0.0252],[1994,0.0108,-0.0705,0.028],[1995,0.3495,0.2249,0.0273],[1996,0.2705,-0.0052,0.0304],[1997,0.2771,0.138,0.0157],[1998,0.3128,0.1144,0.0167],[1999,0.1548,-0.081,0.0274],[2000,-0.0515,0.1725,0.0373],[2001,-0.1345,0.0601,0.0114],[2002,-0.2004,0.1238,0.026],[2003,0.2826,0.0331,0.0193],[2004,0.0596,0.0363,0.0297],[2005,0.1001,0.0276,0.0399],[2006,0.1322,0.0198,0.0208],[2007,-0.0134,0.1243,0.0428],[2008,-0.3515,0.1346,0.0003],[2009,0.3273,-0.0659,0.0263],[2010,0.1613,0.0633,0.0163],[2011,0.0331,0.15,0.0292],[2012,0.1603,0.0246,0.016],[2013,0.2535,-0.0554,0.0158],[2014,0.1335,0.109,-0.0009],[2015,-0.0334,0.0017,0.0137],[2016,0.2091,-0.0063,0.025],[2017,0.2471,0.0124,0.0207],[2018,-0.047,0.0155,0.0155],[2019,0.2788,0.1055,0.0249],[2020,0.1753,0.0756,0.014],[2021,0.2211,-0.0453,0.0748],[2022,-0.1201,-0.1169,0.0641],[2023,0.233,-0.004,0.0309],[2024,0.2618,-0.0006,0.03],[2025,0.1737,0.0772,0.0239]];
 const HIST_FIRST = HIST[0][0], HIST_LAST = HIST[HIST.length-1][0];
-const BUILD = '68b42c4';            // deploy.sh stamps the published copy with the source commit
+const BUILD = 'b12e0a2';            // deploy.sh stamps the published copy with the source commit
 let engine = 'mc';           // 'mc' Monte Carlo, 'hist' every historical start year
 let selYear = null;          // historical start year picked on the history chart
 const CUR_YEAR = new Date().getFullYear();
@@ -802,7 +783,10 @@ const INPUTS = [
   {id:'stocks', lvl:1, label:'Stocks in your mix', hint:'The rest is bonds, rebalanced yearly', min:0,max:100,step:5,def:70,fmt:'pct0'},
 
   {id:'planAge', lvl:2, sec:'uncert', label:'Plan to age', min:80,max:105,step:1,def:95,fmt:'age'},
-  {id:'infl', lvl:2, sec:'uncert', label:'Average inflation', hint:'Varies year to year around this', min:0,max:6,step:.1,def:2.5,fmt:'pct'},
+  // Five choices rather than a free number: nobody can estimate thirty years of inflation, and the figures
+  // come from the page's own 1871-2025 record except the Fed's target (owner, 28 Sept 2026).
+  {id:'infl', lvl:2, sec:'uncert', label:'Average inflation', hint:'Varies year to year around this', type:'select', def:'2.5',
+   options:[['2','The Fed\'s target, 2%'],['2.5','The last 30 years, 2.5%'],['2.9','The last century, 2.9%'],['3.7','Since the Second World War, 3.7%'],['5.4','The worst 30 years on record, 5.4%']]},
   {id:'stockRet', lvl:2, sec:'uncert', label:'Average stock return', hint:'What it grows at over decades, after the good and bad years', type:'select', def:'balanced',
    options:[['cautious',`Cautious, ${retPctS(STOCK_RET.cautious)}`],['balanced',`Balanced, ${retPctS(STOCK_RET.balanced)}`],['historical',`Historical, ${retPctS(STOCK_RET.historical)}`]]},
   // Fees as one blended yearly percentage of savings (design review #4, owner's call, 28 Sept 2026). Default
@@ -975,6 +959,11 @@ function applySnapshot(o){
   // then carries no spouse figure: its benefit stays whole in the first field and the spouse's is zero,
   // so its results do not change.
   if(o.S && o.S.ssAmt!==undefined && o.S.ssAmt2===undefined){ S.ssAmt2 = 0; S.ssAge2 = S.ssAge; }
+  // inflation used to be a free number; a saved one snaps to the nearest of the five choices
+  if(o.S && o.S.infl!==undefined && isFinite(+o.S.infl)){
+    const opts=INPUTS.find(d=>d.id==='infl').options.map(x=>x[0]);
+    S.infl = opts.reduce((b,x)=>Math.abs(+x - +o.S.infl) < Math.abs(+b - +o.S.infl) ? x : b, opts[0]);
+  }
   if(o.S && Array.isArray(o.S.events)) S.events = o.S.events.slice(0,30).map(cleanEvent);
   if(o.S && Array.isArray(o.S.income)) S.income = o.S.income.slice(0,12).map(cleanIncome);
   // A pension used to be three fields of its own. Saved plans and older scenario codes still carry
@@ -1104,7 +1093,7 @@ function simulate(s, lvl, seedVal, mode){
 
   const w = s.stocks/100;
   const feeKeep = 1 - (lvl>=2 ? Math.min(.03, Math.max(0, (+s.fee||0)/100)) : 0);
-  const inflMean = (lvl>=2 ? s.infl : 2.5)/100;
+  const inflMean = (lvl>=2 ? +s.infl : 2.5)/100;
   const L = TAXLAW[s.filing==='single' ? 'single' : 'mfj'];
   const st = stateRateOf(s, lvl);
   const ssAmt = s.ssAmt, ssAge = s.ssAge;
@@ -1205,6 +1194,12 @@ function simulate(s, lvl, seedVal, mode){
         rB = Math.exp(muB + MKT.bVol*zB) - 1;
         infl = Math.max(-.03, inflMean + MKT.inflVol*nrm());
         rC = Math.max(0, MKT.cMean + MKT.cVol*nrm());
+        /* Returns move with inflation. The presets are what money grows at when inflation is 2.5%, so a year
+           of higher inflation carries higher nominal returns and the same return after inflation. With
+           returns fixed instead, the inflation input was a hidden second return dial: 2% to 3.5% swung the
+           default plan by 30 points, of which inflation itself accounted for about 3 (design review #3). */
+        const adj = (1+infl)/(1+INFL_REF);
+        rS = (1+rS)*adj - 1; rB = (1+rB)*adj - 1; rC = (1+rC)*adj - 1;
       } else if(mode==='stress'){
         const row = s._seq[k-1]; rS=row[0]; rB=row[1]; infl=row[2]; rC=row[3];
       } else {
@@ -2817,13 +2812,15 @@ let stressSel = null;
 function stressSeq(s, lvl, test){
   const A=Math.round(s.age), R=Math.max(Math.round(s.retAge),A);
   const H=Math.max(lvl>=2?Math.round(s.planAge):95, R+1, A+1), nY=H-A+1;
-  const infl=(lvl>=2?s.infl:2.5)/100, avg=[stockMeanOf(s, lvl), MKT.bMean, infl, MKT.cMean];
+  // the ordinary years move with inflation too, as in the projections
+  const infl=(lvl>=2?+s.infl:2.5)/100, adj=(1+infl)/(1+INFL_REF);
+  const avg=[(1+stockMeanOf(s, lvl))*adj-1, (1+MKT.bMean)*adj-1, infl, (1+MKT.cMean)*adj-1];
   const kR = R - A + 1;                      // first year of retirement
   const h0 = test.y!=null ? test.y - HIST_FIRST : -1;
   const seq=[];
   for(let k=1;k<nY;k++){
     if(k < kR){ seq.push(avg); continue; }
-    if(test.y==null){ seq.push(k===kR ? [-.30, MKT.bMean, infl, MKT.cMean] : avg); continue; }
+    if(test.y==null){ seq.push(k===kR ? [-.30, avg[1], infl, avg[3]] : avg); continue; }
     const row = HIST[h0 + (k-kR)];
     seq.push(row ? [row[1], row[2], row[3], Math.max(0,(1+row[3])*1.005-1)] : avg);
   }
@@ -4115,10 +4112,7 @@ function run(){
   syncRuleNote();
   syncSplitNote();
   syncCode();
-  // donateLink is parked and returns nothing - see the note at its definition
-  const _md = document.getElementById('methodDonate');
-if(_md) _md.innerHTML = donateLink('Here, if you would like to');
-document.getElementById('footer').innerHTML = 'For planning and education. Not financial, tax or legal advice, not estate planning, and not a financial adviser. © 2026 Brad Boyce. All rights reserved. Build ' + BUILD + '.' + '<button type="button" class="cmplink" id="openMethod">How this works</button>' + '<a class="cmplink" href="maths.html" target="_blank" rel="noopener">The arithmetic</a>' + '<button type="button" class="cmplink" id="openTerms">Terms of use</button>' + donateLink('Chip in');
+document.getElementById('footer').innerHTML = 'For planning and education. Not financial, tax or legal advice, not estate planning, and not a financial adviser. © 2026 Brad Boyce. All rights reserved. Build ' + BUILD + '.' + '<button type="button" class="cmplink" id="openMethod">How this works</button>' + '<a class="cmplink" href="maths.html" target="_blank" rel="noopener">The arithmetic</a>' + '<button type="button" class="cmplink" id="openTerms">Terms of use</button>';
 }
 /* The clover's bubble, for a tap. Wired once, here: it used to sit inside run(), so every
    recalculation added another pair of listeners, and after an even number of runs a tap toggled
@@ -4162,7 +4156,11 @@ const HELP = {
   stocks:{t:'Stocks in your mix', b:['The share of your investments held in stocks. The rest is bonds.','The mix is rebalanced back to this split every year. More stocks raise the average return and widen the range between good and bad futures.']},
   // Level 2
   planAge:{t:'Plan to age', b:['How long the money needs to last. A future counts as a success only if spending is fully covered in every year until you reach this age: the plan runs up to that birthday.','Level 1 uses 95. Planning past your expected lifespan protects against living longer than average.']},
-  infl:{t:'Average inflation', b:['The average yearly rise in prices. Each simulated year draws its own rate around this average, with a spread of 1.2 points, and each year is drawn afresh, so a projected future rarely has the long runs of high inflation history has had. For those, see the 1966 and 1973 stress tests and the backtests.','Spending, contributions and income all grow with that future’s inflation. Level 1 uses 2.5%.','Investment returns do not rise with it: they are set by the stock-return choice above. So a higher figure here also means lower returns after inflation, which is why it moves the answer so much.','For scale: prices roughly tripled between 1966 and 1982. An average cannot show you what that felt like year by year, which is what the backtests are for.']},
+  infl:{t:"Average inflation", b:[
+    "Nobody can forecast thirty years of prices, so this offers five yardsticks rather than a number to guess. Each simulated year draws its own rate around the one you pick, with a spread of 1.2 points.",
+    "<b style=\"display:inline;font:inherit;font-weight:600\">The Fed's target, 2%</b> is what policy aims for. <b style=\"display:inline;font:inherit;font-weight:600\">The last 30 years, 2.5%</b> is 1996 to 2025, and what Level 1 uses. <b style=\"display:inline;font:inherit;font-weight:600\">The last century, 2.9%</b> is 1926 to 2025. <b style=\"display:inline;font:inherit;font-weight:600\">Since the Second World War, 3.7%</b> takes in the 1970s. <b style=\"display:inline;font:inherit;font-weight:600\">The worst 30 years on record, 5.4%</b> is 1966 to 1995.",
+    "Investment returns move with inflation: the stock and bond figures are what money grows at when inflation is 2.5%, and more inflation brings higher returns in dollars. So this setting changes only what inflation genuinely hurts: a pension that does not rise with prices, the Social Security tax thresholds, which never rise, and tax on gains that are partly just inflation. For most plans that is a few points; with a fixed pension it can be a lot.",
+    "A worse decade has happened: 8.7% a year from 1973 to 1982. But no thirty years ever averaged that, and what hurt was the sequence, with returns falling as prices rose. The 1966 and 1973 stress tests and the backtests replay exactly that, which an average cannot."]},
   ssAmt:{t:'Your Social Security', b:['Your own yearly benefit at full retirement age, in today\'s dollars: 67 if you were born in 1960 or later, a little under 67 before that. It is the figure your statement leads with. The model then applies the claiming age you choose below: about 30% less at 62, about 24% more at 70. It rises with inflation, matching Social Security\'s cost-of-living adjustment, and counts toward your retirement income.','Your statement at ssa.gov/myaccount has the most accurate figure. If you don\'t have it handy, the estimator below builds one from your pay.','If you are married, your spouse\'s benefit has its own box below, with its own claiming age, so one of you can claim early while the other waits.'], src:['SSA, retirement benefits','https://www.ssa.gov/benefits/retirement/planner/taxes.html']},
   ssAmt2:{t:'Your spouse\'s Social Security', b:['Your spouse\'s own yearly benefit at full retirement age, in today\'s dollars; the model applies their claiming age below. Their statement at ssa.gov/myaccount has it; the estimator works for them too, from their pay.','A spouse who earned little can instead receive up to half of the other\'s full-retirement benefit. If that is larger than their own, enter that figure here.','Having separate ages is what makes the common strategy possible: the lower earner claims early, while the higher earner waits to 70, which also raises the cheque the survivor keeps.']},
   ssAge2:{t:'Your spouse claims it at age', b:['The age your spouse claims, on your own age timeline: the model treats you both as the same age. If your spouse is three years younger and plans to claim at 67, enter 70.','The model applies the reduction for claiming early, or the credit for waiting, to the full-retirement-age figure above.']},

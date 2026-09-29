@@ -124,7 +124,18 @@ z<sub>S</sub> ~ N(0,1)
 z<sub>B</sub> = &rho;·z<sub>S</sub> + &radic;(1 &minus; &rho;²)·z&prime;,   z&prime; ~ N(0,1)
 
 r<sub>S</sub> = exp(&mu;<sub>S</sub> + &sigma;<sub>S</sub>·z<sub>S</sub>) &minus; 1
-r<sub>B</sub> = exp(&mu;<sub>B</sub> + &sigma;<sub>B</sub>·z<sub>B</sub>) &minus; 1</div>
+r<sub>B</sub> = exp(&mu;<sub>B</sub> + &sigma;<sub>B</sub>·z<sub>B</sub>) &minus; 1
+
+then, each year, r &larr; (1 + r)·(1 + i) / 1.025 &minus; 1   for stocks, bonds and cash</div>
+<p>The presets are what money grows at when inflation is 2.5%, so each year's nominal returns move with that
+year's inflation <var>i</var> and the return after inflation does not depend on it. Until 28 September 2026
+returns were fixed in dollars while spending, benefits and brackets rose with inflation, so the inflation
+setting was a hidden second return dial: 2% to 3.5% swung the default plan by 30 points, of which inflation
+itself accounted for about 3. The stress tests' ordinary years are adjusted the same way; the backtests use
+each real year's own returns and inflation. The reader chooses the average inflation from five figures: the
+Fed's 2% target and, from this page's own record, 2.5% (1996&ndash;2025), 2.9% (1926&ndash;2025), 3.7%
+(1946&ndash;2025) and 5.4% (1966&ndash;1995, the worst thirty years). The worst decade, 8.7% from 1973, is a
+sequence rather than an average and is covered by the stress tests.</p>
 
 <div class="note"><b>Caveat.</b> The conventional way to parameterise a lognormal is by its
 <em>arithmetic</em> mean, which requires &mu; = ln(1+m) &minus; &sigma;²/2. This engine deliberately
@@ -483,7 +494,7 @@ failure age &mdash; out of 2,000 futures in random mode, or out of the number of
 in backtest mode.</p>
 <div class="note"><b>Sampling error.</b> With 2,000 paths the standard error near 50% is
 &radic;(0.25/2000) &asymp; 1.1 points. Measured: 25 different seeds (1 to 25) on the default plan at
-Level 1 spread from 54.9% to 59.8%, standard deviation 1.3 points. Differences smaller than about two
+Level 1 spread from 55.1% to 59.8%, standard deviation 1.2 points. Differences smaller than about two
 points are noise.</div>
 
 <h3>Percentile bands</h3>
