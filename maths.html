@@ -449,11 +449,15 @@ Security taxation thresholds fall from the joint pair to the single pair, which 
 <p>After every flow, growth is applied and the inflation index advances:</p>
 <div class="fx">r = w·r<sub>S</sub> + (1 &minus; w)·r<sub>B</sub>
 
-pre-tax, Roth, brokerage  ×= (1 + r)
+pre-tax, Roth, brokerage  ×= (1 + r) · (1 &minus; fee)
 cash                      ×= (1 + r<sub>C</sub>)
 f                         ×= (1 + i)</div>
-<p>with <var>w</var> the stock share. Rebalancing to the target mix is therefore implicit and exact
-every year, at no cost and with no tax.</p>
+<p>with <var>w</var> the stock share and <var>fee</var> the reader's yearly fees as a share of savings
+(Level 2, default 0; Level 1 assumes none). It is one blended figure - fund costs, plan fees and any
+adviser - taken off the invested accounts after the year's growth; a flat fee belongs in spending
+instead. Added 28 September 2026: returns were gross of all costs before, with no way to enter them. At
+1% it lowers the share of futures that last by roughly 10 to 20 points across the example plans. Rebalancing
+to the target mix is implicit and exact every year, at no cost and with no tax.</p>
 <div class="note"><b>Caveat: withdrawals precede growth.</b> The whole year's spending is taken
 before any return is applied, which is equivalent to withdrawing on 1 January. Real spending happens
 through the year. This is conservative &mdash; it removes money before it can earn &mdash; by roughly
