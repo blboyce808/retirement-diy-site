@@ -524,7 +524,7 @@ footer{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:80ch}
       </div>
       <div class="grid" id="grid"></div>
       
-      <div class="assump"><h2>Assumptions behind these results</h2><p>Tap any question mark for how each one works and why it matters.</p><ul class="alist" id="alist"></ul></div>
+      <div class="assump"><h2>Assumptions behind these results</h2><ul class="alist" id="alist"></ul></div>
       <footer id="footer"></footer>
   <dialog id="ssdlg" class="xdlg" aria-label="Social Security estimator"></dialog>
   <dialog id="buddlg" class="xdlg" aria-label="Retirement budget planner"></dialog>
@@ -759,7 +759,7 @@ const N_PATHS = 2000;
    Built from Robert Shiller's monthly S&P composite, dividend, CPI and long-rate series (1871 to 2022). */
 const HIST = [[1871,0.1532,0.0504,0.0152],[1872,0.1094,0.0384,0.0229],[1873,-0.0262,0.0635,-0.044],[1874,0.0451,0.083,-0.0695],[1875,0.0515,0.0854,-0.0573],[1876,-0.1368,0.0561,0.0083],[1877,-0.0168,0.0526,-0.1563],[1878,0.1583,0.0522,-0.1029],[1879,0.4807,0.0571,0.2065],[1880,0.2568,0.0643,-0.0571],[1881,0.0036,0.0431,0.0807],[1882,0.0355,0.0354,-0.0187],[1883,-0.0524,0.0371,-0.0761],[1884,-0.1199,0.0438,-0.1029],[1885,0.2906,0.0467,-0.035],[1886,0.1171,0.0223,0.0],[1887,-0.006,0.0239,0.0476],[1888,0.0319,0.0535,-0.0454],[1889,0.0696,0.0368,-0.0476],[1890,-0.0595,0.0191,0.025],[1891,0.1839,0.0377,-0.0603],[1892,0.06,0.0247,0.0778],[1893,-0.1862,0.0413,-0.1329],[1894,0.0367,0.0553,-0.0409],[1895,0.0516,0.024,0.0137],[1896,0.0315,0.0513,-0.0285],[1897,0.1991,0.0378,0.0294],[1898,0.285,0.0529,0.015],[1899,0.0371,0.0271,0.1686],[1900,0.2014,0.0354,-0.0241],[1901,0.1925,0.0248,0.0246],[1902,0.0819,0.0226,0.0962],[1903,-0.1701,0.0254,-0.0439],[1904,0.3111,0.0279,0.0229],[1905,0.2089,0.0386,0.0],[1906,0.0059,0.0162,0.0449],[1907,-0.2394,0.0217,-0.0215],[1908,0.3837,0.047,0.0323],[1909,0.1591,0.0264,0.1074],[1910,-0.0351,0.0339,-0.0677],[1911,0.0345,0.0376,-0.0108],[1912,0.0719,0.008,0.0734],[1913,-0.0484,0.0659,0.0204],[1914,-0.0529,0.0357,0.01],[1915,0.3042,0.0565,0.0297],[1916,0.0794,0.0273,0.125],[1917,-0.1807,0.0177,0.1966],[1918,0.1755,0.0508,0.1786],[1919,0.1947,0.0115,0.1697],[1920,-0.136,0.0412,-0.0155],[1921,0.0946,0.1088,-0.1105],[1922,0.2859,0.0386,-0.0059],[1923,0.0507,0.0658,0.0298],[1924,0.2594,0.0556,0.0],[1925,0.2502,0.0522,0.0347],[1926,0.1106,0.0629,-0.0223],[1927,0.3629,0.0342,-0.0114],[1928,0.4645,0.0129,-0.0116],[1929,-0.0899,0.0598,0.0],[1930,-0.219,0.0291,-0.0702],[1931,-0.4247,0.0077,-0.1006],[1932,-0.0679,0.0652,-0.0979],[1933,0.5525,0.0478,0.0233],[1934,-0.0792,0.0571,0.0303],[1935,0.5344,0.039,0.0147],[1936,0.3201,0.0241,0.0217],[1937,-0.3125,0.0363,0.0071],[1938,0.1668,0.0416,-0.0141],[1939,0.0279,0.0357,-0.0071],[1940,-0.0894,0.0434,0.0144],[1941,-0.088,-0.0212,0.1135],[1942,0.2027,0.0238,0.0764],[1943,0.2335,0.0239,0.0296],[1944,0.1916,0.0336,0.023],[1945,0.3842,0.0383,0.0225],[1946,-0.1179,0.0171,0.1813],[1947,0.0254,0.0073,0.1023],[1948,0.0942,0.0349,0.0127],[1949,0.1659,0.0223,-0.0208],[1950,0.3315,0.0033,0.0809],[1951,0.2116,0.017,0.0433],[1952,0.1415,0.015,0.0038],[1953,0.0268,0.0562,0.0113],[1954,0.4562,0.0145,-0.0074],[1955,0.2848,0.0034,0.0037],[1956,0.0691,-0.0137,0.0299],[1957,-0.0564,0.0633,0.0362],[1958,0.3951,-0.0382,0.014],[1959,0.0756,-0.0102,0.0103],[1960,0.0625,0.1131,0.0171],[1961,0.1894,0.0206,0.0067],[1962,-0.0281,0.0595,0.0133],[1963,0.2088,0.0132,0.0164],[1964,0.1578,0.0402,0.0097],[1965,0.114,0.0115,0.0192],[1966,-0.0647,0.0483,0.0346],[1967,0.1598,-0.0202,0.0365],[1968,0.1048,0.0207,0.044],[1969,-0.0839,-0.0499,0.0618],[1970,0.0703,0.1822,0.0529],[1971,0.1381,0.0822,0.0327],[1972,0.176,0.0255,0.0365],[1973,-0.1609,0.0301,0.0939],[1974,-0.2085,0.0374,0.118],[1975,0.3857,0.0598,0.0672],[1976,0.111,0.1116,0.0522],[1977,-0.0884,0.0252,0.0684],[1978,0.1593,0.0115,0.0928],[1979,0.1661,-0.0039,0.1391],[1980,0.2529,0.0157,0.1183],[1981,-0.0698,0.0279,0.0839],[1982,0.2881,0.3795,0.0371],[1983,0.2014,0.0393,0.0419],[1984,0.0752,0.1325,0.0353],[1985,0.2585,0.2441,0.0389],[1986,0.3094,0.2289,0.0146],[1987,-0.0206,-0.0258,0.0405],[1988,0.1763,0.0616,0.0467],[1989,0.2277,0.1454,0.052],[1990,-0.0083,0.0896,0.0565],[1991,0.3157,0.1499,0.026],[1992,0.0757,0.0988,0.0326],[1993,0.1155,0.1244,0.0252],[1994,0.0108,-0.0705,0.028],[1995,0.3495,0.2249,0.0273],[1996,0.2705,-0.0052,0.0304],[1997,0.2771,0.138,0.0157],[1998,0.3128,0.1144,0.0167],[1999,0.1548,-0.081,0.0274],[2000,-0.0515,0.1725,0.0373],[2001,-0.1345,0.0601,0.0114],[2002,-0.2004,0.1238,0.026],[2003,0.2826,0.0331,0.0193],[2004,0.0596,0.0363,0.0297],[2005,0.1001,0.0276,0.0399],[2006,0.1322,0.0198,0.0208],[2007,-0.0134,0.1243,0.0428],[2008,-0.3515,0.1346,0.0003],[2009,0.3273,-0.0659,0.0263],[2010,0.1613,0.0633,0.0163],[2011,0.0331,0.15,0.0292],[2012,0.1603,0.0246,0.016],[2013,0.2535,-0.0554,0.0158],[2014,0.1335,0.109,-0.0009],[2015,-0.0334,0.0017,0.0137],[2016,0.2091,-0.0063,0.025],[2017,0.2471,0.0124,0.0207],[2018,-0.047,0.0155,0.0155],[2019,0.2788,0.1055,0.0249],[2020,0.1753,0.0756,0.014],[2021,0.2211,-0.0453,0.0748],[2022,-0.1201,-0.1169,0.0641],[2023,0.233,-0.004,0.0309],[2024,0.2618,-0.0006,0.03],[2025,0.1737,0.0772,0.0239]];
 const HIST_FIRST = HIST[0][0], HIST_LAST = HIST[HIST.length-1][0];
-const BUILD = 'd55745c';            // deploy.sh stamps the published copy with the source commit
+const BUILD = '77296b8';            // deploy.sh stamps the published copy with the source commit
 /* VISIT COUNT. The one request this page makes to anyone but the server that sent it (owner, 28 Sept 2026):
    an anonymous visit count to GoatCounter, disclosed in the terms. Built here as a plain image request rather
    than loading GoatCounter's count.js, so nothing is fetched from outside and the page still works offline.
@@ -807,78 +807,77 @@ const INPUTS = [
   {id:'retAge', lvl:1, label:'Retire at age', min:30,max:80,step:1,def:65,fmt:'age'},
   // spending third: it moves the verdict more than anything else in The basics, and the verdict's
   // '$10K less than you planned' refers to it (design review #8, 28 Sept 2026)
-  {id:'spend', lvl:1, label:'Yearly spending in retirement, after tax', hint:"What you actually spend, in today's dollars", extra:'budEst', min:10000,max:400000,step:500,def:62000,fmt:'usd'},
+  {id:'spend', lvl:1, label:'Yearly spending in retirement, after tax', extra:'budEst', min:10000,max:400000,step:500,def:62000,fmt:'usd'},
   {id:'savings', lvl:1, only:[1,2], label:'Retirement savings today', min:0,max:9.5e6,step:5000,def:160000,fmt:'usd'},
-  {id:'contrib', lvl:1, label:'Added each year until you retire', hint:"In today's dollars", min:0,max:150000,step:1000,def:10000,fmt:'usd'},
+  {id:'contrib', lvl:1, label:'Added each year until you retire', min:0,max:150000,step:1000,def:10000,fmt:'usd'},
   {id:'filing', lvl:1, label:'Tax filing status', type:'select', def:'mfj', options:[['mfj','Married'],['single','Single']]},
-  {id:'ssAmt', lvl:1, label:'Your Social Security', hint:"Per year at full retirement age (67), today's dollars", min:0,max:150000,step:500,def:24000,fmt:'usd', extra:'ssEst'},
-  {id:'ssAge', lvl:1, label:'You claim it at age', hint:'Earlier means a smaller cheque for life, later a larger one', min:62,max:70,step:1,def:67,fmt:'age'},
+  {id:'ssAmt', lvl:1, label:'Your Social Security', hint:'At full retirement age (67), per year', min:0,max:150000,step:500,def:24000,fmt:'usd', extra:'ssEst'},
+  {id:'ssAge', lvl:1, label:'You claim it at age', min:62,max:70,step:1,def:67,fmt:'age'},
   // each spouse's own benefit and claiming age, so a couple can have the higher earner delay while
   // the other claims early (backlog, 28 Sept 2026); hidden for a single filer
-  {id:'ssAmt2', lvl:1, label:"Your spouse's Social Security", hint:"Per year at full retirement age (67), today's dollars", min:0,max:150000,step:500,def:18000,fmt:'usd'},
-  {id:'ssAge2', lvl:1, label:'Your spouse claims it at age', hint:'On your age timeline: the model treats you both as the same age', min:62,max:70,step:1,def:67,fmt:'age'},
-  {id:'stocks', lvl:1, label:'Stocks in your mix', hint:'The rest is bonds, rebalanced yearly', min:0,max:100,step:5,def:70,fmt:'pct0'},
+  {id:'ssAmt2', lvl:1, label:"Your spouse's Social Security", hint:'At full retirement age (67), per year', min:0,max:150000,step:500,def:18000,fmt:'usd'},
+  {id:'ssAge2', lvl:1, label:'Your spouse claims it at age', hint:'At your age, not theirs', min:62,max:70,step:1,def:67,fmt:'age'},
 
   {id:'planAge', lvl:2, sec:'uncert', label:'Plan to age', min:80,max:105,step:1,def:95,fmt:'age'},
   // Five choices rather than a free number: nobody can estimate thirty years of inflation, and the figures
   // come from the page's own 1871-2025 record except the Fed's target (owner, 28 Sept 2026).
-  {id:'infl', lvl:2, sec:'uncert', label:'Average inflation', hint:'Varies year to year around this', type:'select', def:'2.5',
+  {id:'infl', lvl:2, sec:'uncert', label:'Average inflation', type:'select', def:'2.5',
    options:[['2','2% (the Fed\'s target)'],['2.5','2.5% (the last 30 years)'],['2.9','2.9% (the last century)'],['3.7','3.7% (since the Second World War)'],['5.4','5.4% (the worst 30 years on record)']]},
-  {id:'stockRet', lvl:2, sec:'uncert', label:'Average stock return', hint:'What it grows at over decades, after the good and bad years', type:'select', def:'balanced',
+  {id:'stockRet', lvl:2, sec:'uncert', label:'Average stock return', type:'select', def:'balanced',
    options:[['cautious',`${retPctS(STOCK_RET.cautious)} (cautious)`],['balanced',`${retPctS(STOCK_RET.balanced)} (balanced)`],['historical',`${retPctS(STOCK_RET.historical)} (historical)`]]},
+  {id:'stocks', lvl:2, sec:'uncert', label:'Stocks in your mix', min:0,max:100,step:5,def:70,fmt:'pct0'},
   // Fees as one blended yearly percentage of savings (design review #4, owner's call, 28 Sept 2026). Default
   // 0: the audience is do-it-yourself investors, and a default of 0 keeps every existing result unchanged.
-  {id:'fee', lvl:2, sec:'uncert', label:'Yearly fees', hint:'% of your savings: fund costs, plan fees and any adviser', min:0,max:3,step:.05,def:0,fmt:'pct'},
+  {id:'fee', lvl:2, sec:'uncert', label:'Yearly advisory fees', min:0,max:3,step:.05,def:0,fmt:'pct'},
   {id:'spendRule', lvl:2, wide:true, sec:'incspend', label:'Spending rule', type:'select', def:'fixed',
    options:[['fixed','Steady: the income you set'],['guard','Guardrails: the income you set, adjusted'],
             ['pct','Percent of the portfolio'],['oneN','Divide by the years left'],['vpw','VPW, rising with age']],
-   hint:'The first two spend the income from The basics; the rest let the portfolio decide', extra:'ruleNote'},
-  {id:'spendPct', lvl:2, sec:'incspend', label:'Percent to take each year', hint:'Only for the percent rule', min:2,max:8,step:.1,def:4,fmt:'pct'},
-  {id:'spendDecl', lvl:2, sec:'incspend', label:'Spending eases after 75', hint:'Yearly drop, after inflation', min:0,max:3,step:.25,def:0,fmt:'pct'},
-  {id:'stateTax', lvl:2, sec:'incspend', label:'State income tax rate', hint:'Flat rate on federally taxable income', min:0,max:13.3,step:.1,def:4,fmt:'pct'},
+   extra:'ruleNote'},
+  {id:'spendPct', lvl:2, sec:'incspend', label:'Percent to take each year', min:2,max:8,step:.1,def:4,fmt:'pct'},
+  {id:'spendDecl', lvl:2, sec:'incspend', label:'Spending decreases after age 75', min:0,max:3,step:.25,def:0,fmt:'pct'},
+  {id:'stateTax', lvl:2, sec:'incspend', label:'State income tax rate', min:0,max:13.3,step:.1,def:4,fmt:'pct'},
 
-  {id:'trad', lvl:3, label:'Trad. 401k and IRA', hint:'Taxed as income when you withdraw. Also includes 403b, 457 and TSP', min:0,max:4e6,step:5000,def:105000,fmt:'usd'},
-  {id:'roth', lvl:3, label:'Roth 401k and IRA', hint:'Tax-free when you withdraw', min:0,max:2e6,step:5000,def:25000,fmt:'usd'},
-  {id:'brok', lvl:3, label:'Taxable brokerage', hint:'Only gains are taxed', min:0,max:3e6,step:5000,def:25000,fmt:'usd'},
-  {id:'basis', lvl:3, label:'Brokerage cost basis', hint:'Share of it that is money you put in', min:0,max:100,step:5,def:60,fmt:'pct0'},
+  {id:'trad', lvl:3, label:'Trad. 401k and IRA', hint:'Includes 403b, 457 and TSP', min:0,max:4e6,step:5000,def:105000,fmt:'usd'},
+  {id:'roth', lvl:3, label:'Roth 401k and IRA', min:0,max:2e6,step:5000,def:25000,fmt:'usd'},
+  {id:'brok', lvl:3, label:'Taxable brokerage', min:0,max:3e6,step:5000,def:25000,fmt:'usd'},
+  {id:'basis', lvl:3, label:'Brokerage cost basis', hint:'The % that is money you put in', min:0,max:100,step:5,def:60,fmt:'pct0'},
   {id:'cash', lvl:3, label:'Excess savings held as cash', hint:'Beyond what you keep for everyday bills', min:0,max:500000,step:1000,def:5000,fmt:'usd'},
   {id:'contribTo', lvl:3, label:'New savings go to', type:'select', def:'trad', options:[['trad','Trad. 401k and IRA'],['roth','Roth'],['brok','Brokerage']]},
-  {id:'surv', lvl:5, label:'Model one spouse dying', hint:'Only applies to a married plan',
+  {id:'surv', lvl:5, label:'Model one spouse dying',
    type:'select', def:'off', options:[['off','No'],['on','Yes']]},
   {id:'survAge', lvl:5, label:'One spouse dies at age', min:65,max:100,step:1,def:85,fmt:'age'},
-  {id:'survSS', lvl:5, label:'Social Security the survivor keeps', hint:'They keep the larger of the two cheques, not both',
+  {id:'survSS', lvl:5, label:'Social Security the survivor keeps',
    type:'select', def:'60', options:[['50','Half'],['60','60%'],['75','75%'],['100','All of it']]},
-  {id:'survInc', lvl:5, label:'Other income the survivor keeps', hint:'Pension survivor share, and any other stream',
+  {id:'survInc', lvl:5, label:'Other income the survivor keeps',
    type:'select', def:'50', options:[['0','None, it stops'],['50','Half'],['75','75%'],['100','All of it']]},
-  {id:'survSpend', lvl:5, label:'Spending the survivor needs', hint:'One person, but not half the cost', min:40,max:100,step:5,def:75,fmt:'pct0'},
-  {id:'seq', lvl:5, wide:true, label:'Withdrawal order', hint:'Which pot to spend first',
+  {id:'survSpend', lvl:5, label:'Spending the survivor needs', min:40,max:100,step:5,def:75,fmt:'pct0'},
+  {id:'seq', lvl:5, wide:true, label:'Withdrawal order',
    type:'select', def:'std', options:[['std','Cash, brokerage, Trad. 401k and IRA, Roth'],['tdf','Trad. 401k and IRA first'],['prop','Proportional']]},
-  {id:'rothConv', lvl:5, wide:true, label:'Roth conversions', hint:'Move Trad. 401k and IRA money to Roth in your low-income years',
+  {id:'rothConv', lvl:5, wide:true, label:'Roth conversions',
    type:'select', def:'off', options:[['off','None'],['12','Fill the 12% tax bracket'],['22','Fill the 22% tax bracket'],['24','Fill the 24% tax bracket']]},
-  {id:'convKeep', lvl:5, label:'Keep liquid when converting', hint:"Years of spending left in cash and brokerage; conversion tax will not dip below it",
+  {id:'convKeep', lvl:5, label:'Keep liquid when converting', hint:'Years of spending, in cash and brokerage',
    min:0,max:5,step:1,def:2,fmt:'age'},
-  {id:'convEnd', lvl:5, label:'Convert until age', hint:'Conversions run from the year you retire to this age', min:60,max:80,step:1,def:73,fmt:'age'},
-  {id:'irmaa', lvl:5, label:'Medicare surcharges (IRMAA)', hint:'Higher premiums from 65 when income two years earlier was high',
+  {id:'convEnd', lvl:5, label:'Convert until age', min:60,max:80,step:1,def:73,fmt:'age'},
+  {id:'irmaa', lvl:5, label:'Medicare surcharges (IRMAA)',
    type:'select', def:'on', options:[['on','Model them'],['off','Ignore them']]},
-  {id:'rmd', lvl:5, label:'Required minimum distributions', hint:'The law empties Trad. 401k and IRA accounts whether you need the money or not',
+  {id:'rmd', lvl:5, label:'Required minimum distributions',
    type:'select', def:'on', options:[['on','Model them'],['off','Ignore them']]},
   {id:'heirs', lvl:6, sec:'legacy6', subhead:'Who inherits it, and what they pay',
    label:'People sharing it',
-   hint:'How many people your savings will be bequeathed to', min:1,max:6,step:1,def:2,fmt:'age'},
+   min:1,max:6,step:1,def:2,fmt:'age'},
   {id:'heirInc', lvl:6, sec:'legacy6', label:'What each of them earns',
-   hint:"Their own household income today, before tax", min:0,max:500000,step:5000,def:120000,fmt:'usd'},
+   hint:'Their household income, before tax', min:0,max:500000,step:5000,def:120000,fmt:'usd'},
   {id:'heirFiling', lvl:6, sec:'legacy6', label:'How they file',
    type:'select', def:'mfj', options:[['mfj','Married'],['single','Single']]},
   {id:'charShare', lvl:6, sec:'legacy6', label:'Share of Trad. 401k and IRA left to charity',
-   hint:'A charity pays no income tax on it. Anything left to people does', min:0,max:100,step:5,def:0,fmt:'pct0'},
+   min:0,max:100,step:5,def:0,fmt:'pct0'},
   {id:'giftAmt', lvl:6, sec:'legacy6', subhead:"Yearly gifting while you're still alive",
-   label:'Gifts to people', hint:"Today's dollars. Funded from savings like any other cost, and not counted as spending",
+   label:'Gifts to people',
    min:0,max:200000,step:1000,def:0,fmt:'usd'},
   {id:'qcd', lvl:6, sec:'legacy6', label:'Gifts to charity, from your IRA',
-   hint:'Today\'s dollars. A QCD, from age 70. Counts toward your required withdrawal and never becomes income',
    min:0,max:111000,step:1000,def:0,fmt:'usd'},
   {id:'giftAge', lvl:6, sec:'legacy6', label:'Start giving to people at age', min:50,max:100,step:1,def:75,fmt:'age'},
-  {id:'legacy', lvl:3, label:'Leave behind at least', hint:"Today's dollars, at your plan age", min:0,max:3e6,step:10000,def:250000,fmt:'usd'},
+  {id:'legacy', lvl:3, label:'Leave behind at least', min:0,max:3e6,step:10000,def:250000,fmt:'usd'},
 ];
 const DEF = {}; INPUTS.forEach(d=>DEF[d.id]=d.def);
 
@@ -1832,7 +1831,7 @@ function syncDimmed(){
 /* The same order the fields appear in. Filing status moved above Social Security because it
    decides whether that figure is one benefit or two, and being asked for a couple's combined
    benefit before saying you are a couple is the wrong way round. */
-const CUE_ORDER = ['age','retAge','spend','savings','contrib','filing','ssAmt','ssAge','ssAmt2','ssAge2','pension','stocks'];
+const CUE_ORDER = ['age','retAge','spend','savings','contrib','filing','ssAmt','ssAge','ssAmt2','ssAge2','pension'];
 const CUE_TEXT = 'do this next:';
 // Nothing has been answered yet, so there is no "next" to point at: the first one invites
 // rather than continues. It comes back whenever the run restarts, after a Reset or an example.
@@ -2141,10 +2140,10 @@ function buildPension(){
     const c=pensionCard();
     const others=S.income.filter(x=>!isPension(x)).length;
     wrap.innerHTML=`<div class="field"><div class="top"><div class="lab"><label>Do you have a pension?</label>${q('pension')}
-          <span class="hint">An amount paid to you for life by a former employer or a government plan</span></div>
+</div>
         <div class="seg" id="hasPen" role="group" aria-label="Do you have a pension?"><button type="button" data-has="yes" aria-pressed="${!!c}">Yes</button><button type="button" data-has="no" aria-pressed="${!c}">No</button></div></div></div>`
       + (c ? `<div class="field"><div class="top"><div class="lab"><label for="pen_amt">Pension per year</label>
-            <span class="hint">${c.cola ? "Before tax, in today's dollars" : 'Before tax, the amount of the cheque when it starts'}</span></div>
+            <span class="hint">${c.cola ? 'Before tax' : 'Before tax, as the first cheque'}</span></div>
           <span class="num"><span>$</span><input id="pen_amt" inputmode="decimal" aria-label="Pension per year" value="${Math.round(c.amt).toLocaleString('en-US')}"></span></div></div>
         <div class="field"><div class="top"><div class="lab"><label for="pen_age">Pension starts at age</label></div>
           <span class="num"><input id="pen_age" inputmode="numeric" aria-label="Pension starts at age" value="${c.startAge}"></span></div></div>
@@ -2444,7 +2443,7 @@ function buildCSV(){
   if(lastSustain!==null) rows.push(["Spending that lasts in 90% of futures (after tax, today's dollars)", lastSustain]);
   // the after-tax companions to the face-value balances, in the same dollars as the columns
   const vr = res.rule && res.rule!=='fixed' && res.rule!=='guard';
-  if(level>=5 && !vr) rows.push([`Worth after tax at ${res.H}, middle future (Trad. 401k and IRA at your final-year rate)`, Math.round(endNetMed(res))]);
+  if(level>=5 && !vr) rows.push([`Worth after tax at age ${res.H}, middle future (Trad. 401k and IRA at your final-year rate)`, Math.round(endNetMed(res))]);
   if(level>=6 && !vr) rows.push([`Heirs receive, after taxes, middle future`, Math.round(legacySplit(res).heirs)]);
   rows.push([]);
   rows.push(['Input','Value']);
@@ -2663,7 +2662,7 @@ function syncGrossNote(){
   const el=document.getElementById('grossNote'); if(!el) return;
   const L=TAXLAW[S.filing==='single'?'single':'mfj'];
   const gross=grossFromNet(S.spend, L, stateRateOf(S, level));
-  el.innerHTML = `<span>Estimated amount with income taxes (your needed “salary”). Payroll taxes are not included.</span><b>$${(Math.round(gross/500)*500).toLocaleString('en-US')}</b>`;
+  el.innerHTML = `<span>Spending before taxes ($${(Math.round(gross/500)*500).toLocaleString('en-US')})${q('grossSpend')}</span>`;
 }
 function syncRuleNote(){
   const el=document.getElementById('ruleNote'); if(!el) return;
@@ -2674,7 +2673,7 @@ function syncRuleNote(){
   : rule==='guard' ? `Starts at the ${target} from The basics, then cuts or raises it as markets move.`
   : rule==='pct'   ? `Withdraws ${(+S.spendPct||4).toFixed(1)}% of the portfolio each year, before tax; you live on what is left after the tax. The ${target} becomes a target to judge that against.`
   : rule==='oneN'  ? `Withdraws the portfolio divided by the years left, before tax; you live on what is left after the tax. The ${target} becomes a target to judge that against.`
-  :                  `Withdraws a share that rises with age, ${(vpwPct(Math.max(Math.round(S.age),Math.round(S.retAge)))*100).toFixed(1)}% at ${Math.max(Math.round(S.age),Math.round(S.retAge))}, before tax. The ${target} becomes a target to judge that against.`;
+  :                  `Withdraws a share that rises with age, ${(vpwPct(Math.max(Math.round(S.age),Math.round(S.retAge)))*100).toFixed(1)}% at age ${Math.max(Math.round(S.age),Math.round(S.retAge))}, before tax. The ${target} becomes a target to judge that against.`;
 }
 function syncSplitNote(){
   const el=document.getElementById('splitNote');
@@ -2716,7 +2715,7 @@ function setLevel(k){
 
 /* ===================== PANELS ===================== */
 const PANELS = [
-  {id:'total', lvl:1, title:'Total savings', color:'--pine', wide:true, desc:'All accounts combined, on reaching each age.'},
+  {id:'total', lvl:1, title:'Total savings', color:'--pine', wide:true, desc:''},
   {id:'flow', lvl:2, title:'Annual spending in retirement', color:'--steel', wide:true, desc:'Each year of the median future: what arrives by itself, what you take from savings, and what is left once tax and any early-withdrawal penalty are paid.'},
   {id:'assets', lvl:1, title:'Assets by class, median outcome', color:'--steel', wide:true, desc:'Each account in the median future, stacked. Hatched areas show guaranteed income as the savings it would take to replace it.'},
   {id:'history', lvl:2, title:'Backtest your scenario against history', color:'--pine', wide:true, paid:true, desc:'Your plan replayed through ten real stretches of US markets since 1871, from the worst outcome to the best. Tap a line or a year to follow it in the charts below.'},
@@ -2748,7 +2747,7 @@ function buildGrid(){
   const g=document.getElementById('grid'); g.innerHTML='';
   PANELS.filter(p=>p.lvl<=level).forEach(p=>{
     const el=document.createElement('div'); el.className='panel'+(p.wide?' wide':'');
-    el.innerHTML=`<h3><i style="background:var(${p.color})"></i><span id="ttl_${p.id}">${p.title}</span>${q('panel_'+p.id)}</h3><p class="desc">${p.desc}</p>${p.id==='market'?MARKET_CTRL:''}${p.id==='total'?Y_CTRL:''}${p.id==='flow'?FLOW_CTRL:''}${p.id==='tax'?'<p class="taxtot" id="taxTotal"></p>':''}${p.id==='bequest'?BEQ_CTRL+'<p class="rsum" id="beqNote"></p>':''}${p.id==='market'
+    el.innerHTML=`<h3><i style="background:var(${p.color})"></i><span id="ttl_${p.id}">${p.title}</span>${q('panel_'+p.id)}</h3>${p.desc?`<p class="desc">${p.desc}</p>`:''}${p.id==='market'?MARKET_CTRL:''}${p.id==='total'?Y_CTRL:''}${p.id==='flow'?FLOW_CTRL:''}${p.id==='tax'?'<p class="taxtot" id="taxTotal"></p>':''}${p.id==='bequest'?BEQ_CTRL+'<p class="rsum" id="beqNote"></p>':''}${p.id==='market'
       ? `<div class="stklab">Total savings in this future</div><div class="cv cvtop"><canvas id="cv_mbal" role="img" aria-label="Total savings in the selected future"></canvas></div><div class="stklab">Market return each year</div><div class="cv cvbot"><canvas id="cv_market" role="img" aria-label="Yearly market returns in the selected future"></canvas></div><div class="legend clg" id="lg_market"></div>`
       : `<div class="cv"><canvas id="cv_${p.id}" role="img" aria-label="${p.title} over time"></canvas></div>`}${p.id==='total'?'<div class="legend clg" id="legend"></div><div class="evkey" id="evKey" hidden></div>':''}${p.id==='assets'?'<div class="legend clg" id="lg_assets"></div>':''}${p.id==='bequest'?'<div class="legend clg" id="lg_bequest"></div>':''}${p.id==='flow'?'<div class="legend clg" id="lg_flow"></div>':''}${p.id==='history'?'<div class="hlg" id="lg_history"></div><p class="rsum" id="histnote"></p>':''}${p.id==='stress'?'<div class="scards" id="stressCards"></div>':''}${p.id==='tax'?'<div class="cnotes" id="notes_tax" hidden></div>':''}`;
     // everything under the heading goes in a body that folds; the heading gets a chevron and a headline
@@ -2921,7 +2920,7 @@ function drawStress(res, real, tb){
   if(box){
     box.innerHTML = out.map(o=>{
       const dry=o.r.dryAge[0], last=o.r.nY-1;
-      const resTxt = isNaN(dry) ? `Lasts to ${o.r.H}, ${money(val(o,last))} left` : `Runs short at ${dry}`;
+      const resTxt = isNaN(dry) ? `Lasts to age ${o.r.H}, ${money(val(o,last))} left` : `Runs short at age ${dry}`;
       const note = o.t.y!=null && o.histYears < o.r.nY-1-(o.r.R-o.r.A) ? `<span>History through ${HIST_LAST}, then average years</span>` : '';
       return `<button type="button" class="scard" data-st="${o.t.k}" aria-pressed="${stressSel===o.t.k}"><b>${o.t.t}</b><span>${o.t.d}</span>${note}<div class="res${isNaN(dry)?'':' bad'}">${resTxt}</div></button>`;
     }).join('');
@@ -3120,7 +3119,7 @@ function renderEventKey(res){
   el.innerHTML = `<div class="evkh">Life events, in today's dollars${q('evkey')}</div>` + rows.map(({start,end,n,e})=>{
     const inn = e.type==='in';
     return `<div class="evkr"><span class="evka" style="color:var(${inn?'--pine':'--risk'})">${inn?'&#9650;':'&#9660;'}</span>`
-      + `<span class="evkage">${n>1 ? start+'&ndash;'+end : start}</span>`
+      + `<span class="evkage">${n>1 ? 'Ages '+start+'&ndash;'+end : 'Age '+start}</span>`
       + `<span class="evkn">${esc(e.name || (inn?'Money in':'Money out'))}</span>`
       + `<span class="evkv">${inn?'+':'&minus;'}${money(+e.amt)}${n>1?' a year':''}</span></div>`;
   }).join('');
@@ -3186,8 +3185,8 @@ function drawBequest(res, real){
         const d = legacySplit(res).heirs - legacySplit(base).heirs;
         const what = asked && seqOn ? 'this order and these conversions' : asked ? 'these conversions' : 'this order';
         parts.push(Math.abs(d) < 1000
-          ? `At ${res.H}, the people you leave it to would receive about the same as with the usual order and no conversions.`
-          : `At ${res.H}, the people you leave it to would receive about ${money(Math.abs(d))} ${d > 0 ? 'more' : 'less'} with ${what} than with the usual order and no conversions.`);
+          ? `At age ${res.H}, the people you leave it to would receive about the same as with the usual order and no conversions.`
+          : `At age ${res.H}, the people you leave it to would receive about ${money(Math.abs(d))} ${d > 0 ? 'more' : 'less'} with ${what} than with the usual order and no conversions.`);
       }
     }
     note.textContent = parts.join(' ');
@@ -3340,38 +3339,38 @@ function taxCauses(res, real){
   // Retiring can move tax either way: withdrawals start, but the paycheck the model stacks other income
   // on stops. With cash and a brokerage to live on first, the second wins and tax falls.
   if(R>A) add(R, 0, 2, 'rule', ({dir:d})=> d>0
-    ? `You retire at ${R}, and from here the bills are paid from savings. Withdrawals from Trad. 401k and IRA money are taxed as income.`
-    : `You retire at ${R}. While you work, the model taxes dividends, interest and any withdrawals on top of your salary; once it stops, that income falls within your deductions, and the first years are paid from cash and the brokerage, which is mostly money already taxed.`);
+    ? `You retire at age ${R}, and from here the bills are paid from savings. Withdrawals from Trad. 401k and IRA money are taxed as income.`
+    : `You retire at age ${R}. While you work, the model taxes dividends, interest and any withdrawals on top of your salary; once it stops, that income falls within your deductions, and the first years are paid from cash and the brokerage, which is mostly money already taxed.`);
   // one note per start age: a couple claiming at the same age gets one, claiming apart gets two
   const two = S.filing!=='single' && +S.ssAmt2>0, same = two && Math.round(S.ssAge2)===Math.round(S.ssAge);
   const ssStarts = [];
   if(+S.ssAmt>0) ssStarts.push([Math.round(S.ssAge), !two || same ? 'Social Security' : 'Your Social Security']);
   if(two && (!same || !(+S.ssAmt>0))) ssStarts.push([Math.round(S.ssAge2), +S.ssAmt>0 ? `Your spouse's Social Security` : 'Social Security']);
   ssStarts.filter(([age])=>age>A).forEach(([age, who])=> add(age, 0, 2, 'rule', ({dir:d})=> d<0
-    ? `${who} starts at ${age}, so less has to come out of Trad. 401k and IRA money, which is what the tax is charged on.`
-    : `${who} starts at ${age}. Up to 85% of Social Security becomes taxable once other income is added to it.`));
-  if(rmdOn) add(rmdAge, 1, 2, 'rule', ()=>`Required minimum distributions start at ${rmdAge}: the law forces money out of Trad. 401k and IRA each year, and it is taxed as income.`);
+    ? `${who} starts at age ${age}, so less has to come out of Trad. 401k and IRA money, which is what the tax is charged on.`
+    : `${who} starts at age ${age}. Up to 85% of Social Security becomes taxable once other income is added to it.`));
+  if(rmdOn) add(rmdAge, 1, 2, 'rule', ()=>`Required minimum distributions start at age ${rmdAge}: the law forces money out of Trad. 401k and IRA each year, and it is taxed as income.`);
   if(level>=5 && S.rothConv && S.rothConv!=='off'){
     const c0=Math.max(R,A);
-    add(c0, 1, 2, 'rule', ()=>`Roth conversions start at ${c0}. Money moved from Trad. 401k and IRA into the Roth is taxed as income in the year it moves.`);
-    add(Math.round(S.convEnd)+1, -1, 2, 'rule', ()=>`Roth conversions stop after ${Math.round(S.convEnd)}, and the tax paid on them stops with them.`);
+    add(c0, 1, 2, 'rule', ()=>`Roth conversions start at age ${c0}. Money moved from Trad. 401k and IRA into the Roth is taxed as income in the year it moves.`);
+    add(Math.round(S.convEnd)+1, -1, 2, 'rule', ()=>`Roth conversions stop after age ${Math.round(S.convEnd)}, and the tax paid on them stops with them.`);
   }
   if(level>=5 && S.surv==='on' && S.filing!=='single')
-    add(Math.round(S.survAge)+1, 1, 2, 'rule', ()=>`The plan assumes one spouse dies at ${Math.round(S.survAge)}. From the next year the survivor files single: narrower brackets and half the standard deduction on much the same income.`);
+    add(Math.round(S.survAge)+1, 1, 2, 'rule', ()=>`The plan assumes one spouse dies at age ${Math.round(S.survAge)}. From the next year the survivor files single: narrower brackets and half the standard deduction on much the same income.`);
   if(R<59 && R<55) add(60, -1, 3, 'rule', ()=>`The 10% penalty on Trad. 401k and IRA withdrawals before 59 and a half stops, and the tax total drops with it.`);
   if(level>=6 && +S.giftAmt>0) add(Math.round(S.giftAge), 1, 2, 'rule', ()=>`Giving ${money(+S.giftAmt)} a year from ${Math.round(S.giftAge)} is paid for with larger withdrawals, and withdrawals from Trad. 401k and IRA are taxed as income.`);
   if(level>=6 && +S.qcd>0 && A<70) add(70, -1, 2, 'rule', ()=>`Gifts to charity straight from the IRA start at 70. They satisfy the required withdrawal without ever counting as income.`);
 
   (S.income||[]).filter(c=>c.amt>0).forEach(c=>{
     const nm=esc(c.name||(c.pen?'Your pension':'An income stream'));
-    add(c.startAge, 0, 1, 'rule', ({dir:d})=> d<0 ? `${nm} starts at ${c.startAge}, so less has to come out of accounts that are taxed.`
-                                     : `${nm} starts at ${c.startAge}${c.taxable?', and it is taxed as income':''}.`);
+    add(c.startAge, 0, 1, 'rule', ({dir:d})=> d<0 ? `${nm} starts at age ${c.startAge}, so less has to come out of accounts that are taxed.`
+                                     : `${nm} starts at age ${c.startAge}${c.taxable?', and it is taxed as income':''}.`);
     if(c.endAge>0) add(c.endAge+1, 0, 1, 'rule', ({dir:d})=> d>0 ? `${nm} stops at ${c.endAge}, so more has to come out of accounts that are taxed.`
                                                     : `${nm} stops at ${c.endAge}${c.taxable?', and the tax on it stops too':''}.`);
   });
   if(level>=4) (S.events||[]).filter(e=>+e.amt>0).forEach(e=>{
     const start=A+(Math.round(+e.year||CUR_YEAR)-CUR_YEAR), nm=esc(e.name||(e.type==='in'?'Money coming in':'A cost'));
-    const tag = `${nm} (${money(+e.amt)} at ${start})`;
+    const tag = `${nm} (${money(+e.amt)} at age ${start})`;
     // Before retirement the salary pays the bills, so money coming in is simply invested, and its
     // dividends and interest are taxed every year on top of the salary: tax goes up, not down.
     if(e.type==='in' && start < R) add(start, 1, 0, 'eventIn', ()=>`${tag} is invested in the brokerage account while you are still working. Its dividends and interest are taxed every year, on top of your salary.`);
@@ -3436,14 +3435,14 @@ function chartNotes(id, res, series){
     }
     const shown = ep.dir<0 && ep.deep>=ep.k && series[ep.deep]<ep.pre*.25 ? ep.deep : ep.end;
     const a2 = res.ages[shown];
-    const when = ep.lasting ? `From ${a1}` : (a1===a2 ? `At ${a1}` : `${a1}–${a2}`);
+    const when = ep.lasting ? `From age ${a1}` : (a1===a2 ? `At age ${a1}` : `Ages ${a1}–${a2}`);
     const what = ep.dir<0 ? (series[ep.k]<1 ? 'tax falls to nothing' : 'tax drops') : 'tax jumps';
     // a temporary move that ends for a reason of its own says so; after a life event only a fixed rule
     // counts as that reason (required distributions starting while an inheritance is still being spent)
     if(!ep.lasting && hit && (hit.kind==='rule' || hit.kind==='eventIn' || hit.kind==='eventOut')){
       const back = res.ages[Math.min(ep.end+1, series.length-1)];
       const ret = near(back, -ep.dir).filter(c=>c!==hit && (hit.kind==='rule' ? (c.kind!=='eventIn' && c.kind!=='eventOut') : c.kind==='rule'))[0];
-      if(ret) why += ` It ${ep.dir>0?'comes back down':'recovers'} at ${back}: ${ret.text({dir:-ep.dir, n:0})}`;
+      if(ret) why += ` It ${ep.dir>0?'comes back down':'recovers'} at age ${back}: ${ret.text({dir:-ep.dir, n:0})}`;
     }
     // the gap noted as (j): below Level 5 nothing forces pre-tax money out, which can deepen a dip
     if(ep.dir<0 && !rmdOn && a1>=rmdAge && tr[ep.k]>100000)
@@ -3685,8 +3684,8 @@ function renderEventWarn(res){
   const ev=(S.events||[]).find(e=>{ if(e.type==='in' || !(+e.amt>0)) return false;
     const st=res.A+(Math.round(+e.year||CUR_YEAR)-CUR_YEAR), n=Math.max(1,Math.round(+e.years||1));
     return age>=st && age<=st+n-1; });
-  const what = ev && ev.name ? `${ev.name} at ${age}` : `The cost at ${age}`;
-  const how = share>=.1 ? `In ${Math.round(share*10)} of 10 futures` : 'In some futures';
+  const what = ev && ev.name ? `${ev.name} at age ${age}` : `The cost at age ${age}`;
+  const how = share>=.1 ? `In ${Math.round(share*100)}% of futures` : 'In some futures';
   const unit = res.mode==='hist' ? 'start years' : 'futures';
   el.textContent = `${how.replace('futures', unit)}, ${what} costs more than your savings can cover once the tax and early-withdrawal penalty on the withdrawal are paid. The model cannot borrow, so in those ${unit} the plan ends there, and nothing is added afterwards, not even your contributions.`;
   el.hidden=false;
@@ -3827,7 +3826,7 @@ function drawPanel(id, res, b, color, yFmt){
     totals.sort((x,y)=>x-y);
     const el=document.getElementById('taxTotal');
     // retirement only, like the chart above it; the working years' tax is in the CSV
-    if(el) el.textContent = `Total taxes paid in retirement, ${res.R} to ${res.H}: `
+    if(el) el.textContent = `Total taxes paid in retirement, ages ${res.R} to ${res.H}: `
       + money(totals[Math.floor(.5*(totals.length-1))])
       + (dollars==='real' ? " in today's dollars" : ' in future dollars');
   }
@@ -3900,9 +3899,9 @@ function renderHeadlines(res, real, tb){
   const ssFull = two ? Math.max(Math.round(S.ssAge), Math.round(S.ssAge2)) : Math.round(S.ssAge);
   if(level>=2){
     const share = res.netSpend>0 ? Math.round(ssTodayAt(ssFull)/res.netSpend*100) : 0;
-    set('flow', hasSS() ? `Social Security covers about ${share}% of your spending from ${ssFull}` : 'Your savings pay for all of it');
+    set('flow', hasSS() ? `Social Security covers about ${share}% of your spending from age ${ssFull}` : 'Your savings pay for all of it');
   }
-  if(level>=3) set('assets', `${money(tb[50][Math.max(0, R-A)])} across your accounts on reaching ${R}${dl}`);
+  if(level>=3) set('assets', `${money(tb[50][Math.max(0, R-A)])} across your accounts on reaching age ${R}${dl}`);
   else {
     const inc = (S.income||[]).reduce((m,c)=>{ const v=incomeAt([c], ssFull, 1); return m + v.taxed + v.free; }, 0);
     const val = (ssTodayAt(ssFull) + inc) / SWR;
@@ -3912,19 +3911,19 @@ function renderHeadlines(res, real, tb){
     const h = res.mode==='hist' ? res : histRun();
     if(h){ let ok=0; for(let i=0;i<h.nP;i++) if(isNaN(h.dryAge[i])) ok++; set('history', `Lasted in ${Math.round(ok/h.nP*100)}% of start years since ${HIST_FIRST}`); }
     const st = runStress(level); const lasted = st.filter(x=>isNaN(x.r.dryAge[0])).length;
-    set('stress', `Lasts to ${H} in ${lasted} of the ${st.length}`);
+    set('stress', `Lasts to age ${H} in ${lasted} of the ${st.length} scenarios`);
     const i10 = rankPaths(res)[Math.round(.1*(res.nP-1))];
-    set('market', !isNaN(res.dryAge[i10]) ? `The unlucky future runs short at ${res.dryAge[i10]}`
+    set('market', !isNaN(res.dryAge[i10]) ? `The unlucky future runs short at age ${res.dryAge[i10]}`
       : `The unlucky future ends with ${money(GET.total(res,res.nY-1,i10)/(real?res.CI[res.nY-1][i10]:1))}${dl}`);
   }
   if(level>=5){
     const t=[]; for(let i=0;i<res.nP;i++) t.push(taxSum(res, i, real, R-A+1)); t.sort((x,y)=>x-y);
-    set('tax', `${money(t[Math.floor(.5*(t.length-1))])} in tax, ${R} to ${H}${dl}`);
+    set('tax', `${money(t[Math.floor(.5*(t.length-1))])} in tax, ages ${R} to ${H}${dl}`);
   }
   const varRule = res.rule && res.rule!=='fixed' && res.rule!=='guard';
   // Total savings: the goal for what is left from Level 3, and what it is worth after tax at Level 5
   const tot = [];
-  if(level===5 && !varRule) tot.push(`Worth about ${money(endNetMed(res))} after tax at ${H}${dl}${q('endNet')}`);
+  if(level===5 && !varRule) tot.push(`Worth about ${money(endNetMed(res))} after tax at age ${H}${dl}${q('endNet')}`);
   if(level>=3){
     let ok=0; for(let i=0;i<res.nP;i++){ if(isNaN(res.dryAge[i]) && GET.total(res,res.nY-1,i)/res.CI[res.nY-1][i] > S.legacy) ok++; }
     tot.push(`${Math.round(ok/res.nP*100)}% of ${res.mode==='hist' ? 'start years' : 'simulated futures'} end above ${money(S.legacy)}${real ? '' : " in today's dollars"}${q('legacyStat')}`);
@@ -3933,7 +3932,7 @@ function renderHeadlines(res, real, tb){
   // the spending chart: under guardrails, how often and how far spending is cut
   if(level>=2 && res.guard){
     const m=[...res.MINM].sort((a,b)=>a-b); let cut=0; for(const v of m) if(v<.999) cut++;
-    set('flow', `Cut at least once in ${Math.round(cut/res.nP*10)} of 10 futures; unlucky case down to ${Math.round(m[Math.floor(.1*(m.length-1))]*100)}% of plan${q('guardStat')}`);
+    set('flow', `Cut at least once in ${Math.round(cut/res.nP*100)}% of futures; unlucky case down to ${Math.round(m[Math.floor(.1*(m.length-1))]*100)}% of plan${q('guardStat')}`);
   }
   if(level>=6){
     const sp = legacySplit(res);
@@ -3942,7 +3941,7 @@ function renderHeadlines(res, real, tb){
     // lifetime totals add up decades, so they stay in today's dollars and say so under future ones
     const td = real ? '' : " in today's dollars";
     const parts = [];
-    if(varRule) parts.push(`Heirs would receive about ${money(sp.heirs)} at ${H}${dl}${q('endHeir')}`);
+    if(varRule) parts.push(`Heirs would receive about ${money(sp.heirs)} at age ${H}${dl}${q('endHeir')}`);
     if(gave > 0) parts.push(`${money(gave)} given away while alive${td}${q('gaveStat')}`);
     if(qcd > 0) parts.push(`${money(qcd)} to charity while alive${td}${q('qcdStat')}`);
     if(sp.charity > 0) parts.push(`charity receives ${money(sp.charity)} at the end${q('endChar')}`);
@@ -3954,7 +3953,7 @@ function renderHeadlines(res, real, tb){
         const toHeir = (res.TRAD[k][i]||0)*(1-share);
         const v = (toHeir*(1-heirEffRate(toHeir/res.CI[k][i])) + (res.ROTH[k][i]||0) + (res.BROK[k][i]||0) + (res.CASH[k][i]||0)) * (real ? 1/res.CI[k][i] : 1);
         if(v > best){ best = v; at = a; } });
-      if(!varRule) parts.unshift(`Heirs would receive the most at ${at}: about ${money(best)}${dl}`); }
+      if(!varRule) parts.unshift(`Heirs would receive the most at age ${at}: about ${money(best)}${dl}`); }
     set('bequest', parts.join(' · '));
   }
 }
@@ -4110,7 +4109,7 @@ function renderBase(){
       <div><span>Success</span>${pts(BASE.success)} → ${pts(cur.success)}${dPts(BASE.success,cur.success)}</div>
       <div><span>Spending that lasts</span>${BASE.sust==null?'—':money(BASE.sust)} → ${sTxt}${cur.varRule||sNow==null?'':dMon(BASE.sust,sNow)}</div>
       ${sameH
-        ? `<div><span>Typical balance at ${cur.H||''}</span>${money(bEnd)} → ${money(cEnd)}${dMon(bEnd,cEnd)}</div>`
+        ? `<div><span>Typical balance at age ${cur.H||''}</span>${money(bEnd)} → ${money(cEnd)}${dMon(bEnd,cEnd)}</div>`
         : `<div><span>Typical balance at the end</span>${money(bEnd)} at ${BASE.H} → ${money(cEnd)} at ${cur.H}${dMon(bEnd,cEnd)}</div>`}
     </div>
     <p class="bchg">${changed.length ? 'What changed: '+changed.map(esc).join('; ')+'.' : 'Nothing has changed yet. Adjust any input to see the difference.'}</p>`;
@@ -4147,9 +4146,9 @@ function run(){
       for(let k=age-res.A+1; i>=0 && k<res.nY; k++){ if(res.SPEND[k][i] > 0){ x = res.SPEND[k][i]; from = res.A+k-1; ss = res.IN_SS[k][i] > 0; oth = res.IN_OTH[k][i] > 0; break; } }
       // two complete, plain sentences (owner's choice, 29 Sept 2026): when, then what is left to live on
       const what = ss && oth ? 'Social Security and other income pay' : ss ? 'Social Security pays' : 'your other income pays';
-      unlucky.v = `Savings run out at ${age}.`;
+      unlucky.v = `Savings run out at age ${age}.`;
       unlucky.s = x > 0
-        ? `${from > age ? `From ${from}` : 'After that'}, ${what} ${money(x)} a year${real ? '' : " in today's dollars"}.`
+        ? `${from > age ? `From age ${from}` : 'After that'}, ${what} ${money(x)} a year${real ? '' : " in today's dollars"}.`
         : 'Nothing else comes in after that.';
     } }
 
@@ -4183,7 +4182,7 @@ function run(){
         // left at the plan age; only 1/N does (timing audit T18)
         : res.rule==='vpw'
         ? `This takes a share that rises with age, so the balance shrinks late in life. You live on what it pays: typically ${money(spendStats.med)} a year${inToday}, and as little as ${money(spendStats.worst)} in a bad year.`
-        : `This spends your savings down to almost nothing by ${res.H}, on purpose. You live on what it pays along the way: typically ${money(spendStats.med)} a year${inToday}, and as little as ${money(spendStats.worst)} in a bad year.`)
+        : `This spends your savings down to almost nothing by age ${res.H}, on purpose. You live on what it pays along the way: typically ${money(spendStats.med)} a year${inToday}, and as little as ${money(spendStats.worst)} in a bad year.`)
     : mode==='hist'
     /* Percentages throughout (owner, 29 Sept 2026), and the money is not called "your" money until it is:
        the page opens on a typical household, an example is named, and anything the reader has entered is
@@ -4215,7 +4214,7 @@ function run(){
     <div class="stat hero${sd?' pending':''}" id="sustBox"><div class="l">${sustLabel}${q('sustain')}</div><div class="v" id="sustV">${sd?sd.text:'…'}</div><div class="s" id="sustS">${sd?sd.sub:'Finding it…'}</div></div>`
     + (level>=6
       ? `<div class="stat"><div class="l">Your heirs receive, after taxes${q('endHeir')}</div><div class="v">${money(legacySplit(res).heirs)}</div></div>`
-      : `<div class="stat"><div class="l">Typical balance at ${res.H}${q('endMed')}</div><div class="v">${money(endMed)}</div></div>`)
+      : `<div class="stat"><div class="l">Typical balance at age ${res.H}${q('endMed')}</div><div class="v">${money(endMed)}</div></div>`)
     + `<div class="stat"><div class="l">Unlucky case, worst 10%${q('endP10')}</div><div class="v">${unlucky.v}</div>${unlucky.s ? `<div class="s">${unlucky.s}</div>` : ''}</div>`;
   if(varRule){
     statsHtml += `<div class="stat"><div class="l">Unlucky future, worst 10%${q('spendLow')}</div><div class="v">${money(spendStats.p10)}</div>`
@@ -4377,7 +4376,7 @@ const HELP = {
   se_shape:{t:'Earlier pay, compared with now', b:['How your earlier pay compares with today\'s, after adjusting for wage growth over time. Most careers rise, so "somewhat lower" suits many people.','Somewhat lower starts your career at 75% of today\'s level and rises steadily. Much lower starts at 50%.']},
   se_stop:{t:'Stop working at age', b:['The age you stop working: pay counts up to the year before this age, and nothing from this age on. Stopping before 62 does not reduce a benefit directly, but it can leave fewer high-earning years in the 35-year average.']},
   se_claim:{t:'Start benefits at age', b:[()=>`Full retirement age is ${SSP.fra} for anyone born in 1960 or later. Starting at 62 cuts the benefit by 30% for life. Waiting past ${SSP.fra} adds 8% a year, up to 24% more at 70.`,'Waiting also raises what a surviving spouse would receive.'], src:['SSA, early or late retirement','https://www.ssa.gov/benefits/retirement/planner/agereduction.html']},
-  se_spouse:{t:'Spousal benefit', b:[()=>`A spouse with little work history can receive up to half of your full-retirement-age benefit. It is reduced if started before ${SSP.fra} and does not grow by waiting past ${SSP.fra}. This estimate assumes your spouse starts at the same age you do.`,'If your spouse has their own work history, estimate their benefit separately and add the two.']},
+  se_spouse:{t:'Spousal benefit', b:[()=>`A spouse with little work history can receive up to half of your full-retirement-age benefit. It is reduced if started before age ${SSP.fra} and does not grow by waiting past ${SSP.fra}. This estimate assumes your spouse starts at the same age you do.`,'If your spouse has their own work history, estimate their benefit separately and add the two.']},
   se_cut:{t:'Benefit cut', b:['Social Security\'s trustees project that the retirement trust fund runs short in the early 2030s. If Congress does not act, incoming taxes would cover roughly 80% of scheduled benefits.','Checking this box plans for that reduction. Many planners use it as a cautious case.']},
   se_aime:{t:'Average indexed monthly earnings', b:['Social Security indexes each year of pay to today\'s wage levels, keeps your highest 35 years, and divides the total by 420 months. Missing years count as zero.']},
   se_pia:{t:'Full-retirement-age benefit', b:[()=>`The monthly benefit at full retirement age. The 2026 formula replaces 90% of the first $${SSP.b1.toLocaleString('en-US')} of monthly average earnings, 32% up to $${SSP.b2.toLocaleString('en-US')}, and 15% above that. Lower earners get a larger share of their pay replaced.`], src:['SSA, benefit formula bend points','https://www.ssa.gov/oact/cola/bendpoints.html']},
@@ -4470,6 +4469,7 @@ const HELP = {
   panel_total:{t:'Total savings', b:['The sum of all your account balances on reaching each age: after the year before it, with that year\'s contributions or withdrawals and investment returns. The first point is today\'s balance.','A future that runs out drops to zero and stays there, which pulls the lower band down late in life.']},
   panel_assets:{t:'Assets by class, median outcome', b:['This follows one future, the one whose ending wealth is the median of all simulated futures, and stacks each of its accounts year by year. It shows how money moves between account types as you save, retire and draw down.','Unlike the shaded bands elsewhere, these are values from a single future, so they add up.']},
   assets_hatch:{t:'Hatched areas', b:['Social Security and a pension are assets too, even though you cannot withdraw them as a lump sum. The hatched areas show what they are worth as savings, using the 4% rule: a $20,000 yearly pension matches roughly $500,000 in savings.','Social Security appears from the age you start collecting it. A fixed pension shrinks in today\'s dollars once payments begin, because inflation erodes each check. These areas have no value to heirs: they stop when you do. Hover the chart to see the total in your accounts, before any tax still owed on Trad. 401k and IRA money.']},
+  grossSpend:{t:'Spending before taxes', b:['The yearly income, before income tax, that would leave you the spending above once federal and state income tax are paid. It is there to compare with a salary or a Social Security statement.','Payroll taxes are not included: Social Security and Medicare tax stop when you stop working, so the comparison with a working salary is not one for one.','The plan itself does not use this figure. It works out the tax on what you actually withdraw each year, which is usually less, because some of it is already-taxed money.']},
   engine:{t:'Two ways to test your plan', b:[`<b style="display:inline;font:inherit;font-weight:600">Monte Carlo Statistical Projections</b> runs your plan through ${N_PATHS.toLocaleString()} imagined futures. Each year\'s stock, bond and inflation numbers are drawn at random from the averages and spreads in the assumptions list. This explores a wide range of possibilities, including futures worse or better than anything seen before, but it is only as good as those assumptions.`,`<b style="display:inline;font:inherit;font-weight:600">Historical Backtests</b> runs your plan through what actually happened. It pretends you start today at your current age in ${HIST_FIRST}, then in ${HIST_FIRST+1}, and so on, replaying real US markets year by year in order. It answers: would this plan have survived the Great Depression, the 1970s, and every other stretch on record?`,'History is a limited record: about 150 years, only a handful of truly separate bad stretches, and only for the US, one of the best-performing markets of the period. The two methods check each other. When they disagree, the Monte Carlo assumptions are usually the more cautious of the two.', ()=>`Right now the projections draw ${N_PATHS.toLocaleString()} futures, with stocks growing about ${retPctS(stockMeanOf(S, level))} a year over the long run. The backtests replay every complete start year since ${HIST_FIRST}.`]},
   panel_history:{t:'Backtest your scenario against history', b:['It usually lasts in more start years than the projection does in simulated futures, because the projection assumes somewhat lower stock returns than the past delivered.','Your plan, with the same taxes, income, accounts and life events, replayed through real US stock, bond and inflation history. Each line is one start year: the year you would be your current age.','Of every complete start year since 1871, the chart shows ten, spread evenly from the worst ending to the best. Red lines ran short. The rest shade from gold to green as the ending rises.','Tap a line or a year to switch to Historical Backtests and follow that start year in the market returns and assets charts. Neighbouring start years share most of their markets, so bad outcomes cluster around a few hard stretches, such as the 1900s, the late 1920s and the mid-1960s.']},
   a_hist:{t:'Historical market data', b:[`Annual US returns from January ${HIST_FIRST} to January ${HIST_LAST+1}. Everything to 2022 comes from Robert Shiller\'s public dataset; his file stops there, so the last three years are built from the S&P 500 total return index, the 10-year Treasury and the consumer price index instead. Stocks are the S&P composite index with dividends reinvested. Bonds are a 10-year US Treasury bought each January at the prevailing yield and sold a year later. Inflation is the consumer price index.`,'Shiller\'s data uses monthly average prices, which smooths some returns slightly compared with exact year-end prices.'], src:['Robert Shiller, online data','http://www.econ.yale.edu/~shiller/data.htm']},
@@ -4521,7 +4521,7 @@ const HELP = {
     'Rules that take a share of the portfolio cannot run it dry, so the share of futures that last is not a useful test of them. This is the test instead: in the worst one future in ten, what did the average year look like?',
     'Compare it with the income you asked for. A rule that never fails while paying you half of what you needed has not solved your problem, it has renamed it.']},
   spendRule:{t:'Spending rule', b:['Steady means you spend the same inflation-adjusted amount every year, whatever markets do. It is simple, and it is the rule behind the success percentages most calculators show.','Guardrails means you adjust. Each year the model compares your withdrawal to your savings. If that rate climbs 20% above where it started, you cut spending by 10%. If it falls 20% below, you give yourself a 10% raise. Cuts stop at 70% of your plan and raises stop at 150%.','Guardrails make running out much less likely, but you pay for that in lean years. The Spending cuts box shows how often and how deep.']},
-  spendDecl:{t:'Spending eases after 75', b:['Research on actual retirees finds spending usually drifts down in later years, even after inflation, as travel and activity slow. Health costs rise, but less than other spending falls.','A common finding is a drop of about 1 to 2% a year. Leave this at 0 to keep spending steady, the cautious choice.']},
+  spendDecl:{t:'Spending eases after 75', b:['A yearly drop, after inflation: 2% means each year\'s spending is 2% smaller in today\'s dollars than the year before, from age 75 on.','Research on actual retirees finds spending usually drifts down in later years, even after inflation, as travel and activity slow. Health costs rise, but less than other spending falls.','A common finding is a drop of about 1 to 2% a year. Leave this at 0 to keep spending steady, the cautious choice.']},
   guardStat:{t:'Spending cuts', b:['How many futures needed at least one guardrail cut, and how low spending went in the unlucky case (1 in 10), as a share of your planned spending.','A high success rate with frequent deep cuts means the plan survives by living on less. Decide whether you could live with that.']},
   baseline:{t:'Compare to a baseline', b:['Save the current plan as a baseline, then change anything: retire later, save more, move money around. The baseline stays put, so you see exactly what each change buys you.','The dashed gold line on the total savings chart is the baseline\'s typical future.','The baseline is kept on this device with the rest of your settings. It is not included in scenario codes.']},
   panel_stress:{t:'Stress tests', b:['Each test gives you ordinary, average markets until the year you retire, then replays one of history\'s worst stretches starting that very year. That isolates the sequence-of-returns risk: bad years right after you stop working do the most damage.','Where the historical record runs out (it ends in '+HIST_LAST+'), the remaining years use average returns again.','The dashed line is your typical Monte Carlo future, for comparison. Stress tests use the same taxes, income, accounts and events as the rest of your plan.','History supplies the bad starts free of charge: 1929, 1937, 1966, 1973, 2000, 2008. Nobody who retired into one of them knew at the time which one they had drawn.']},
@@ -4621,7 +4621,7 @@ const HELP = {
       ? (+S.fee>0 ? `${+(+S.fee).toFixed(2)}% a year comes off your savings, as set under Yearly fees.` : "None are deducted: Yearly fees is set to 0%, which fits low-cost index funds with no adviser. Set it there if you pay more.")
       : "Returns are before any fees. Level 2 has a Yearly fees setting for fund costs, plan fees and an adviser.",
     "For scale, on the example plans a fee of 1% a year lowers the share of futures that last by roughly 10 to 20 points."]},
-  fee:{t:"Yearly fees", b:[
+  fee:{t:'Yearly advisory fees', b:['An adviser\'s fee, and it can also include fund expense ratios and any other investment fees: 401(k) plan fees, wrap fees, platform charges.',
     "Everything you pay each year as a share of your savings, added together: fund expense ratios, any 401(k) plan fees, and an adviser's fee. It comes off your invested accounts every year; cash is left alone.",
     "To blend them: an adviser charging 1% on 80% of your savings, with funds costing 0.1%, comes to about 0.9%. Most statements show each of these. Low-cost index funds with no adviser are typically 0.05 to 0.2%.",
     "A flat yearly fee, such as a planner on a retainer, is not a percentage: add it to your yearly spending instead.",
@@ -4644,6 +4644,7 @@ function assumptionRows(){
     ['a_rho','Stock and bond correlation',MKT.rho.toFixed(2)],
     ['a_cash','Cash returns',`${pctS(MKT.cMean)} avg`],
     ['a_infl','Inflation variation',level===1?`${pctS(MKT.inflVol)} spread`:`${pctS(inflAvg)} avg, ${pctS(MKT.inflVol)} spread`]]),
+    ...(level<2 ? [['stocks','Stocks in your mix',`${Math.round(S.stocks)}%, the rest bonds; set at Level 2`]] : []),
     ['a_rebal','Rebalancing','Yearly, fixed mix'],
     ['a_timing','Time steps','Yearly'],
     ['a_order','Withdrawal order',level>=3?'Cash, brokerage, Trad. 401k and IRA, Roth':'Single pot'],
@@ -4655,7 +4656,7 @@ function assumptionRows(){
     ...(level>=5 ? [['a_rmd','Required minimum distributions', S.rmd==='off' ? 'Not modeled'
         : `From age ${rmdStartAge(CUR_YEAR-Math.round(S.age))}`],
       ['a_surv','Survivor years', S.surv==='on' && S.filing!=='single'
-        ? `One spouse dies at ${Math.round(S.survAge)}` : 'Not modeled'],
+        ? `One spouse dies at age ${Math.round(S.survAge)}` : 'Not modeled'],
       ['a_irmaa','Medicare surcharges', S.irmaa==='off' ? 'Not modeled' : 'From 65, on income two years earlier'],
       ['a_seq','Withdrawal order', {std:'Cash, brokerage, Trad. 401k and IRA, Roth', tdf:'Trad. 401k and IRA first', prop:'Proportional'}[S.seq||'std']],
       ['a_conv','Roth conversions', S.rothConv==='off' ? 'None'
