@@ -170,6 +170,17 @@ footer .cmplink{margin-left:6px}
 @media (max-width:900px){.main{grid-template-columns:1fr}}
 aside.inputs{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 16px 16px;position:sticky;top:calc(12px + env(safe-area-inset-top,0px));max-height:calc(100vh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow:auto}
 @media (max-width:900px){aside.inputs{position:static;max-height:none}}
+/* On a phone the inputs used to stack above the results, so the verdict sat 2.4 screens down and no edit
+   visibly did anything. The verdict, headline figures and baseline now come first, then the questions,
+   then the charts (design review #8, 28 Sept 2026). */
+@media (max-width:900px){
+  .main{display:flex;flex-direction:column;gap:0}
+  .main > section{display:contents}
+  .main > section > *{order:6}
+  .main .verdict{order:1} .main .stats{order:2} .main .basebar{order:3}
+  .main aside.inputs{order:4;margin:4px 0 22px}
+  .main .bar{order:5}
+}
 .grp{padding:12px 0 4px;border-bottom:1px solid var(--line)}
 .grp:last-of-type{border-bottom:0}
 .grp > summary{cursor:pointer;border-radius:6px;margin-bottom:6px}
@@ -498,7 +509,7 @@ footer{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:80ch}
       </div>
       <div class="grid" id="grid"></div>
       
-      <div class="assump"><h2>Assumptions behind these results</h2><p>These are fixed in the free levels. Tap any question mark for how each one works and why it matters.</p><ul class="alist" id="alist"></ul></div>
+      <div class="assump"><h2>Assumptions behind these results</h2><p>Tap any question mark for how each one works and why it matters.</p><ul class="alist" id="alist"></ul></div>
       <footer id="footer"></footer>
   <dialog id="ssdlg" class="xdlg" aria-label="Social Security estimator"></dialog>
   <dialog id="buddlg" class="xdlg" aria-label="Retirement budget planner"></dialog>
@@ -511,11 +522,11 @@ footer{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:80ch}
         <tbody>
           <tr><th scope="row">Real federal tax brackets</th><td data-l="Typical free calculator">Rarely; usually a flat rate</td><td data-l="Paid planners">Yes</td><td data-l="Retirement.diy" class="us">Yes, free</td></tr>
           <tr><th scope="row">History back to 1871 and stress tests</th><td data-l="Typical free calculator">Some</td><td data-l="Paid planners">Some</td><td data-l="Retirement.diy" class="us">Yes, free</td></tr>
-          <tr><th scope="row">&ldquo;How much can I safely spend?&rdquo;</th><td data-l="Typical free calculator">Rarely</td><td data-l="Paid planners">Some, on paid tiers</td><td data-l="Retirement.diy" class="us">Yes, free, on the first screen</td></tr>
+          <tr><th scope="row">&ldquo;How much can I spend each year?&rdquo;</th><td data-l="Typical free calculator">Rarely</td><td data-l="Paid planners">Some, on paid tiers</td><td data-l="Retirement.diy" class="us">Yes, free, on the first screen</td></tr>
           <tr><th scope="row">Assumptions, explanations and raw numbers</th><td data-l="Typical free calculator">Varies; some publish their math</td><td data-l="Paid planners">Help articles; reports often on paid tiers</td><td data-l="Retirement.diy" class="us">Explained beside every input and result; every number exports free to a spreadsheet</td></tr>
           <tr><th scope="row">Account, password or email</th><td data-l="Typical free calculator">Usually none</td><td data-l="Paid planners">Required</td><td data-l="Retirement.diy" class="us">None, ever</td></tr>
           <tr><th scope="row">Tracking, ads or referrals</th><td data-l="Typical free calculator">Often</td><td data-l="Paid planners">Varies</td><td data-l="Retirement.diy" class="us">None</td></tr>
-          <tr><th scope="row">Price</th><td data-l="Typical free calculator">Free</td><td data-l="Paid planners">About $110&ndash;150 a year</td><td data-l="Retirement.diy" class="us">Free, all of it. Donations welcome, never required</td></tr>
+          <tr><th scope="row">Price</th><td data-l="Typical free calculator">Free</td><td data-l="Paid planners">About $110&ndash;150 a year</td><td data-l="Retirement.diy" class="us">Free, all of it</td></tr>
         </tbody>
       </table>
       <p class="cmpnote">Describes typical tools in each category as of September 2026. Features vary by product and change often. The assumptions behind the numbers, and what they have been checked against, are in <button type="button" class="cmplink" id="openMethod2">How this works</button>.</p>
@@ -594,7 +605,7 @@ footer{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:80ch}
       <p>This page is the summary. There is a companion page that writes out every calculation the engine performs &mdash; the return draws, the bond pricing, the tax arithmetic including the fixed point that solves for withdrawing enough to cover its own tax, the withdrawal orders, conversions, surcharges, and how paths become percentages &mdash; in enough detail to check it or rebuild it. It marks the places the implementation departs from the textbook, and there are several. <a class="cmplink" href="maths.html" target="_blank" rel="noopener">The arithmetic, in full</a></p>
       <h3 class="tmh">What it costs</h3>
       <p>Nothing, and there is nothing to buy. Every level is open, there is no account to make, no email to hand over, and nothing on this page is tracking you or being sold to anybody. It is a side project rather than a business, and the honest reason everything is free is that charging for it would mean building a payment system instead of improving the model.</p>
-      <p>If it turned out to be worth something to you, there is somewhere to chip in. It changes nothing about what you get: there is no version of this page held back for people who pay. <span id="methodDonate"></span></p>
+      <p hidden><span id="methodDonate"></span></p>
       <h3 class="tmh">Sources</h3>
       <p class="cmpnote">Robert Shiller, online data, Yale University, for everything to 2022. The Federal Reserve Bank of St Louis (FRED) series GS10 and CPIAUCNS, and the S&amp;P 500 total return index, for 2023 onwards. IRS Revenue Procedure 2025-32 and Publication 590-B. Social Security Administration, retirement benefits and the provisional-income rules. Medicare.gov, Medicare costs. Cooley, Hubbard and Walz, &ldquo;Retirement Savings: Choosing a Withdrawal Rate That Is Sustainable&rdquo;, AAII Journal, 1998. FI Calc, ficalc.app, consulted September 2026. Named rather than linked, so that reading the method does not mean leaving the page.</p>
     </div>
@@ -623,7 +634,7 @@ footer{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:80ch}
       <p>To the fullest extent permitted by law, the owner is not liable for any loss or damage arising from your use of this site or anything you do or do not do as a result of it, including lost savings, lost income, lost opportunity or tax owed. If any liability cannot be excluded, it is limited to the amount you paid to use the site, which at present is nothing.</p>
 
       <h3 class="tmh">Your data</h3>
-      <p>Every calculation runs in your browser. Nothing you enter is sent anywhere, and there is no account, no login and no analytics. Your figures are kept in your browser storage on this device so the page remembers them; clearing your browser data removes them, and nobody else can read them.</p>
+      <p>Every calculation runs in your browser. Nothing you enter is sent anywhere, and there is no account, no login and no analytics. Your figures are kept in your browser storage on this device so the page remembers them; clearing your browser data removes them. They never leave the device, but anyone using the same browser on it can see them, so on a shared computer press Reset when you finish: it clears everything the page stored, including a saved baseline and your budget.</p>
       <p>A scenario code holds your numbers in a scrambled but unencrypted form. Anyone holding a code can read the plan inside it, so share one only with someone you trust. Exported spreadsheets contain your financial data and go wherever you save them.</p>
       <p>The page makes no requests to anyone once it has loaded. The charting library and the heading font are part of the file itself, so no content network, font service or analytics provider sees that you visited, what you looked at, or for how long. You can check this: open your browser&rsquo;s network tab, or disconnect from the internet and reload. It still works.</p>
       <p>The one exception is the server that sends you the page in the first place, which necessarily sees the request, as it would for any website.</p>
@@ -645,7 +656,7 @@ footer{margin-top:28px;font-size:12.5px;color:var(--muted);max-width:80ch}
 </div>
 
 <script>
-/* ============ MARKET ASSUMPTIONS (fixed in free levels, except the Level 2 stock-return preset) ============ */
+/* ============ MARKET ASSUMPTIONS (fixed, except the Level 2 stock-return preset and yearly fees) ============ */
 const MKT = {sMean:.075, sVol:.17, bMean:.040, bVol:.06, rho:.10, inflVol:.012, cMean:.030, cVol:.010,
   /* What a taxable account hands out each year whether or not anything is sold. divS is the stock
      dividend yield: the S&P 500 pays 1.05% in September 2026 against a 1.61% long-run average, and a
@@ -752,7 +763,7 @@ const N_PATHS = 2000;
    Built from Robert Shiller's monthly S&P composite, dividend, CPI and long-rate series (1871 to 2022). */
 const HIST = [[1871,0.1532,0.0504,0.0152],[1872,0.1094,0.0384,0.0229],[1873,-0.0262,0.0635,-0.044],[1874,0.0451,0.083,-0.0695],[1875,0.0515,0.0854,-0.0573],[1876,-0.1368,0.0561,0.0083],[1877,-0.0168,0.0526,-0.1563],[1878,0.1583,0.0522,-0.1029],[1879,0.4807,0.0571,0.2065],[1880,0.2568,0.0643,-0.0571],[1881,0.0036,0.0431,0.0807],[1882,0.0355,0.0354,-0.0187],[1883,-0.0524,0.0371,-0.0761],[1884,-0.1199,0.0438,-0.1029],[1885,0.2906,0.0467,-0.035],[1886,0.1171,0.0223,0.0],[1887,-0.006,0.0239,0.0476],[1888,0.0319,0.0535,-0.0454],[1889,0.0696,0.0368,-0.0476],[1890,-0.0595,0.0191,0.025],[1891,0.1839,0.0377,-0.0603],[1892,0.06,0.0247,0.0778],[1893,-0.1862,0.0413,-0.1329],[1894,0.0367,0.0553,-0.0409],[1895,0.0516,0.024,0.0137],[1896,0.0315,0.0513,-0.0285],[1897,0.1991,0.0378,0.0294],[1898,0.285,0.0529,0.015],[1899,0.0371,0.0271,0.1686],[1900,0.2014,0.0354,-0.0241],[1901,0.1925,0.0248,0.0246],[1902,0.0819,0.0226,0.0962],[1903,-0.1701,0.0254,-0.0439],[1904,0.3111,0.0279,0.0229],[1905,0.2089,0.0386,0.0],[1906,0.0059,0.0162,0.0449],[1907,-0.2394,0.0217,-0.0215],[1908,0.3837,0.047,0.0323],[1909,0.1591,0.0264,0.1074],[1910,-0.0351,0.0339,-0.0677],[1911,0.0345,0.0376,-0.0108],[1912,0.0719,0.008,0.0734],[1913,-0.0484,0.0659,0.0204],[1914,-0.0529,0.0357,0.01],[1915,0.3042,0.0565,0.0297],[1916,0.0794,0.0273,0.125],[1917,-0.1807,0.0177,0.1966],[1918,0.1755,0.0508,0.1786],[1919,0.1947,0.0115,0.1697],[1920,-0.136,0.0412,-0.0155],[1921,0.0946,0.1088,-0.1105],[1922,0.2859,0.0386,-0.0059],[1923,0.0507,0.0658,0.0298],[1924,0.2594,0.0556,0.0],[1925,0.2502,0.0522,0.0347],[1926,0.1106,0.0629,-0.0223],[1927,0.3629,0.0342,-0.0114],[1928,0.4645,0.0129,-0.0116],[1929,-0.0899,0.0598,0.0],[1930,-0.219,0.0291,-0.0702],[1931,-0.4247,0.0077,-0.1006],[1932,-0.0679,0.0652,-0.0979],[1933,0.5525,0.0478,0.0233],[1934,-0.0792,0.0571,0.0303],[1935,0.5344,0.039,0.0147],[1936,0.3201,0.0241,0.0217],[1937,-0.3125,0.0363,0.0071],[1938,0.1668,0.0416,-0.0141],[1939,0.0279,0.0357,-0.0071],[1940,-0.0894,0.0434,0.0144],[1941,-0.088,-0.0212,0.1135],[1942,0.2027,0.0238,0.0764],[1943,0.2335,0.0239,0.0296],[1944,0.1916,0.0336,0.023],[1945,0.3842,0.0383,0.0225],[1946,-0.1179,0.0171,0.1813],[1947,0.0254,0.0073,0.1023],[1948,0.0942,0.0349,0.0127],[1949,0.1659,0.0223,-0.0208],[1950,0.3315,0.0033,0.0809],[1951,0.2116,0.017,0.0433],[1952,0.1415,0.015,0.0038],[1953,0.0268,0.0562,0.0113],[1954,0.4562,0.0145,-0.0074],[1955,0.2848,0.0034,0.0037],[1956,0.0691,-0.0137,0.0299],[1957,-0.0564,0.0633,0.0362],[1958,0.3951,-0.0382,0.014],[1959,0.0756,-0.0102,0.0103],[1960,0.0625,0.1131,0.0171],[1961,0.1894,0.0206,0.0067],[1962,-0.0281,0.0595,0.0133],[1963,0.2088,0.0132,0.0164],[1964,0.1578,0.0402,0.0097],[1965,0.114,0.0115,0.0192],[1966,-0.0647,0.0483,0.0346],[1967,0.1598,-0.0202,0.0365],[1968,0.1048,0.0207,0.044],[1969,-0.0839,-0.0499,0.0618],[1970,0.0703,0.1822,0.0529],[1971,0.1381,0.0822,0.0327],[1972,0.176,0.0255,0.0365],[1973,-0.1609,0.0301,0.0939],[1974,-0.2085,0.0374,0.118],[1975,0.3857,0.0598,0.0672],[1976,0.111,0.1116,0.0522],[1977,-0.0884,0.0252,0.0684],[1978,0.1593,0.0115,0.0928],[1979,0.1661,-0.0039,0.1391],[1980,0.2529,0.0157,0.1183],[1981,-0.0698,0.0279,0.0839],[1982,0.2881,0.3795,0.0371],[1983,0.2014,0.0393,0.0419],[1984,0.0752,0.1325,0.0353],[1985,0.2585,0.2441,0.0389],[1986,0.3094,0.2289,0.0146],[1987,-0.0206,-0.0258,0.0405],[1988,0.1763,0.0616,0.0467],[1989,0.2277,0.1454,0.052],[1990,-0.0083,0.0896,0.0565],[1991,0.3157,0.1499,0.026],[1992,0.0757,0.0988,0.0326],[1993,0.1155,0.1244,0.0252],[1994,0.0108,-0.0705,0.028],[1995,0.3495,0.2249,0.0273],[1996,0.2705,-0.0052,0.0304],[1997,0.2771,0.138,0.0157],[1998,0.3128,0.1144,0.0167],[1999,0.1548,-0.081,0.0274],[2000,-0.0515,0.1725,0.0373],[2001,-0.1345,0.0601,0.0114],[2002,-0.2004,0.1238,0.026],[2003,0.2826,0.0331,0.0193],[2004,0.0596,0.0363,0.0297],[2005,0.1001,0.0276,0.0399],[2006,0.1322,0.0198,0.0208],[2007,-0.0134,0.1243,0.0428],[2008,-0.3515,0.1346,0.0003],[2009,0.3273,-0.0659,0.0263],[2010,0.1613,0.0633,0.0163],[2011,0.0331,0.15,0.0292],[2012,0.1603,0.0246,0.016],[2013,0.2535,-0.0554,0.0158],[2014,0.1335,0.109,-0.0009],[2015,-0.0334,0.0017,0.0137],[2016,0.2091,-0.0063,0.025],[2017,0.2471,0.0124,0.0207],[2018,-0.047,0.0155,0.0155],[2019,0.2788,0.1055,0.0249],[2020,0.1753,0.0756,0.014],[2021,0.2211,-0.0453,0.0748],[2022,-0.1201,-0.1169,0.0641],[2023,0.233,-0.004,0.0309],[2024,0.2618,-0.0006,0.03],[2025,0.1737,0.0772,0.0239]];
 const HIST_FIRST = HIST[0][0], HIST_LAST = HIST[HIST.length-1][0];
-const BUILD = '7a8d908';            // deploy.sh stamps the published copy with the source commit
+const BUILD = '8004079';            // deploy.sh stamps the published copy with the source commit
 let engine = 'mc';           // 'mc' Monte Carlo, 'hist' every historical start year
 let selYear = null;          // historical start year picked on the history chart
 const CUR_YEAR = new Date().getFullYear();
@@ -776,6 +787,9 @@ function sectionOf(d){ return d.sec || firstSectionOf(d.lvl); }
 const INPUTS = [
   {id:'age', lvl:1, label:'Your age now', min:20,max:80,step:1,def:50,fmt:'age'},
   {id:'retAge', lvl:1, label:'Retire at age', min:30,max:80,step:1,def:65,fmt:'age'},
+  // spending third: it moves the verdict more than anything else in The basics, and the verdict's
+  // '$10K less than you planned' refers to it (design review #8, 28 Sept 2026)
+  {id:'spend', lvl:1, label:'Yearly spending in retirement, after tax', hint:"What you actually spend, in today's dollars", extra:'budEst', min:10000,max:400000,step:500,def:62000,fmt:'usd'},
   {id:'savings', lvl:1, only:[1,2], label:'Retirement savings today', min:0,max:9.5e6,step:5000,def:160000,fmt:'usd'},
   {id:'contrib', lvl:1, label:'Added each year until you retire', hint:"In today's dollars", min:0,max:150000,step:1000,def:10000,fmt:'usd'},
   {id:'filing', lvl:1, label:'Tax filing status', type:'select', def:'mfj', options:[['mfj','Married'],['single','Single']]},
@@ -786,7 +800,6 @@ const INPUTS = [
   {id:'ssAmt2', lvl:1, label:"Your spouse's Social Security", hint:"Per year at full retirement age (67), today's dollars", min:0,max:150000,step:500,def:18000,fmt:'usd'},
   {id:'ssAge2', lvl:1, label:'Your spouse claims it at age', hint:'On your age timeline: the model treats you both as the same age', min:62,max:70,step:1,def:67,fmt:'age'},
   {id:'stocks', lvl:1, label:'Stocks in your mix', hint:'The rest is bonds, rebalanced yearly', min:0,max:100,step:5,def:70,fmt:'pct0'},
-  {id:'spend', lvl:1, label:'Yearly spending in retirement, after tax', hint:"What you actually spend, in today's dollars", extra:'budEst', min:10000,max:400000,step:500,def:62000,fmt:'usd'},
 
   {id:'planAge', lvl:2, sec:'uncert', label:'Plan to age', min:80,max:105,step:1,def:95,fmt:'age'},
   {id:'infl', lvl:2, sec:'uncert', label:'Average inflation', hint:'Varies year to year around this', min:0,max:6,step:.1,def:2.5,fmt:'pct'},
@@ -1758,7 +1771,7 @@ function syncDimmed(){
 /* The same order the fields appear in. Filing status moved above Social Security because it
    decides whether that figure is one benefit or two, and being asked for a couple's combined
    benefit before saying you are a couple is the wrong way round. */
-const CUE_ORDER = ['age','retAge','savings','contrib','filing','ssAmt','ssAge','ssAmt2','ssAge2','pension','stocks','spend'];
+const CUE_ORDER = ['age','retAge','spend','savings','contrib','filing','ssAmt','ssAge','ssAmt2','ssAge2','pension','stocks'];
 const CUE_TEXT = 'do this next:';
 // Nothing has been answered yet, so there is no "next" to point at: the first one invites
 // rather than continues. It comes back whenever the run restarts, after a Reset or an example.
@@ -1948,7 +1961,10 @@ function buildInputs(){
     seed=(Math.random()*1e9)|0; save(); run();
   };
   const bs=document.getElementById('baseSet'); if(bs) bs.onclick=setBaseline;
-  document.getElementById('reset').onclick=()=>{ S=Object.assign({},DEF,{events:[],income:[]}); splitDone=false; eventsSeeded=false; seedKey=null; touched={}; if(level>=3) splitSavings(); if(level>=4) seedEvents(); save(); buildInputs(); run(); };
+  // Reset clears everything the page stored about the reader, the saved baseline (a full copy of their
+  // figures) and the budget included: on a shared computer it is how they leave nothing behind (design
+  // review #9, 28 Sept 2026; it used to leave both in place).
+  document.getElementById('reset').onclick=()=>{ S=Object.assign({},DEF,{events:[],income:[]}); splitDone=false; eventsSeeded=false; seedKey=null; touched={}; BASE=null; BUD=null; if(level>=3) splitSavings(); if(level>=4) seedEvents(); save(); buildInputs(); run(); };
   syncGrossNote(); syncRuleNote(); syncSplitNote(); syncDimmed();   // run() may have fired before this panel existed
   tools.querySelector('details').addEventListener('toggle',syncCode);
   document.getElementById('copyCode').onclick=()=>{
@@ -2375,7 +2391,7 @@ function buildCSV(){
   rows.push([]);
   rows.push(['Input','Value']);
   settingsRows().forEach(r=>rows.push(r));
-  if(mode==='mc') rows.push(['Stock returns', `${retPctS(stockMeanOf(S, level))} avg, ${pctS(MKT.sVol)} spread`], ['Bond returns', `${pctS(MKT.bMean)} avg, ${pctS(MKT.bVol)} spread`], ['Cash returns', `${pctS(MKT.cMean)} avg`]);
+  if(mode==='mc') rows.push(['Stock returns', `${retPctS(stockMeanOf(S, level))} a year compounded, ${pctS(MKT.sVol)} spread`], ['Bond returns', `${pctS(MKT.bMean)} a year compounded, ${pctS(MKT.bVol)} spread`], ['Cash returns', `${pctS(MKT.cMean)} avg`]);
   rows.push([]);
 
   // columns, one row per age
@@ -3587,14 +3603,21 @@ function renderEventWarn(res){
   el.textContent = `${how.replace('futures', unit)}, ${what} costs more than your savings can cover once the tax and early-withdrawal penalty on the withdrawal are paid. The model cannot borrow, so in those ${unit} the plan ends there, and nothing is added afterwards, not even your contributions.`;
   el.hidden=false;
 }
-function renderTeaser(mode){
+/* The backtest figure sits one line under the projection, and on the default plan they are 21 points apart
+   (58 against 79). Stated bare, a reader cannot tell which to believe, so the line reconciles them in plain
+   words, with the numbers behind the question mark (design review #5, 28 Sept 2026). */
+function renderTeaser(mode, success){
   const el=document.getElementById('teaser');
   if(level<2 || mode==='hist'){ el.hidden=true; return; }
   const h=histRun();
   if(!h){ el.hidden=true; return; }
   let ok=0; for(let i=0;i<h.nP;i++) if(isNaN(h.dryAge[i])) ok++;
+  const diff = ok/h.nP - (success ?? ok/h.nP);
+  const lead = diff >= .05 ? 'History was kinder' : diff <= -.05 ? 'History was harsher' : 'History agrees';
+  const why = diff >= .05 ? ' The projection assumes somewhat lower stock returns than the past.'
+            : diff <= -.05 ? ' The projection assumes somewhat better conditions than the past had.' : '';
   el.hidden=false;
-  el.innerHTML=`Across real US markets since ${HIST_FIRST}, this plan would have lasted in <b>${ok} of ${h.nP}</b> start years.${q('teaser')}`;
+  el.innerHTML=`${lead}: in real US markets since ${HIST_FIRST}, this plan would have lasted in <b>${ok} of ${h.nP}</b> start years.${why}${q('teaser')}`;
 }
 function drawHistory(res0, real){
   const h = res0.mode==='hist' ? res0 : histRun();
@@ -3975,7 +3998,7 @@ function run(){
     : mode==='hist'
     ? `In ${Math.round(success*res.nP)} of ${res.nP} historical start years, your money lasts to age ${res.H}.`
     : `In ${pctTxt} of 100 simulated futures, your money lasts to age ${res.H}.`;
-  renderTeaser(mode);
+  renderTeaser(mode, success);
   renderEventWarn(res);
   const st=document.getElementById('state');
   const keep = spendStats && spendStats.target>0 ? spendStats.p10/spendStats.target : 1;
@@ -4043,7 +4066,7 @@ function run(){
   renderBase();
   document.getElementById('barnote').textContent = mode==='hist'
     ? `${res.nP} historical start years, ${res.startYear[0]} to ${res.startYear[res.nP-1]}, shown in ${dl}.`
-    : `${res.nP.toLocaleString()} simulated futures, shown in ${dl}.`;
+    : `${res.nP.toLocaleString()} simulated futures, with stocks growing about ${retPctS(stockMeanOf(S, level))} a year over the long run, shown in ${dl}.`;
 
   PANELS.filter(p=>p.lvl<=level).forEach(p=>{
     if(p.id==='bequest'){ drawBequest(res, real); return; }
@@ -4112,7 +4135,7 @@ const HELP = {
   stocks:{t:'Stocks in your mix', b:['The share of your investments held in stocks. The rest is bonds.','The mix is rebalanced back to this split every year. More stocks raise the average return and widen the range between good and bad futures.']},
   // Level 2
   planAge:{t:'Plan to age', b:['How long the money needs to last. A future counts as a success only if spending is fully covered in every year until you reach this age: the plan runs up to that birthday.','Level 1 uses 95. Planning past your expected lifespan protects against living longer than average.']},
-  infl:{t:'Average inflation', b:['The average yearly rise in prices. Each simulated year draws its own rate around this average, with a spread of 1.2 points, so some futures see long stretches of high inflation.','Spending, contributions and income all grow with that future’s inflation. Level 1 uses 2.5%.','For scale: prices roughly tripled between 1966 and 1982. An average cannot show you what that felt like year by year, which is what the backtests are for.']},
+  infl:{t:'Average inflation', b:['The average yearly rise in prices. Each simulated year draws its own rate around this average, with a spread of 1.2 points, and each year is drawn afresh, so a projected future rarely has the long runs of high inflation history has had. For those, see the 1966 and 1973 stress tests and the backtests.','Spending, contributions and income all grow with that future’s inflation. Level 1 uses 2.5%.','Investment returns do not rise with it: they are set by the stock-return choice above. So a higher figure here also means lower returns after inflation, which is why it moves the answer so much.','For scale: prices roughly tripled between 1966 and 1982. An average cannot show you what that felt like year by year, which is what the backtests are for.']},
   ssAmt:{t:'Your Social Security', b:['Your own yearly benefit at full retirement age, in today\'s dollars: 67 if you were born in 1960 or later, a little under 67 before that. It is the figure your statement leads with. The model then applies the claiming age you choose below: about 30% less at 62, about 24% more at 70. It rises with inflation, matching Social Security\'s cost-of-living adjustment, and counts toward your retirement income.','Your statement at ssa.gov/myaccount has the most accurate figure. If you don\'t have it handy, the estimator below builds one from your pay.','If you are married, your spouse\'s benefit has its own box below, with its own claiming age, so one of you can claim early while the other waits.'], src:['SSA, retirement benefits','https://www.ssa.gov/benefits/retirement/planner/taxes.html']},
   ssAmt2:{t:'Your spouse\'s Social Security', b:['Your spouse\'s own yearly benefit at full retirement age, in today\'s dollars; the model applies their claiming age below. Their statement at ssa.gov/myaccount has it; the estimator works for them too, from their pay.','A spouse who earned little can instead receive up to half of the other\'s full-retirement benefit. If that is larger than their own, enter that figure here.','Having separate ages is what makes the common strategy possible: the lower earner claims early, while the higher earner waits to 70, which also raises the cheque the survivor keeps.']},
   ssAge2:{t:'Your spouse claims it at age', b:['The age your spouse claims, on your own age timeline: the model treats you both as the same age. If your spouse is three years younger and plans to claim at 67, enter 70.','The model applies the reduction for claiming early, or the credit for waiting, to the full-retirement-age figure above.']},
@@ -4126,7 +4149,7 @@ const HELP = {
     ()=>`All three keep the same ${pctS(MKT.sVol)} year-to-year spread, so only the average moves and the three stay comparable. Bond, cash and inflation assumptions do not change either.`,
     'No one knows which is right. Try each and see how much your answer depends on the choice: if the verdict holds across all three, it does not rest on this assumption.']},
   // Level 3
-  trad:{t:'Trad. 401k and IRA', b:['Every pre-tax retirement account: a traditional 401(k) or IRA, a 403(b), a 457(b), the federal Thrift Savings Plan, a SEP or SIMPLE IRA. Put them all in this one box. Every dollar withdrawn counts as ordinary income and is taxed through the federal tax brackets, plus your state rate.','Required minimum distributions are not modeled in the free levels. Level 5 adds them.']},
+  trad:{t:'Trad. 401k and IRA', b:['Every pre-tax retirement account: a traditional 401(k) or IRA, a 403(b), a 457(b), the federal Thrift Savings Plan, a SEP or SIMPLE IRA. Put them all in this one box. Every dollar withdrawn counts as ordinary income and is taxed through the federal tax brackets, plus your state rate.','From 73, or 75 if you were born in 1960 or later, the law makes you take a share out every year, the required minimum distribution, and the model does so at every level.']},
   roth:{t:'Roth 401(k) and IRA', b:['Accounts funded with money already taxed. Qualified withdrawals are tax-free.','Because they are spent last, Roth balances often keep growing late in life and pass to heirs tax-free.']},
   brok:{t:'Taxable brokerage', b:['A regular investment account. When you sell, only the gain portion is taxed, at the 0, 15 or 20% long-term capital-gains rates, depending on your other income.','It is invested in the same stock and bond mix as your other accounts.']},
   basis:{t:'Brokerage cost basis', b:['The share of your brokerage balance that is money you put in, rather than growth. That part comes back tax-free when you sell.','As the account grows, the gain share rises. Each sale uses up basis in proportion to how much of the account you sell.']},
@@ -4448,8 +4471,8 @@ function assumptionRows(){
       ['a_hist','Market data',`US history ${HIST_FIRST}–${HIST_LAST}`],
       ['a_histcash','Cash returns','Inflation + 0.5%'],
     ] : [
-    ['a_stocks','Stock returns',`${retPctS(stockMeanOf(S, level))} avg, ${pctS(MKT.sVol)} spread`],
-    ['a_bonds','Bond returns',`${pctS(MKT.bMean)} avg, ${pctS(MKT.bVol)} spread`],
+    ['a_stocks','Stock returns',`${retPctS(stockMeanOf(S, level))} a year, compounded, ${pctS(MKT.sVol)} spread`],
+    ['a_bonds','Bond returns',`${pctS(MKT.bMean)} a year, compounded, ${pctS(MKT.bVol)} spread`],
     ['a_rho','Stock and bond correlation',MKT.rho.toFixed(2)],
     ['a_cash','Cash returns',`${pctS(MKT.cMean)} avg`],
     ['a_infl','Inflation variation',level===1?`${pctS(MKT.inflVol)} spread`:`${pctS(inflAvg)} avg, ${pctS(MKT.inflVol)} spread`]]),
