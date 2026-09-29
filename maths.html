@@ -279,9 +279,18 @@ required distributions. Social Security is two benefits for a married plan, each
 claiming age on the reader's age timeline (the model treats both spouses as the same age), and one for
 a single filer. Plans and codes from before 28 September 2026 held one household figure claimed at one
 age; they load with that figure whole and the spouse's at zero, so their results do not change.</p>
-<div class="fx">s = ( ssAmt·[a &ge; ssAge] + ssAmt<sub>2</sub>·[a &ge; ssAge<sub>2</sub>] ) · f · (survivor share, if widowed)
+<div class="fx">s = ( ssAmt·c(ssAge)·[a &ge; ssAge] + ssAmt<sub>2</sub>·c(ssAge<sub>2</sub>)·[a &ge; ssAge<sub>2</sub>] ) · f · (survivor share, if widowed)
 
-other: for each card, amount·f if it rises with inflation, else the amount as written,
+c(age) = 1 &minus; (5/9% · min(m, 36) + 5/12% · max(0, m &minus; 36))   when claiming m months before full retirement age
+c(age) = 1 + 2/3% · months after it, up to 70</div>
+<p>Each amount is entered at full retirement age, 67 for anyone born in 1960 or later and 66 plus two
+months a year for 1955-59, and <code>c</code> is the law's reduction for claiming early or its credit
+for waiting, whole years assumed: 70% at 62 and 124% at 70 for the 1960 cohort. Until 28 September 2026
+the amount was entered at the claiming age and the age moved only the start date, so claiming early read
+as better; plans and codes from before then are converted on load, keeping the same cheque. A spousal
+benefit claimed early is reduced slightly faster in law (25/36% a month for the first 36 months) than the
+own-benefit schedule used here.</p>
+<div class="fx">other: for each card, amount·f if it rises with inflation, else the amount as written,
        included when startAge &le; a &le; endAge, split into taxable and tax-free</div>
 <p>Their net contribution is the gross less the extra tax they cause:</p>
 <div class="fx">guarNet = s + rmd + other<sub>taxed</sub> + other<sub>free</sub> &minus; (T<sub>base</sub> &minus; T<sub>wage</sub>)</div>
