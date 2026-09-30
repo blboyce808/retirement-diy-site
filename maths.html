@@ -518,9 +518,13 @@ dollars, with failures pushed below all survivors and earlier failures below lat
 <div class="fx">score = endingBalance / f &minus; [failed] · 10⁹ · (200 &minus; failureAge)</div>
 
 <h3>Spending that lasts in 90% of futures</h3>
-<p>The largest spending figure that still succeeds in at least 90% of futures, found by bisection:
-the upper bound doubles until it fails or reaches $5,000,000, then the interval halves for up to 18
-steps or until it is narrower than $1,000, and the result is rounded down to the nearest $1,000.
+<p>The largest whole $1,000 of spending that still succeeds in at least 90% of futures, up to
+$5,000,000. Success can only fall as spending rises, so the search keeps the highest figure known to
+pass and the lowest known to fail, and stops when they are $1,000 apart. It starts from the success
+rate already worked out at the planned spending, steps away from it until the 90% line is crossed,
+then aims each guess at the crossing by interpolating between the two nearest results, bisecting
+instead when an end sits at 0% or 100% or interpolation stalls on one side. The answer is the same
+as a plain bisection would give; it takes about four simulations instead of fifteen.
 Everything else about the plan is held fixed. It is not reported for the portfolio-based spending
 rules, where the question is meaningless because the rule itself decides spending and no amount can
 ever fail.</p>
