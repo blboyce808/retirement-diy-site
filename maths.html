@@ -323,10 +323,15 @@ amount; under the three portfolio-based rules it is discarded and replaced:</p>
   <tr><th>Rule</th><th>Amount spent</th></tr>
   <tr><td>Steady</td><td><code>planned</code></td></tr>
   <tr><td>Guardrails</td><td><code>planned · m</code>, with <var>m</var> adjusted as below</td></tr>
-  <tr><td>Percent of portfolio</td><td><code>W &minus; extra(W) + max(0, guarNet)</code>, <code>W = P·rate</code></td></tr>
-  <tr><td>Divide by years left</td><td><code>W &minus; extra(W) + max(0, guarNet)</code>, <code>W = P/(H&minus;a)</code></td></tr>
-  <tr><td>VPW</td><td><code>W &minus; extra(W) + max(0, guarNet)</code>, <code>W = P·v(a)</code></td></tr>
+  <tr><td>Percent of portfolio</td><td><code>W&prime; &minus; extra(W&prime;) + max(0, guarNet &minus; x)</code>, <code>W = P·rate</code></td></tr>
+  <tr><td>Divide by years left</td><td><code>W&prime; &minus; extra(W&prime;) + max(0, guarNet &minus; x)</code>, <code>W = P/(H&minus;a)</code></td></tr>
+  <tr><td>VPW</td><td><code>W&prime; &minus; extra(W&prime;) + max(0, guarNet &minus; x)</code>, <code>W = P·v(a)</code></td></tr>
 </table>
+<p>A required minimum distribution counts toward the rule's withdrawal. <var>P</var> includes the year's
+RMD, <var>W&prime;</var> = max(0, <var>W</var> &minus; RMD) is all that is drawn on top of it, and
+<var>x</var> is the part of the RMD beyond <var>W</var>, after its own tax, which is reinvested rather than
+spent (zero when the RMD is smaller). Until 29 September 2026 the RMD was added on top of the whole share,
+so from RMD age these rules spent roughly twice what they should.</p>
 <p>For the three portfolio rules <var>W</var> is a withdrawal before tax, as the 4% rule and VPW define
 it, and <code>extra(W)</code> is the income tax and early-withdrawal penalty that drawing <var>W</var>
 in the usual order adds to the year's bill (section 7). The reader lives on what is left. Until 28
