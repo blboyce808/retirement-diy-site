@@ -641,7 +641,7 @@ at all. Writing <code>c</code> for the charitable share of the pre-tax pot and <
 heir's rate:</p>
 <div class="fx">to charity = trad · c</div>
 <div class="fx">tax = trad · (1 &minus; c) · h</div>
-<div class="fx">to heirs = trad · (1 &minus; c) · (1 &minus; h) + roth + brokerage + cash</div>
+<div class="fx">to heirs = trad · (1 &minus; c) · (1 &minus; h) + roth + brokerage + cash + home equity</div>
 <p>And <code>h</code> is worked out rather than chosen. Since 2020 most beneficiaries must empty an
 inherited retirement account within ten years, so what they inherit arrives as a decade of extra
 ordinary income stacked on whatever they already earn. For <code>n</code> people sharing a pot
@@ -686,13 +686,43 @@ titling, probate, state law &mdash; is legal machinery this page does not touch 
 most retirement accounts the beneficiary form overrides the will, and this tool has never seen
 yours.</div>
 
+<h3>The home</h3>
+<p>From Level 3 the reader can enter a home: its value today <code>V</code>, the mortgage still owed today
+<code>M</code> and the years left on it <code>Y</code>. It is counted and never sold. The plan cannot spend it,
+so it changes neither the success rate nor the spending that lasts, and it is kept out of Total savings. At
+index <code>k</code> of a path with cumulative inflation <code>CI<sub>k</sub></code>:</p>
+<div class="fx">equity<sub>k</sub> = max(0, V · CI<sub>k</sub> &minus; M · max(0, 1 &minus; k / Y))</div>
+<p>so the value keeps pace with that path's inflation, flat in today's dollars, and the balance is paid down
+evenly, in dollars, to nothing after <code>Y</code> years (with <code>Y</code> = 0, nothing is owed). A real
+loan pays mostly interest at first, so this flatters equity slightly in the early years. The payments are not
+modelled as a cost: before retirement they come out of the salary, and after it they are taken to be inside
+the yearly spending the reader entered. The note under the mortgage question gives the balance at retirement,
+<code>M · max(0, 1 &minus; (R &minus; A) / Y)</code>, and the payoff age <code>A + Y</code>.</p>
+<p>At death the equity goes to heirs in full: inherited property takes a new cost basis at its value on the day of
+death, so no income tax is owed on the gain, and estate tax is out of scope here as everywhere. It is drawn as its
+own block on Assets by class and its own band on the Level 6 chart, it is included in what heirs receive and in the
+share of futures clearing the reader's target at the plan age, and a future that ran short still leaves it. Home
+prices over long stretches have run a little ahead of inflation nationally and a long way behind it in some places
+and decades; inflation is the neutral assumption.</p>
+<p><b>Selling it</b> is a Level 4 life event, the one whose amount the model works out, once per plan. In its year
+<code>k</code>, priced at the index in force when that year began, like every other event:</p>
+<div class="fx">freed = V · CI<sub>k&minus;1</sub> · (1 &minus; 0.06) &minus; M · max(0, 1 &minus; (k&minus;1) / Y) &minus; N · CI<sub>k&minus;1</sub></div>
+<p>with 6% for agents and closing and <code>N</code> the next home's cost in today's dollars (zero for a renter). A
+positive amount goes into the brokerage as basis, like money coming in; a negative one, a dearer next home, is paid
+for like any other cost that year. From index <code>k</code> the next home is the equity counted, owned outright at
+<code>N · CI</code>. The gain is taken to be inside the exclusion for a main home, $250,000 single and $500,000
+married, so no tax is charged on it; moving costs, and rent for a renter, are the reader's to put in spending. The
+card, the arrow on the charts and the events key show <code>freed</code> in today's dollars at the plan's average
+inflation, an estimate, since each future's prices differ.</p>
+
 <h2 id="notmod">11. What is not modelled</h2>
 <ul>
   <li><strong>Fees beyond one blended rate.</strong> Level 2 takes a single yearly percentage off the
     pre-tax, Roth and brokerage balances after each year's growth (never cash); per-account and tiered
     adviser fees are not separated.</li>
-  <li><strong>Your home.</strong> Its equity, a downsizing or a reverse mortgage counts for nothing
-    unless it is entered as a life event.</li>
+  <li><strong>Borrowing against the home.</strong> A reverse mortgage or a home equity line is not modelled;
+    the home is spent only by selling it (section 10), and tax on a gain beyond the main-home exclusion is not
+    charged.</li>
   <li><strong>A glide path.</strong> The stock share is fixed and rebalanced to it every year.</li>
   <li><strong>Healthcare inflation</strong> running ahead of general inflation, and long-term care.</li>
   <li><strong>ACA premium subsidies</strong> before 65, which can be worth thousands and which
