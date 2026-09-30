@@ -688,7 +688,7 @@ yours.</div>
 
 <h3>The home</h3>
 <p>From Level 3 the reader can enter a home: its value today <code>V</code>, the mortgage still owed today
-<code>M</code> and the years left on it <code>Y</code>. It is counted and never sold. The plan cannot spend it,
+<code>M</code> and the years left on it <code>Y</code>. It is counted, and by default not sold: unless a sale is added (below), the plan cannot spend it,
 so it changes neither the success rate nor the spending that lasts, and it is kept out of Total savings. At
 index <code>k</code> of a path with cumulative inflation <code>CI<sub>k</sub></code>:</p>
 <div class="fx">equity<sub>k</sub> = max(0, V · CI<sub>k</sub> &minus; M · max(0, 1 &minus; k / Y))</div>
