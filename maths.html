@@ -733,6 +733,34 @@ invisible where stocks dominate and widens as bonds take over, which is the obse
 100% / 96.8% / 91.3% / 77.8% at $35,000 / $40,000 / $45,000 / $50,000, against their 100% / 96.8% /
 91.2% / 79.2%. The remaining gap at $50,000 is their default 5% cash sleeve.</p>
 
+<h3>Against Portfolio Visualizer (Monte Carlo)</h3>
+<p>FI Calc checks the backtests only; this checks the projections. Portfolio Visualizer's Monte Carlo
+tool, "Forecasted Returns" model, was given this model's own assumptions converted to the arithmetic
+means and standard deviations it asks for: stocks 9.06% and 18.7% (the moments of a lognormal whose
+log has mean ln 1.075 and spread 0.17), 10-year Treasuries 4.19% and 6.26%, parameterized inflation
+2.5% and 1.2%, annual rebalancing, $1,000,000, 30 years, inflation-adjusted annual withdrawals, pre-tax
+returns. It draws 5,000 futures; ours are 20,000 (ten seeds of 2,000), run with every dollar in a Roth
+and no state tax so no tax is charged. Measured 29 September 2026.</p>
+<table>
+  <tr><th>Spending</th><th class="n">100%: ours</th><th class="n">PV</th><th class="n">ours, end-of-year</th><th class="n">60/40: ours</th><th class="n">PV</th><th class="n">ours, end-of-year</th></tr>
+  <tr><td>$35,000</td><td class="n">87.3</td><td class="n">88.0</td><td class="n">87.5</td><td class="n">92.6</td><td class="n">92.1</td><td class="n">93.0</td></tr>
+  <tr><td>$40,000</td><td class="n">80.6</td><td class="n">79.9</td><td class="n">81.0</td><td class="n">84.8</td><td class="n">85.5</td><td class="n">85.7</td></tr>
+  <tr><td>$45,000</td><td class="n">72.8</td><td class="n">74.0</td><td class="n">74.5</td><td class="n">73.4</td><td class="n">75.4</td><td class="n">76.1</td></tr>
+  <tr><td>$50,000</td><td class="n">64.4</td><td class="n">67.6</td><td class="n">66.9</td><td class="n">60.5</td><td class="n">65.0</td><td class="n">64.4</td></tr>
+</table>
+<p>The gap that grows with spending is withdrawal timing. With both spreads set to 0.01% the tool
+reports a median ending balance of $4,589,365 at $50,000; the recurrence
+B<sub>t+1</sub> = B<sub>t</sub>(1+r) &minus; W(1+i)<sup>t+1</sup>, spending taken after the year's growth
+at that year's end prices, gives $4,589,342, while this model's B<sub>t+1</sub> = (B<sub>t</sub> &minus;
+W(1+i)<sup>t</sup>)(1+r) gives $4,019,793. The "end-of-year" columns come from an independent
+re-implementation of section 2's return model, which reproduces this engine's own figures under its own
+convention and then switches only the timing: all eight land within 1.1 points of Portfolio Visualizer,
+inside the sampling error of 5,000 futures (about 0.6 points). Three smaller differences remain and pull
+against each other: their returns are normal rather than lognormal (a fatter left tail, which is
+harsher), their stocks and bonds are correlated with inflation at the historical &minus;0.08 and
+&minus;0.15 where this model scales nominal returns with inflation, and their stock-bond correlation is
+the historical 0.07 against this model's 0.10.</p>
+
 <h3>The distribution against 155 years of returns</h3>
 <table>
   <tr><th>Statistic</th><th class="n">History</th><th class="n">Lognormal</th></tr>
