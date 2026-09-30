@@ -523,8 +523,11 @@ $5,000,000. Success can only fall as spending rises, so the search keeps the hig
 pass and the lowest known to fail, and stops when they are $1,000 apart. It starts from the success
 rate already worked out at the planned spending, steps away from it until the 90% line is crossed,
 then aims each guess at the crossing by interpolating between the two nearest results, bisecting
-instead when an end sits at 0% or 100% or interpolation stalls on one side. The answer is the same
-as a plain bisection would give; it takes about four simulations instead of fifteen.
+instead when an end sits at 0% or 100% or interpolation stalls on one side. It narrows in on the
+first 150 futures, which are exactly the first 150 of the full run because every future is drawn in
+turn from the same random sequence, then confirms on all 2,000, stepping $1,000 at a time from the
+rough answer until a figure that passes sits next to one that fails. The answer is the same as a
+plain bisection on all 2,000 would give, for the cost of about three full runs instead of fifteen.
 Everything else about the plan is held fixed. It is not reported for the portfolio-based spending
 rules, where the question is meaningless because the rule itself decides spending and no amount can
 ever fail.</p>
