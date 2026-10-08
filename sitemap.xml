@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- lowercase on purpose: search consoles compare these addresses as plain strings (the brand is written retirementDIY.org) -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://retirementDIY.org/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://retirementDIY.org/maths.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retirementdiy.org/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://retirementdiy.org/maths.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
 </urlset>
