@@ -1,0 +1,5 @@
+# retirementDIY.org: everything is public, and nothing here is personal; plans live only in each visitor's browser.
+User-agent: *
+Allow: /
+
+Sitemap: https://retirementDIY.org/sitemap.xml
