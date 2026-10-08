@@ -1,21 +1,24 @@
-# Retirement.diy
+# retirementDIY.org
 
 A Monte Carlo retirement calculator that runs entirely in your browser.
 
-**Live:** https://blboyce808.github.io/retirement-diy-site/
+**Live:** https://retirementDIY.org
 
-> Deep Analysis. Never Shared. Sleep Easier.
+> No login. No fees. Just math.
 
 ## Why the source is here
 
-Every calculation happens on your device. Nothing you type is uploaded, there are no accounts,
-no analytics, no tracking, no ads and no affiliate links. You do not have to take that on trust:
+Every calculation happens on your device. Nothing you type is uploaded, and there are no accounts,
+no cookies, no tracking, no ads and no affiliate links. You do not have to take that on trust:
 this is the whole application, one self-contained HTML file. Read it, or open your browser's
-network tab and watch it ask for nothing.
+network tab and watch what it asks for.
 
-The page makes no outside requests at all. The charting library and the heading font are embedded
-in the file, so nothing is fetched from a CDN, a font service or an analytics provider. Disconnect
-from the internet and reload it: everything still works.
+The page makes one outside request, and only one: an anonymous visit count to GoatCounter, an
+open-source counter. It receives the page's address and title and the site that linked you there,
+never anything you type, and a browser sending Global Privacy Control or Do Not Track is not counted
+at all. Everything else, the charting library and the heading font included, is embedded in the
+file, so nothing is fetched from a CDN or a font service. Disconnect from the internet and reload
+it: everything still works.
 
 ## What it does
 
@@ -24,9 +27,11 @@ from the internet and reload it: everything still works.
   provisional-income rules and long-term capital gains, indexed to each future's inflation
 - Backtests against real US market history from 1871, and stress tests that start your
   retirement in 1929, 1937, 1966, 1973, 2000 or 2008
-- Answers "how much can I safely spend?", not just "will I run out?"
+- Answers "how much could I spend, and how often does it last?", not just "will I run out?"
 - Every input, result and chart has a plain-English explanation behind a question mark
-- Full CSV export of every number behind every chart
+- Checked against the Trinity study, FI Calc and Portfolio Visualizer; the arithmetic is written
+  out in full on a companion page
+- A spreadsheet export of your settings and the year-by-year results
 
 ## Status
 
