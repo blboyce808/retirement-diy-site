@@ -435,6 +435,11 @@ details.share textarea{width:100%;min-height:62px;margin:8px 0 6px;padding:8px;b
 /* A label to the left of a row of buttons, so the row says what it controls before the reader
    presses anything. Fixed width so stacked rows line up; on a phone the row wraps and it sits above. */
 .mctl .mlab{flex:0 0 18.5em;font-size:13px;font-weight:600;color:var(--ink)}
+.actl .mlab{flex-basis:auto;margin-right:6px}
+.actl input[type=range]{flex:0 1 14em;width:auto;min-width:8em;margin:0 4px}
+.actl input[type=range]:disabled{opacity:.45}
+.actl .aend{font-size:12px;color:var(--muted)}
+.asay{margin:0 0 6px;font-size:13px;color:var(--muted)}
 @media (max-width:640px){.mctl .mlab{flex-basis:100%}}
 .yctl{gap:10px;font-size:12.5px}
 .yctl .ytog{display:inline-flex;align-items:center;gap:5px;font-weight:600;cursor:pointer}
@@ -868,7 +873,7 @@ const N_PATHS = 2000;
    Built from Robert Shiller's monthly S&P composite, dividend, CPI and long-rate series (1871 to 2022). */
 const HIST = [[1871,0.1532,0.0504,0.0152],[1872,0.1094,0.0384,0.0229],[1873,-0.0262,0.0635,-0.044],[1874,0.0451,0.083,-0.0695],[1875,0.0515,0.0854,-0.0573],[1876,-0.1368,0.0561,0.0083],[1877,-0.0168,0.0526,-0.1563],[1878,0.1583,0.0522,-0.1029],[1879,0.4807,0.0571,0.2065],[1880,0.2568,0.0643,-0.0571],[1881,0.0036,0.0431,0.0807],[1882,0.0355,0.0354,-0.0187],[1883,-0.0524,0.0371,-0.0761],[1884,-0.1199,0.0438,-0.1029],[1885,0.2906,0.0467,-0.035],[1886,0.1171,0.0223,0.0],[1887,-0.006,0.0239,0.0476],[1888,0.0319,0.0535,-0.0454],[1889,0.0696,0.0368,-0.0476],[1890,-0.0595,0.0191,0.025],[1891,0.1839,0.0377,-0.0603],[1892,0.06,0.0247,0.0778],[1893,-0.1862,0.0413,-0.1329],[1894,0.0367,0.0553,-0.0409],[1895,0.0516,0.024,0.0137],[1896,0.0315,0.0513,-0.0285],[1897,0.1991,0.0378,0.0294],[1898,0.285,0.0529,0.015],[1899,0.0371,0.0271,0.1686],[1900,0.2014,0.0354,-0.0241],[1901,0.1925,0.0248,0.0246],[1902,0.0819,0.0226,0.0962],[1903,-0.1701,0.0254,-0.0439],[1904,0.3111,0.0279,0.0229],[1905,0.2089,0.0386,0.0],[1906,0.0059,0.0162,0.0449],[1907,-0.2394,0.0217,-0.0215],[1908,0.3837,0.047,0.0323],[1909,0.1591,0.0264,0.1074],[1910,-0.0351,0.0339,-0.0677],[1911,0.0345,0.0376,-0.0108],[1912,0.0719,0.008,0.0734],[1913,-0.0484,0.0659,0.0204],[1914,-0.0529,0.0357,0.01],[1915,0.3042,0.0565,0.0297],[1916,0.0794,0.0273,0.125],[1917,-0.1807,0.0177,0.1966],[1918,0.1755,0.0508,0.1786],[1919,0.1947,0.0115,0.1697],[1920,-0.136,0.0412,-0.0155],[1921,0.0946,0.1088,-0.1105],[1922,0.2859,0.0386,-0.0059],[1923,0.0507,0.0658,0.0298],[1924,0.2594,0.0556,0.0],[1925,0.2502,0.0522,0.0347],[1926,0.1106,0.0629,-0.0223],[1927,0.3629,0.0342,-0.0114],[1928,0.4645,0.0129,-0.0116],[1929,-0.0899,0.0598,0.0],[1930,-0.219,0.0291,-0.0702],[1931,-0.4247,0.0077,-0.1006],[1932,-0.0679,0.0652,-0.0979],[1933,0.5525,0.0478,0.0233],[1934,-0.0792,0.0571,0.0303],[1935,0.5344,0.039,0.0147],[1936,0.3201,0.0241,0.0217],[1937,-0.3125,0.0363,0.0071],[1938,0.1668,0.0416,-0.0141],[1939,0.0279,0.0357,-0.0071],[1940,-0.0894,0.0434,0.0144],[1941,-0.088,-0.0212,0.1135],[1942,0.2027,0.0238,0.0764],[1943,0.2335,0.0239,0.0296],[1944,0.1916,0.0336,0.023],[1945,0.3842,0.0383,0.0225],[1946,-0.1179,0.0171,0.1813],[1947,0.0254,0.0073,0.1023],[1948,0.0942,0.0349,0.0127],[1949,0.1659,0.0223,-0.0208],[1950,0.3315,0.0033,0.0809],[1951,0.2116,0.017,0.0433],[1952,0.1415,0.015,0.0038],[1953,0.0268,0.0562,0.0113],[1954,0.4562,0.0145,-0.0074],[1955,0.2848,0.0034,0.0037],[1956,0.0691,-0.0137,0.0299],[1957,-0.0564,0.0633,0.0362],[1958,0.3951,-0.0382,0.014],[1959,0.0756,-0.0102,0.0103],[1960,0.0625,0.1131,0.0171],[1961,0.1894,0.0206,0.0067],[1962,-0.0281,0.0595,0.0133],[1963,0.2088,0.0132,0.0164],[1964,0.1578,0.0402,0.0097],[1965,0.114,0.0115,0.0192],[1966,-0.0647,0.0483,0.0346],[1967,0.1598,-0.0202,0.0365],[1968,0.1048,0.0207,0.044],[1969,-0.0839,-0.0499,0.0618],[1970,0.0703,0.1822,0.0529],[1971,0.1381,0.0822,0.0327],[1972,0.176,0.0255,0.0365],[1973,-0.1609,0.0301,0.0939],[1974,-0.2085,0.0374,0.118],[1975,0.3857,0.0598,0.0672],[1976,0.111,0.1116,0.0522],[1977,-0.0884,0.0252,0.0684],[1978,0.1593,0.0115,0.0928],[1979,0.1661,-0.0039,0.1391],[1980,0.2529,0.0157,0.1183],[1981,-0.0698,0.0279,0.0839],[1982,0.2881,0.3795,0.0371],[1983,0.2014,0.0393,0.0419],[1984,0.0752,0.1325,0.0353],[1985,0.2585,0.2441,0.0389],[1986,0.3094,0.2289,0.0146],[1987,-0.0206,-0.0258,0.0405],[1988,0.1763,0.0616,0.0467],[1989,0.2277,0.1454,0.052],[1990,-0.0083,0.0896,0.0565],[1991,0.3157,0.1499,0.026],[1992,0.0757,0.0988,0.0326],[1993,0.1155,0.1244,0.0252],[1994,0.0108,-0.0705,0.028],[1995,0.3495,0.2249,0.0273],[1996,0.2705,-0.0052,0.0304],[1997,0.2771,0.138,0.0157],[1998,0.3128,0.1144,0.0167],[1999,0.1548,-0.081,0.0274],[2000,-0.0515,0.1725,0.0373],[2001,-0.1345,0.0601,0.0114],[2002,-0.2004,0.1238,0.026],[2003,0.2826,0.0331,0.0193],[2004,0.0596,0.0363,0.0297],[2005,0.1001,0.0276,0.0399],[2006,0.1322,0.0198,0.0208],[2007,-0.0134,0.1243,0.0428],[2008,-0.3515,0.1346,0.0003],[2009,0.3273,-0.0659,0.0263],[2010,0.1613,0.0633,0.0163],[2011,0.0331,0.15,0.0292],[2012,0.1603,0.0246,0.016],[2013,0.2535,-0.0554,0.0158],[2014,0.1335,0.109,-0.0009],[2015,-0.0334,0.0017,0.0137],[2016,0.2091,-0.0063,0.025],[2017,0.2471,0.0124,0.0207],[2018,-0.047,0.0155,0.0155],[2019,0.2788,0.1055,0.0249],[2020,0.1753,0.0756,0.014],[2021,0.2211,-0.0453,0.0748],[2022,-0.1201,-0.1169,0.0641],[2023,0.233,-0.004,0.0309],[2024,0.2618,-0.0006,0.03],[2025,0.1737,0.0772,0.0239]];
 const HIST_FIRST = HIST[0][0], HIST_LAST = HIST[HIST.length-1][0];
-const BUILD = 'c40f5c1';            // deploy.sh stamps the published copy with the source commit
+const BUILD = 'b80e8ce';            // deploy.sh stamps the published copy with the source commit
 /* VISIT COUNT. The one request this page makes to anyone but the server that sent it (owner, 28 Sept 2026):
    an anonymous visit count to GoatCounter, disclosed in the terms. Built here as a plain image request rather
    than loading GoatCounter's count.js, so nothing is fetched from outside and the page still works offline.
@@ -3172,7 +3177,7 @@ function setLevel(k){
 const PANELS = [
   {id:'total', lvl:1, title:'Total savings', color:'--pine', wide:true, desc:''},
   {id:'flow', lvl:2, title:'Annual spending in retirement', color:'--steel', wide:true, desc:'Each year of the median future: what arrives by itself, what you take from savings, and what is left once tax and any early-withdrawal penalty are paid.'},
-  {id:'assets', lvl:1, title:'Assets by class, median outcome', color:'--steel', wide:true, desc:'Each account in the median future, stacked. Hatched areas show guaranteed income as the savings it would take to replace it.'},
+  {id:'assets', lvl:1, title:'Assets by class, median outcome', color:'--steel', wide:true, desc:'Each account in one future, stacked; the slider picks which. Hatched areas show guaranteed income as the savings it would take to replace it.'},
   {id:'acctrange', lvl:3, title:'Assets by class, range of outcomes', color:'--steel', wide:true, desc:''},
   {id:'history', lvl:2, title:'Backtest your scenario against history', color:'--pine', wide:true, paid:true, desc:'Your plan replayed through ten real stretches of US markets since 1871, from the worst outcome to the best. Tap a line or a year to follow it in the charts below.'},
   {id:'stress', lvl:2, title:'Stress tests: retiring into a crash', color:'--ochre', wide:true, desc:'What happens if another Great Depression or Great Recession hits right after you retire. It’s a hair-raising historical example which you can consider here.'},
@@ -3203,7 +3208,7 @@ function buildGrid(){
   const g=document.getElementById('grid'); g.innerHTML='';
   PANELS.filter(p=>p.lvl<=level).forEach(p=>{
     const el=document.createElement('div'); el.className='panel'+(p.wide?' wide':'');
-    el.innerHTML=`<h3><i style="background:var(${p.color})"></i><span id="ttl_${p.id}">${p.title}</span>${q('panel_'+p.id)}</h3>${p.desc?`<p class="desc">${p.desc}</p>`:''}${p.id==='market'?MARKET_CTRL:''}${p.id==='total'?Y_CTRL:''}${p.id==='flow'?FLOW_CTRL:''}${p.id==='tax'?'<p class="taxtot" id="taxTotal"></p>':''}${p.id==='bequest'?BEQ_CTRL+'<p class="rsum" id="beqNote"></p>':''}${p.id==='market'
+    el.innerHTML=`<h3><i style="background:var(${p.color})"></i><span id="ttl_${p.id}">${p.title}</span>${q('panel_'+p.id)}</h3>${p.desc?`<p class="desc">${p.desc}</p>`:''}${p.id==='market'?MARKET_CTRL:''}${p.id==='total'?Y_CTRL:''}${p.id==='flow'?FLOW_CTRL:''}${p.id==='assets'?ASSET_CTRL:''}${p.id==='tax'?'<p class="taxtot" id="taxTotal"></p>':''}${p.id==='bequest'?BEQ_CTRL+'<p class="rsum" id="beqNote"></p>':''}${p.id==='market'
       ? `<div class="stklab">Total savings in this future</div><div class="cv cvtop"><canvas id="cv_mbal" role="img" aria-label="Total savings in the selected future"></canvas></div><div class="stklab">Market return each year</div><div class="cv cvbot"><canvas id="cv_market" role="img" aria-label="Yearly market returns in the selected future"></canvas></div><div class="legend clg" id="lg_market"></div>`
       : `<div class="cv"><canvas id="cv_${p.id}" role="img" aria-label="${p.title} over time"></canvas></div>`}${p.id==='total'?'<div class="legend clg" id="legend"></div><div class="evkey" id="evKey" hidden></div>':''}${p.id==='assets'?'<div class="legend clg" id="lg_assets"></div>':''}${p.id==='bequest'?'<div class="legend clg" id="lg_bequest"></div>':''}${p.id==='flow'?'<div class="legend clg" id="lg_flow"></div>':''}${p.id==='history'?'<div class="hlg" id="lg_history"></div><p class="rsum" id="histnote"></p>':''}${p.id==='stress'?'<div class="scards" id="stressCards"></div>':''}${p.id==='tax'?'<div class="cnotes" id="notes_tax" hidden></div>':''}`;
     // everything under the heading goes in a body that folds; the heading gets a chevron and a headline
@@ -3234,6 +3239,7 @@ function buildGrid(){
   document.querySelectorAll('[data-q="pick"]').forEach(el=>el.outerHTML=q('pick'));
   document.querySelectorAll('[data-q="yaxis"]').forEach(el=>el.outerHTML=q('yaxis'));
   document.querySelectorAll('[data-q="flow_view"]').forEach(el=>el.outerHTML=q('flow_view'));
+  document.querySelectorAll('[data-q="asset_pick"]').forEach(el=>el.outerHTML=q('asset_pick'));
   wireYAxis();
   const lg=document.getElementById('legend');
   const ink=cssVar('--ink');
@@ -3312,6 +3318,28 @@ document.addEventListener('click',e=>{
   flowView=b.dataset.flow; if(lastRun) drawFlow(lastRun.res, lastRun.real);
 });
 
+/* Assets by class follows one future, and the slider picks which (owner, 9 Oct 2026): it starts at the median and
+   steps out to the 25th and 10th percentiles either side, so the reader can see how the mix of accounts differs
+   between a poor future and a good one. Futures are ranked as for One future (rankPaths): by what is left at the
+   plan age, those that ran short lowest, the earliest lowest of all. A view setting: not saved, not in codes, and
+   moving it redraws this one chart and its heading, nothing else. */
+const ASSET_STOPS = [10, 25, 50, 75, 90];
+const ASSET_SAY = {10:'1 in 10 futures end with less', 25:'1 in 4 futures end with less', 50:'half of futures end with less',
+  75:'1 in 4 futures end with more', 90:'1 in 10 futures end with more'};
+let assetStop = 2;
+const assetName = p => p===50 ? 'median' : p+'th percentile';
+const ASSET_CTRL = `<div class="mctl actl"><label class="mlab" for="assetPick">Which future</label>
+  <span class="aend">Worse</span><input type="range" id="assetPick" min="0" max="4" step="1" value="2" list="assetTicks" aria-describedby="assetSay"><span class="aend">Better</span>
+  <datalist id="assetTicks"><option value="0"></option><option value="1"></option><option value="2"></option><option value="3"></option><option value="4"></option></datalist>
+  <span data-q="asset_pick"></span></div><p class="asay" id="assetSay" aria-live="polite"></p>`;
+document.addEventListener('input',e=>{
+  if(!e.target || e.target.id!=='assetPick') return;
+  assetStop = Math.max(0, Math.min(4, Math.round(+e.target.value)));
+  if(!lastRun) return;
+  drawAssets(lastRun.res, lastRun.real);
+  const ph = document.getElementById('ph_assets');
+  if(ph) ph.innerHTML = assetsHead(lastRun.res, lastRun.real, band(lastRun.res, GET.total, lastRun.real));
+});
 let retPick='bad', randIdx=null;
 const MARKET_CTRL = `<div class="mctl"><div class="seg" role="group" aria-label="Which future">
   <button data-pick="bad">Unlucky</button><button data-pick="typ">Typical</button><button data-pick="good">Lucky</button><button data-pick="rand">Another</button></div>
@@ -3978,15 +4006,21 @@ function setSSTotal(v){
   S.ssAmt2 = clampInput('ssAmt2', v - S.ssAmt);
 }
 function hasSS(){ return +S.ssAmt>0 || (S.filing!=='single' && +S.ssAmt2>0); }
+function assetsPath(res){
+  return rankPaths(res)[Math.round(ASSET_STOPS[assetStop]/100*(res.nP-1))];
+}
 function drawAssets(res, real){
-  const idx=rankPaths(res);
-  let i=idx[Math.round(.5*(res.nP-1))];
+  let i=assetsPath(res);
   const followYear = res.mode==='hist' && retPick==='year' && selYear!==null && selYear-res.startYear[0]>=0 && selYear-res.startYear[0]<res.nP;
   if(followYear) i=selYear-res.startYear[0];
   // the start year is when the plan begins at today's age, not the year of retirement unless the two coincide
   const ttl=document.getElementById('ttl_assets'); if(ttl) ttl.textContent = followYear
     ? (res.R>res.A ? `Assets by class, the ${selYear} start (retiring in ${selYear+res.R-res.A})` : `Assets by class, retiring into ${selYear}`)
-    : 'Assets by class, median outcome';
+    : `Assets by class, ${assetName(ASSET_STOPS[assetStop])} outcome`;
+  const ap=document.getElementById('assetPick'), say=document.getElementById('assetSay');
+  if(ap){ ap.value=String(assetStop); ap.disabled=followYear; }
+  if(say){ const p=ASSET_STOPS[assetStop], nm=assetName(p);
+    say.textContent = followYear ? `Showing the ${selYear} start picked on the backtest chart.` : `${nm[0].toUpperCase()+nm.slice(1)}: ${ASSET_SAY[p]}.`; }
   const labels=res.ages, nY=res.nY, A=res.A;
   const scale=k=> real ? 1/res.CI[k][i] : 1;
   const series=[];
@@ -4477,6 +4511,15 @@ function planSubject(){
    headings still learns something, and opens one to see how. It stays when the chart opens, in place of the
    one-line description those charts used to carry (owner: keep the interpretation, drop the sentence); what
    the description said lives in each chart's help. */
+/* The Assets heading: the typical balance on reaching retirement at the median, and once the slider has moved, the
+   balance in the future the chart is drawing, so the heading and the chart agree. */
+function assetsHead(res, real, tb){
+  const A = res.A, R = res.R, k = Math.max(0, R-A), dl = real ? '' : ' (future dollars)', p = ASSET_STOPS[assetStop];
+  const where = level>=3 ? 'across your accounts' : 'in savings';
+  if(p===50) return `${money(tb[50][k])} ${where} on reaching age ${R}${dl}`;
+  const i = assetsPath(res), v = GET.total(res,k,i) / (real ? res.CI[k][i] : 1);
+  return `${money(v)} ${where} on reaching age ${R} in this future${dl}`;
+}
 function renderHeadlines(res, real, tb){
   // answer lines hold figures and help buttons only, never text a reader typed
   // a long answer takes a row of its own under the title rather than squeezing the title onto two lines
@@ -4495,7 +4538,7 @@ function renderHeadlines(res, real, tb){
   }
   // A real balance at both depths. Below Level 3 it used to quote Social Security "valued as savings", which read
   // as money the reader has (design review, backlog 1e-2); that valuation stays in the chart and its help.
-  set('assets', `${money(tb[50][Math.max(0, R-A)])} ${level>=3 ? 'across your accounts' : 'in savings'} on reaching age ${R}${dl}`);
+  set('assets', assetsHead(res, real, tb));
   if(level>=2){
     const h = res.mode==='hist' ? res : histRun();
     if(h){ let ok=0; for(let i=0;i<h.nP;i++) if(isNaN(h.dryAge[i])) ok++; set('history', `Lasted in ${Math.round(ok/h.nP*100)}% of start years since ${HIST_FIRST}`); }
@@ -5149,7 +5192,7 @@ const HELP = {
     'The amount under an arrow is the net for that year, so a year with money both coming in and going out shows the difference. An event that repeats is labelled in its first year only; here it shows its yearly amount and the ages it runs.',
     'Amounts are in today\'s dollars even when the chart shows future dollars, because a single future-dollar figure would only be right in one of the many futures behind the chart.']},
   panel_total:{t:'Total savings', b:['The sum of all your account balances on reaching each age: after the year before it, with that year\'s contributions or withdrawals and investment returns. The first point is today\'s balance.','A future that runs out drops to zero and stays there, which pulls the lower band down late in life.']},
-  panel_assets:{t:'Assets by class, median outcome', b:['This follows one future, the one whose ending wealth is the median of all simulated futures, and stacks each of its accounts year by year. It shows how money moves between account types as you save, retire and draw down.','Unlike the shaded bands elsewhere, these are values from a single future, so they add up.','From Level 3, a home you enter is drawn as its equity: its value, rising with inflation, less what is still owed on the mortgage. It sits above your savings because it is not savings: unless you sell it as a life event at Level 4, the plan does not spend it, so it is left out of the total in the tooltip.']},
+  panel_assets:{t:'Assets by class', b:['This follows one future and stacks each of its accounts year by year. It starts at the median future, the one whose ending wealth sits in the middle of all simulated futures; the slider above the chart picks a poorer or a better one. It shows how money moves between account types as you save, retire and draw down.','Unlike the shaded bands elsewhere, these are values from a single future, so they add up.','From Level 3, a home you enter is drawn as its equity: its value, rising with inflation, less what is still owed on the mortgage. It sits above your savings because it is not savings: unless you sell it as a life event at Level 4, the plan does not spend it, so it is left out of the total in the tooltip.']},
   ev_add:{t:'Ready-made life events', b:['Each adds a card already filled in with a typical amount, in today\'s dollars and after tax. Change anything on the card to match your own plans; nothing here is a suggestion to spend it.','<b style="display:inline;font:inherit;font-weight:600">Child\'s college</b>: $40,000 a year for four years. A year at an in-state public four-year college averages $30,990 all in, and private tuition alone averages $45,000, before room and board; the default leans cautious. Most families pay less than the published price once grants are counted, and pay part of it from income or loans, so enter what you expect to come out of savings.','<b style="display:inline;font:inherit;font-weight:600">Long-term care</b>: $75,000 a year for two years, from age 85. Assisted living has a national median of $74,400 a year; a private room in a nursing home is $129,575, and care at home for about 44 hours a week $80,080. Many people need none, and some need much more.','<b style="display:inline;font:inherit;font-weight:600">Receive inheritance</b>: $150,000 in 2040. Money you expect to be left, not money you leave, which is Level 6.'], src:['College Board, Trends in College Pricing 2025; CareScout Cost of Care Survey 2025','https://research.collegeboard.org/trends/college-pricing/highlights']},
   ev_sale:{t:'Selling your home', b:['In the year you choose, the home is sold at that year\'s price, which is today\'s value raised with inflation. About 6% goes on agents and closing, whatever is still owed on the mortgage is paid off, and the next home is bought. What is left goes into your brokerage account, where it is invested like any other money coming in.','From then on the next home is the one counted, owned outright and rising with inflation. If you will rent instead, leave the next home at zero and make sure your spending includes the rent.','The gain is assumed to fall inside the tax exclusion for a main home, $250,000 of gain for a single filer and $500,000 for a couple, so no tax is charged on it. Moving costs are not included.']},
   ev_next:{t:'Next home costs', b:['What you would pay for the next place, in today\'s dollars: a smaller home, a condo, a share of a retirement community. Zero if you will rent.','If it costs more than the sale frees, the difference comes out of savings that year, like any other cost.']},
@@ -5169,6 +5212,7 @@ const HELP = {
   a_hist:{t:'Historical market data', b:[`Annual US returns from January ${HIST_FIRST} to January ${HIST_LAST+1}. Everything to 2022 comes from Robert Shiller\'s public dataset; his file stops there, so the last three years are built from the S&P 500 total return index, the 10-year Treasury and the consumer price index instead. Stocks are the S&P composite index with dividends reinvested. Bonds are a 10-year US Treasury bought each January at the prevailing yield and sold a year later. Inflation is the consumer price index.`,'Shiller\'s data uses monthly average prices, which smooths some returns slightly compared with exact year-end prices.'], src:['Robert Shiller, online data','http://www.econ.yale.edu/~shiller/data.htm']},
   a_histcash:{t:'Cash in historical mode', b:['The dataset has no short-term interest rate going back to 1871, so cash is assumed to earn inflation plus half a percentage point each year.']},
   panel_market:{t:'One future, year by year', b:['Each simulated future is a sequence of yearly returns for your stock and bond mix. This chart shows the sequence for one future, year by year. Green bars are gains and red bars are losses.','The top chart is your total savings in that same future. The shaded band behind it is the middle half of all futures, and the dashed line is the typical one. The ages line up: at each age the top chart shows the savings on reaching it, as every other savings chart does, and the bar beneath is the return in the year that follows. So a red bar is followed by a drop in savings on the way to the next age.','The dashed line marks retirement. Losses in the first years after it do the most damage, because you are selling investments while prices are down. This is called sequence-of-returns risk.','In today\'s dollars mode, returns are shown after that year\'s inflation.']},
+  asset_pick:{t:'Which future', b:['The futures are ranked by what they leave at your plan age, with the ones that ran out ranked lowest, earliest first. The slider steps through five of them: the 10th and 25th percentiles, the median, and the 75th and 90th.','At the 10th percentile, 1 in 10 futures end with less; at the 90th, 1 in 10 end with more. A poor future often shows the accounts running out in the order they are spent; a good one shows which account keeps growing.','It changes only this chart and its heading. The figures above the charts still describe all the futures together.']},
   pick:{t:'Which future', b:['The futures are ranked by what they leave at your plan age, with the ones that ran out ranked lowest.','Unlucky is the future at the 10th percentile, typical is the median and lucky is the 90th percentile. Another shows a random future each time you press it.','Two futures with the same average return can end very differently if the bad years come early.']},
   panel_flow:{t:'Annual spending in retirement', b:[
     'Only the years from retirement are drawn. Before it your salary pays for living, so the years are hatched rather than drawn as zero; a life event paid from savings in those years shows on the total savings chart, with its arrow.',
