@@ -701,9 +701,9 @@ index <code>k</code> of a path with cumulative inflation <code>CI<sub>k</sub></c
 <div class="fx">equity<sub>k</sub> = max(0, V · CI<sub>k</sub> &minus; M · max(0, 1 &minus; k / Y))</div>
 <p>so the value keeps pace with that path's inflation, flat in today's dollars, and the balance is paid down
 evenly, in dollars, to nothing after <code>Y</code> years (with <code>Y</code> = 0, nothing is owed). A real
-loan pays mostly interest at first, so this flatters equity slightly in the early years. The payments are not
-modelled as a cost: before retirement they come out of the salary, and after it they are taken to be inside
-the yearly spending the reader entered. The note under the mortgage question gives the balance at retirement,
+loan pays mostly interest at first, so this flatters equity slightly in the early years. The payments are a cost
+only if the reader enters them (below, with other loans); otherwise before retirement they come out of the salary,
+and after it they are taken to be inside the yearly spending the reader entered. The note under the mortgage question gives the balance at retirement,
 <code>M · max(0, 1 &minus; (R &minus; A) / Y)</code>, and the payoff age <code>A + Y</code>.</p>
 <p>At death the equity goes to heirs in full: inherited property takes a new cost basis at its value on the day of
 death, so no income tax is owed on the gain, and estate tax is out of scope here as everywhere. It is drawn as its
@@ -721,6 +721,26 @@ for like any other cost that year. From index <code>k</code> the next home is th
 married, so no tax is charged on it; moving costs, and rent for a renter, are the reader's to put in spending. The
 card, the arrow on the charts and the events key show <code>freed</code> in today's dollars at the plan's average
 inflation, an estimate, since each future's prices differ.</p>
+
+<h3>Loans being paid off</h3>
+<p>From Level 3 the reader can enter the monthly mortgage payment <code>P</code> and any other loans, each with a
+monthly payment, a number of years <code>n</code>, an optional start age <code>s</code> (blank for one already running)
+and an optional balance <code>B</code>. Payments are fixed in dollars, never indexed. In year index <code>k</code> a loan
+is due when <code>s &minus; A + 1 &le; k &le; s &minus; A + n</code> (with <code>s = A</code> for a running loan; the
+mortgage runs for its <code>Y</code> years left), at <code>12 &middot; payment</code> that year.</p>
+<ul>
+  <li><b>Before retirement</b> a running loan is taken to be inside today's pay, as it is now, and changes nothing. One
+    that starts later comes out of the year's contribution: <code>max(0, contrib &middot; CI<sub>k&minus;1</sub> &minus;
+    payments)</code>; anything beyond that is the pay's. A loan ending before retirement is not assumed to raise saving.</li>
+  <li><b>From retirement</b> the payments due are added to what the year needs, beside spending, gifts and events, and
+    funded by the same withdrawals and tax. They sit outside the spending rule, so guardrails never cut one; under the
+    percent, 1/N and VPW rules they are paid out of the share instead. They count in the spending chart.</li>
+  <li>A sale of the home pays off the mortgage, so its payments stop in the year of the sale.</li>
+  <li><b>At death</b> a balance still owed, <code>B &middot; max(0, 1 &minus; (k &minus; (s &minus; A)) / n)</code>, is paid
+    from what heirs receive: the accounts first, then the home. The mortgage is already netted in the home's equity.</li>
+</ul>
+<p>No interest rate is asked for: the payment and its term are the whole of the cash going out. Credit card debt is
+not covered, and the model never borrows by itself to cover a shortfall.</p>
 
 <h2 id="notmod">11. What is not modelled</h2>
 <ul>
